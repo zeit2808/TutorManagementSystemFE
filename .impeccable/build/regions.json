@@ -1,0 +1,73 @@
+{
+  "draft": false,
+  "regions": [
+    {"id":"paper-texture","kind":"texture","pixelBox":{"x":1468,"y":326,"w":82,"h":58},"note":"clean cool white ruled paper texture sample"},
+
+    {"id":"brand","kind":"chrome","pixelBox":{"x":62,"y":13,"w":255,"h":46},"note":"book mark and Quản Lý Dạy Thêm wordmark"},
+    {"id":"primary-nav","kind":"chrome","pixelBox":{"x":363,"y":11,"w":292,"h":48},"note":"top navigation links with active underline"},
+    {"id":"top-utilities","kind":"chrome","pixelBox":{"x":1092,"y":12,"w":432,"h":45},"note":"date system health and security utilities"},
+
+    {"id":"hero-annotation","kind":"text","pixelBox":{"x":65,"y":80,"w":178,"h":111},"note":"green handwritten note introducing the continuous teaching day"},
+    {"id":"hero-title","kind":"text","pixelBox":{"x":64,"y":209,"w":535,"h":132},"note":"large navy headline Mọi ca dạy trên cùng một nhịp"},
+    {"id":"hero-copy","kind":"text","pixelBox":{"x":67,"y":368,"w":500,"h":82},"note":"two line explanation of connected center operations"},
+    {"id":"hero-proof","kind":"chrome","pixelBox":{"x":67,"y":469,"w":505,"h":32},"note":"three trust facts with green check icons"},
+
+    {"id":"route-upper","kind":"chrome","pixelBox":{"x":643,"y":0,"w":610,"h":375},"note":"responsive green route path from login to approval","codeDrawn":true},
+    {"id":"route-middle","kind":"chrome","pixelBox":{"x":252,"y":336,"w":922,"h":372},"note":"responsive green route path through permissions and schedule","codeDrawn":true},
+    {"id":"route-lower","kind":"chrome","pixelBox":{"x":691,"y":605,"w":735,"h":355},"note":"responsive green route path through attendance into next section","codeDrawn":true},
+
+    {"id":"login-station","kind":"control","pixelBox":{"x":727,"y":68,"w":500,"h":289},"note":"primary login station panel","container":true},
+    {"id":"login-index","kind":"chrome","pixelBox":{"x":701,"y":45,"w":146,"h":48},"note":"station one badge and 06:30 time tab"},
+    {"id":"login-heading","kind":"text","pixelBox":{"x":788,"y":96,"w":217,"h":27},"note":"Đăng nhập hệ thống station heading","parentId":"login-station"},
+    {"id":"login-subcopy","kind":"text","pixelBox":{"x":789,"y":126,"w":318,"h":21},"note":"short sign in explanation","parentId":"login-station"},
+    {"id":"username-field","kind":"control","pixelBox":{"x":755,"y":160,"w":410,"h":43},"note":"username text input with person icon","parentId":"login-station"},
+    {"id":"password-field","kind":"control","pixelBox":{"x":755,"y":209,"w":410,"h":43},"note":"password input with lock and reveal icons","parentId":"login-station"},
+    {"id":"login-button","kind":"control","pixelBox":{"x":755,"y":260,"w":410,"h":50},"note":"jade primary Đăng nhập action","parentId":"login-station"},
+    {"id":"forgot-link","kind":"text","pixelBox":{"x":1052,"y":316,"w":116,"h":23},"note":"Quên mật khẩu link","parentId":"login-station"},
+
+    {"id":"approval-station","kind":"control","pixelBox":{"x":648,"y":382,"w":398,"h":127},"note":"approved center status station","container":true},
+    {"id":"approval-index","kind":"chrome","pixelBox":{"x":634,"y":339,"w":145,"h":54},"note":"station two badge and 07:00 time tab"},
+    {"id":"approval-icon","kind":"chrome","pixelBox":{"x":662,"y":403,"w":50,"h":54},"note":"green center building pictogram","parentId":"approval-station"},
+    {"id":"approval-heading","kind":"text","pixelBox":{"x":716,"y":398,"w":140,"h":29},"note":"Duyệt trung tâm heading","parentId":"approval-station"},
+    {"id":"approval-status","kind":"control","pixelBox":{"x":867,"y":402,"w":105,"h":25},"note":"Đã phê duyệt status pill","parentId":"approval-station"},
+    {"id":"approval-copy","kind":"text","pixelBox":{"x":716,"y":431,"w":286,"h":50},"note":"approved center readiness copy","parentId":"approval-station"},
+
+    {"id":"permission-station","kind":"control","pixelBox":{"x":1074,"y":479,"w":404,"h":154},"note":"role assignment station panel","container":true},
+    {"id":"permission-index","kind":"chrome","pixelBox":{"x":1094,"y":439,"w":147,"h":57},"note":"station three badge and 07:15 time tab"},
+    {"id":"permission-icon","kind":"chrome","pixelBox":{"x":1085,"y":500,"w":47,"h":51},"note":"apricot role assignment pictogram","parentId":"permission-station"},
+    {"id":"permission-heading","kind":"text","pixelBox":{"x":1143,"y":497,"w":142,"h":28},"note":"Phân quyền station heading","parentId":"permission-station"},
+    {"id":"permission-copy","kind":"text","pixelBox":{"x":1143,"y":529,"w":275,"h":24},"note":"role assignment helper text","parentId":"permission-station"},
+    {"id":"permission-chips","kind":"control","pixelBox":{"x":1088,"y":562,"w":378,"h":52},"note":"four role choice chips","parentId":"permission-station"},
+
+    {"id":"schedule-station","kind":"control","pixelBox":{"x":285,"y":601,"w":486,"h":263},"note":"daily schedule station panel","container":true},
+    {"id":"schedule-index","kind":"chrome","pixelBox":{"x":309,"y":560,"w":148,"h":55},"note":"station four badge and 07:30 time tab"},
+    {"id":"schedule-icon","kind":"chrome","pixelBox":{"x":306,"y":626,"w":54,"h":52},"note":"green calendar pictogram","parentId":"schedule-station"},
+    {"id":"schedule-heading","kind":"text","pixelBox":{"x":371,"y":626,"w":105,"h":29},"note":"Xếp lịch station heading","parentId":"schedule-station"},
+    {"id":"schedule-copy","kind":"text","pixelBox":{"x":371,"y":656,"w":266,"h":23},"note":"schedule helper text","parentId":"schedule-station"},
+    {"id":"schedule-table","kind":"control","pixelBox":{"x":304,"y":695,"w":447,"h":157},"note":"four row teaching timetable with room and teacher","parentId":"schedule-station"},
+
+    {"id":"attendance-station","kind":"control","pixelBox":{"x":826,"y":657,"w":557,"h":241},"note":"attendance summary station panel","container":true},
+    {"id":"attendance-index","kind":"chrome","pixelBox":{"x":847,"y":616,"w":179,"h":57},"note":"station five badge and lesson time tab"},
+    {"id":"attendance-icon","kind":"chrome","pixelBox":{"x":844,"y":681,"w":51,"h":53},"note":"green attendance checkbox pictogram","parentId":"attendance-station"},
+    {"id":"attendance-heading","kind":"text","pixelBox":{"x":914,"y":675,"w":127,"h":30},"note":"Điểm danh station heading","parentId":"attendance-station"},
+    {"id":"attendance-link","kind":"text","pixelBox":{"x":1281,"y":681,"w":94,"h":24},"note":"Xem chi tiết action link","parentId":"attendance-station"},
+    {"id":"attendance-copy","kind":"text","pixelBox":{"x":914,"y":708,"w":280,"h":22},"note":"attendance helper text","parentId":"attendance-station"},
+    {"id":"attendance-class","kind":"control","pixelBox":{"x":844,"y":739,"w":505,"h":45},"note":"active class and room summary row","parentId":"attendance-station"},
+    {"id":"attendance-count","kind":"text","pixelBox":{"x":841,"y":793,"w":151,"h":93},"note":"large 22 of 24 attendance count","parentId":"attendance-station"},
+    {"id":"attendance-chart","kind":"control","pixelBox":{"x":1026,"y":793,"w":111,"h":94},"note":"ninety two percent circular attendance chart","parentId":"attendance-station","codeDrawn":true},
+    {"id":"attendance-exceptions","kind":"control","pixelBox":{"x":1170,"y":786,"w":178,"h":104},"note":"two absent students exception panel","parentId":"attendance-station"},
+
+    {"id":"note-login","kind":"text","pixelBox":{"x":1335,"y":111,"w":193,"h":153},"note":"handwritten login starts operations annotation"},
+    {"id":"note-permission","kind":"text","pixelBox":{"x":1328,"y":411,"w":142,"h":100},"note":"handwritten right people right task annotation"},
+    {"id":"note-schedule","kind":"text","pixelBox":{"x":126,"y":682,"w":152,"h":109},"note":"handwritten schedule clarity annotation"},
+    {"id":"note-attendance","kind":"text","pixelBox":{"x":1380,"y":699,"w":152,"h":111},"note":"handwritten timely support annotation"},
+    {"id":"book-doodle","kind":"chrome","pixelBox":{"x":66,"y":512,"w":166,"h":111},"note":"simple blue open book margin doodle","codeDrawn":true},
+    {"id":"calendar-doodle","kind":"chrome","pixelBox":{"x":199,"y":779,"w":76,"h":98},"note":"simple blue calendar margin doodle","codeDrawn":true},
+
+    {"id":"next-section-ground","kind":"plate","pixelBox":{"x":0,"y":873,"w":1586,"h":119},"note":"soft apricot and jade curved paper transition into the next section","bleed":true},
+    {"id":"next-section-kicker","kind":"text","pixelBox":{"x":65,"y":907,"w":118,"h":19},"note":"Sau bước này section kicker"},
+    {"id":"next-section-title","kind":"text","pixelBox":{"x":64,"y":934,"w":289,"h":40},"note":"Báo cáo và đánh giá next section heading"},
+    {"id":"next-section-note","kind":"text","pixelBox":{"x":1324,"y":914,"w":224,"h":70},"note":"handwritten daily data supports tomorrow note"},
+    {"id":"route-down-control","kind":"control","pixelBox":{"x":770,"y":900,"w":52,"h":53},"note":"circular down arrow continuation control"}
+  ]
+}

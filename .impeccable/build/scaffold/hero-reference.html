@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Scaffold reference: home-comp-route.png</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almendra+Display:wght@400&family=Markazi+Text:wght@700&display=swap">
+  <link rel="stylesheet" href="layout.css">
+  <style>html,body{margin:0}body{background:#f4f6f6}.region{box-sizing:border-box}.region.text p{white-space:pre-wrap}</style>
+</head>
+<body>
+<!-- Reference only. Every region sits at its measured box inside a comp-aspect frame. Take the boxes (layout.css), keep your own semantic structure. -->
+<main class="comp-frame" style="max-width:1586px">
+  <div class="r-paper-texture region texture" data-region="paper-texture" style="background-image:url('../../../assets/plates/paper-texture.png');background-repeat:repeat"></div>
+  <div class="r-brand region chrome" data-region="brand"><!-- book mark and Quản Lý Dạy Thêm wordmark --></div>
+  <div class="r-primary-nav region chrome" data-region="primary-nav"><!-- top navigation links with active underline --></div>
+  <div class="r-top-utilities region chrome" data-region="top-utilities"><!-- date system health and security utilities --></div>
+  <div class="r-hero-annotation region text" data-region="hero-annotation"><!-- green handwritten note introducing the continuous teaching day --><p style="font-size:var(--r-hero-annotation-font);font-family:var(--r-hero-annotation-family),sans-serif;font-weight:var(--r-hero-annotation-weight);line-height:1.05;margin:0">hero-annotation</p></div>
+  <div class="r-hero-title region text" data-region="hero-title"><!-- large navy headline Mọi ca dạy trên cùng một nhịp --><p style="font-size:var(--r-hero-title-font);font-family:var(--r-hero-title-family),sans-serif;font-weight:var(--r-hero-title-weight);line-height:1.05;margin:0">hero-title</p></div>
+  <div class="r-hero-copy region text" data-region="hero-copy"><!-- two line explanation of connected center operations --><p style="font-size:var(--r-hero-copy-font);line-height:1.05;margin:0">hero-copy</p></div>
+  <div class="r-hero-proof region chrome" data-region="hero-proof"><!-- three trust facts with green check icons --></div>
+  <div class="r-route-upper region chrome" data-region="route-upper"><!-- responsive green route path from login to approval --></div>
+  <div class="r-route-middle region chrome" data-region="route-middle"><!-- responsive green route path through permissions and schedule --></div>
+  <div class="r-route-lower region chrome" data-region="route-lower"><!-- responsive green route path through attendance into next section --></div>
+  <div class="r-login-station region control" data-region="login-station"><!-- primary login station panel: match the control's lettering and visible shape to the crop (comp-spec.mjs --crop login-station); a control need not have button chrome --></div>
+  <div class="r-login-index region chrome" data-region="login-index"><!-- station one badge and 06:30 time tab --></div>
+  <div class="r-login-heading region text" data-region="login-heading"><!-- Đăng nhập hệ thống station heading --><p style="font-size:var(--r-login-heading-font);line-height:1.05;margin:0">login-heading</p></div>
+  <div class="r-login-subcopy region text" data-region="login-subcopy"><!-- short sign in explanation --><p style="font-size:var(--r-login-subcopy-font);line-height:1.05;margin:0">login-subcopy</p></div>
+  <div class="r-username-field region control" data-region="username-field"><!-- username text input with person icon: match the control's lettering and visible shape to the crop (comp-spec.mjs --crop username-field); a control need not have button chrome --></div>
+  <div class="r-password-field region control" data-region="password-field"><!-- password input with lock and reveal icons: match the control's lettering and visible shape to the crop (comp-spec.mjs --crop password-field); a control need not have button chrome --></div>
+  <div class="r-login-button region control" data-region="login-button"><!-- jade primary Đăng nhập action: match the control's lettering and visible shape to the crop (comp-spec.mjs --crop login-button); a control need not have button chrome --></div>
+  <div class="r-forgot-link region text" data-region="forgot-link"><!-- Quên mật khẩu link --><p style="font-size:var(--r-forgot-link-font);line-height:1.05;margin:0">forgot-link</p></div>
+  <div class="r-approval-station region control" data-region="approval-station"><!-- approved center status station: match the control's lettering and visible shape to the crop (comp-spec.mjs --crop approval-station); a control need not have button chrome --></div>
+  <div class="r-approval-index region chrome" data-region="approval-index"><!-- station two badge and 07:00 time tab --></div>
+  <div class="r-approval-icon region chrome" data-region="approval-icon"><!-- green center building pictogram --></div>
+  <div class="r-approval-heading region text" data-region="approval-heading"><!-- Duyệt trung tâm heading --><p style="font-size:var(--r-approval-heading-font);line-height:1.05;margin:0">approval-heading</p></div>
+  <div class="r-approval-status region control" data-region="approval-status"><!-- Đã phê duyệt status pill: match the control's lettering and visible shape to the crop (comp-spec.mjs --crop approval-status); a control need not have button chrome --></div>
+  <div class="r-approval-copy region text" data-region="approval-copy"><!-- approved center readiness copy --><p style="font-size:var(--r-approval-copy-font);line-height:1.05;margin:0">approval-copy</p></div>
+  <div class="r-permission-station region control" data-region="permission-station"><!-- role assignment station panel: match the control's lettering and visible shape to the crop (comp-spec.mjs --crop permission-station); a control need not have button chrome --></div>
+  <div class="r-permission-index region chrome" data-region="permission-index"><!-- station three badge and 07:15 time tab --></div>
+  <div class="r-permission-icon region chrome" data-region="permission-icon"><!-- apricot role assignment pictogram --></div>
+  <div class="r-permission-heading region text" data-region="permission-heading"><!-- Phân quyền station heading --><p style="font-size:var(--r-permission-heading-font);line-height:1.05;margin:0">permission-heading</p></div>
+  <div class="r-permission-copy region text" data-region="permission-copy"><!-- role assignment helper text --><p style="font-size:var(--r-permission-copy-font);line-height:1.05;margin:0">permission-copy</p></div>
+  <div class="r-permission-chips region control" data-region="permission-chips"><!-- four role choice chips: match the control's lettering and visible shape to the crop (comp-spec.mjs --crop permission-chips); a control need not have button chrome --></div>
+  <div class="r-schedule-station region control" data-region="schedule-station"><!-- daily schedule station panel: match the control's lettering and visible shape to the crop (comp-spec.mjs --crop schedule-station); a control need not have button chrome --></div>
+  <div class="r-schedule-index region chrome" data-region="schedule-index"><!-- station four badge and 07:30 time tab --></div>
+  <div class="r-schedule-icon region chrome" data-region="schedule-icon"><!-- green calendar pictogram --></div>
+  <div class="r-schedule-heading region text" data-region="schedule-heading"><!-- Xếp lịch station heading --><p style="line-height:1.05;margin:0">schedule-heading</p></div>
+  <div class="r-schedule-copy region text" data-region="schedule-copy"><!-- schedule helper text --><p style="font-size:var(--r-schedule-copy-font);line-height:1.05;margin:0">schedule-copy</p></div>
+  <div class="r-schedule-table region control" data-region="schedule-table"><!-- four row teaching timetable with room and teacher: match the control's lettering and visible shape to the crop (comp-spec.mjs --crop schedule-table); a control need not have button chrome --></div>
+  <div class="r-attendance-station region control" data-region="attendance-station"><!-- attendance summary station panel: match the control's lettering and visible shape to the crop (comp-spec.mjs --crop attendance-station); a control need not have button chrome --></div>
+  <div class="r-attendance-index region chrome" data-region="attendance-index"><!-- station five badge and lesson time tab --></div>
+  <div class="r-attendance-icon region chrome" data-region="attendance-icon"><!-- green attendance checkbox pictogram --></div>
+  <div class="r-attendance-heading region text" data-region="attendance-heading"><!-- Điểm danh station heading --><p style="line-height:1.05;margin:0">attendance-heading</p></div>
+  <div class="r-attendance-link region text" data-region="attendance-link"><!-- Xem chi tiết action link --><p style="line-height:1.05;margin:0">attendance-link</p></div>
+  <div class="r-attendance-copy region text" data-region="attendance-copy"><!-- attendance helper text --><p style="font-size:var(--r-attendance-copy-font);line-height:1.05;margin:0">attendance-copy</p></div>
+  <div class="r-attendance-class region control" data-region="attendance-class"><!-- active class and room summary row: match the control's lettering and visible shape to the crop (comp-spec.mjs --crop attendance-class); a control need not have button chrome --></div>
+  <div class="r-attendance-count region text" data-region="attendance-count"><!-- large 22 of 24 attendance count --><p style="font-size:var(--r-attendance-count-font);line-height:1.05;margin:0">attendance-count</p></div>
+  <div class="r-attendance-chart region control" data-region="attendance-chart"><!-- ninety two percent circular attendance chart: match the control's lettering and visible shape to the crop (comp-spec.mjs --crop attendance-chart); a control need not have button chrome --></div>
+  <div class="r-attendance-exceptions region control" data-region="attendance-exceptions"><!-- two absent students exception panel: match the control's lettering and visible shape to the crop (comp-spec.mjs --crop attendance-exceptions); a control need not have button chrome --></div>
+  <div class="r-note-login region text" data-region="note-login"><!-- handwritten login starts operations annotation --><p style="font-size:var(--r-note-login-font);line-height:1.05;margin:0">note-login</p></div>
+  <div class="r-note-permission region text" data-region="note-permission"><!-- handwritten right people right task annotation --><p style="font-size:var(--r-note-permission-font);line-height:1.05;margin:0">note-permission</p></div>
+  <div class="r-note-schedule region text" data-region="note-schedule"><!-- handwritten schedule clarity annotation --><p style="line-height:1.05;margin:0">note-schedule</p></div>
+  <div class="r-note-attendance region text" data-region="note-attendance"><!-- handwritten timely support annotation --><p style="font-size:var(--r-note-attendance-font);line-height:1.05;margin:0">note-attendance</p></div>
+  <div class="r-book-doodle region chrome" data-region="book-doodle"><!-- simple blue open book margin doodle --></div>
+  <div class="r-calendar-doodle region chrome" data-region="calendar-doodle"><!-- simple blue calendar margin doodle --></div>
+  <figure class="r-next-section-ground region plate" data-region="next-section-ground"><img src="../../../assets/plates/next-section-ground.png" alt="" style="width:100%;height:100%;object-fit:contain;object-position:top left"></figure>
+  <div class="r-next-section-kicker region text" data-region="next-section-kicker"><!-- Sau bước này section kicker --><p style="line-height:1.05;margin:0">next-section-kicker</p></div>
+  <div class="r-next-section-title region text" data-region="next-section-title"><!-- Báo cáo và đánh giá next section heading --><p style="font-size:var(--r-next-section-title-font);line-height:1.05;margin:0">next-section-title</p></div>
+  <div class="r-next-section-note region text" data-region="next-section-note"><!-- handwritten daily data supports tomorrow note --><p style="font-size:var(--r-next-section-note-font);line-height:1.05;margin:0">next-section-note</p></div>
+  <div class="r-route-down-control region control" data-region="route-down-control"><!-- circular down arrow continuation control: match the control's lettering and visible shape to the crop (comp-spec.mjs --crop route-down-control); a control need not have button chrome --></div>
+</main>
+</body>
+</html>

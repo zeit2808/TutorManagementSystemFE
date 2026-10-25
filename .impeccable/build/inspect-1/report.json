@@ -1,0 +1,3917 @@
+{
+  "tool": "comp-spec inspect-map",
+  "version": 1,
+  "referenceOnly": true,
+  "stateChanged": false,
+  "comp": ".impeccable\\mocks\\home-comp-route.png",
+  "compSize": {
+    "width": 1586,
+    "height": 992
+  },
+  "inputRegionCount": 58,
+  "regions": [
+    {
+      "id": "paper-texture",
+      "kind": "texture",
+      "note": "clean cool white ruled paper texture sample",
+      "grid": null,
+      "box": {
+        "x": 0.9256,
+        "y": 0.3286,
+        "w": 0.0517,
+        "h": 0.0585
+      },
+      "px": {
+        "x": 1468,
+        "y": 326,
+        "w": 82,
+        "h": 58
+      },
+      "aspect": 1.4138,
+      "palette": [
+        {
+          "hex": "#f6f7f8",
+          "coverage": 1
+        }
+      ],
+      "detail": {
+        "energy": 0.7594
+      },
+      "medium": "raster",
+      "plate": "assets/plates/paper-texture.png",
+      "text": null,
+      "number": 1,
+      "reference": {
+        "policy": "plate-reference-v2",
+        "excludedPixels": 0,
+        "totalPixels": 4756,
+        "remainingPixels": 4756,
+        "excludedFraction": 0.0,
+        "fullyExcluded": false,
+        "regions": [],
+        "ignoredContainers": []
+      },
+      "cropPath": "region-1.png",
+      "referencePath": "reference-1.png"
+    },
+    {
+      "id": "brand",
+      "kind": "chrome",
+      "note": "book mark and Quản Lý Dạy Thêm wordmark",
+      "grid": null,
+      "box": {
+        "x": 0.0391,
+        "y": 0.0131,
+        "w": 0.1608,
+        "h": 0.0464
+      },
+      "px": {
+        "x": 62,
+        "y": 13,
+        "w": 255,
+        "h": 46
+      },
+      "aspect": 5.5435,
+      "palette": [
+        {
+          "hex": "#f7f7f8",
+          "coverage": 0.8194
+        },
+        {
+          "hex": "#091f5a",
+          "coverage": 0.0723
+        },
+        {
+          "hex": "#0c58a1",
+          "coverage": 0.0592
+        },
+        {
+          "hex": "#a9bed6",
+          "coverage": 0.0269
+        },
+        {
+          "hex": "#203a6f",
+          "coverage": 0.0223
+        }
+      ],
+      "detail": {
+        "energy": 47.308
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 2,
+      "cropPath": "region-2.png"
+    },
+    {
+      "id": "primary-nav",
+      "kind": "chrome",
+      "note": "top navigation links with active underline",
+      "grid": null,
+      "box": {
+        "x": 0.2289,
+        "y": 0.0111,
+        "w": 0.1841,
+        "h": 0.0484
+      },
+      "px": {
+        "x": 363,
+        "y": 11,
+        "w": 292,
+        "h": 48
+      },
+      "aspect": 6.0833,
+      "palette": [
+        {
+          "hex": "#f7f8f8",
+          "coverage": 0.9019
+        },
+        {
+          "hex": "#586a92",
+          "coverage": 0.0309
+        },
+        {
+          "hex": "#283a67",
+          "coverage": 0.0296
+        },
+        {
+          "hex": "#b6c1d3",
+          "coverage": 0.0188
+        },
+        {
+          "hex": "#66b8a0",
+          "coverage": 0.0188
+        }
+      ],
+      "detail": {
+        "energy": 35.041
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 3,
+      "cropPath": "region-3.png"
+    },
+    {
+      "id": "top-utilities",
+      "kind": "chrome",
+      "note": "date system health and security utilities",
+      "grid": null,
+      "box": {
+        "x": 0.6885,
+        "y": 0.0121,
+        "w": 0.2724,
+        "h": 0.0454
+      },
+      "px": {
+        "x": 1092,
+        "y": 12,
+        "w": 432,
+        "h": 45
+      },
+      "aspect": 9.6,
+      "palette": [
+        {
+          "hex": "#f7f8f8",
+          "coverage": 0.9496
+        },
+        {
+          "hex": "#758aaa",
+          "coverage": 0.017
+        },
+        {
+          "hex": "#c1cedf",
+          "coverage": 0.0155
+        },
+        {
+          "hex": "#bfe5da",
+          "coverage": 0.0116
+        },
+        {
+          "hex": "#4ea47e",
+          "coverage": 0.0063
+        }
+      ],
+      "detail": {
+        "energy": 24.9459
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 4,
+      "cropPath": "region-4.png"
+    },
+    {
+      "id": "hero-annotation",
+      "kind": "text",
+      "note": "green handwritten note introducing the continuous teaching day",
+      "grid": null,
+      "box": {
+        "x": 0.041,
+        "y": 0.0806,
+        "w": 0.1122,
+        "h": 0.1119
+      },
+      "px": {
+        "x": 65,
+        "y": 80,
+        "w": 178,
+        "h": 111
+      },
+      "aspect": 1.6036,
+      "palette": [
+        {
+          "hex": "#f6f8f8",
+          "coverage": 0.879
+        },
+        {
+          "hex": "#4b936e",
+          "coverage": 0.0408
+        },
+        {
+          "hex": "#c7e6da",
+          "coverage": 0.038
+        },
+        {
+          "hex": "#8abaa6",
+          "coverage": 0.0339
+        },
+        {
+          "hex": "#1e7044",
+          "coverage": 0.0082
+        }
+      ],
+      "detail": {
+        "energy": 22.0178
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 5,
+      "cropPath": "region-5.png"
+    },
+    {
+      "id": "hero-title",
+      "kind": "text",
+      "note": "large navy headline Mọi ca dạy trên cùng một nhịp",
+      "grid": null,
+      "box": {
+        "x": 0.0404,
+        "y": 0.2107,
+        "w": 0.3373,
+        "h": 0.1331
+      },
+      "px": {
+        "x": 64,
+        "y": 209,
+        "w": 535,
+        "h": 132
+      },
+      "aspect": 4.053,
+      "palette": [
+        {
+          "hex": "#f6f7f8",
+          "coverage": 0.6917
+        },
+        {
+          "hex": "#0c194a",
+          "coverage": 0.2492
+        },
+        {
+          "hex": "#b9c4d2",
+          "coverage": 0.0209
+        },
+        {
+          "hex": "#2aa36f",
+          "coverage": 0.0192
+        },
+        {
+          "hex": "#6c7794",
+          "coverage": 0.019
+        }
+      ],
+      "detail": {
+        "energy": 70.0204
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 6,
+      "cropPath": "region-6.png"
+    },
+    {
+      "id": "hero-copy",
+      "kind": "text",
+      "note": "two line explanation of connected center operations",
+      "grid": null,
+      "box": {
+        "x": 0.0422,
+        "y": 0.371,
+        "w": 0.3153,
+        "h": 0.0827
+      },
+      "px": {
+        "x": 67,
+        "y": 368,
+        "w": 500,
+        "h": 82
+      },
+      "aspect": 6.0976,
+      "palette": [
+        {
+          "hex": "#f5f7f8",
+          "coverage": 0.8152
+        },
+        {
+          "hex": "#6e7f9e",
+          "coverage": 0.0923
+        },
+        {
+          "hex": "#bbc7d7",
+          "coverage": 0.0644
+        },
+        {
+          "hex": "#4c6088",
+          "coverage": 0.0167
+        },
+        {
+          "hex": "#a1a9c9",
+          "coverage": 0.0114
+        }
+      ],
+      "detail": {
+        "energy": 41.9173
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 7,
+      "cropPath": "region-7.png"
+    },
+    {
+      "id": "hero-proof",
+      "kind": "chrome",
+      "note": "three trust facts with green check icons",
+      "grid": null,
+      "box": {
+        "x": 0.0422,
+        "y": 0.4728,
+        "w": 0.3184,
+        "h": 0.0323
+      },
+      "px": {
+        "x": 67,
+        "y": 469,
+        "w": 505,
+        "h": 32
+      },
+      "aspect": 15.7813,
+      "palette": [
+        {
+          "hex": "#f6f8f8",
+          "coverage": 0.8094
+        },
+        {
+          "hex": "#0a915b",
+          "coverage": 0.0774
+        },
+        {
+          "hex": "#d1daea",
+          "coverage": 0.0546
+        },
+        {
+          "hex": "#9baac4",
+          "coverage": 0.0296
+        },
+        {
+          "hex": "#415782",
+          "coverage": 0.029
+        }
+      ],
+      "detail": {
+        "energy": 45.2441
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 8,
+      "cropPath": "region-8.png"
+    },
+    {
+      "id": "route-upper",
+      "kind": "chrome",
+      "note": "responsive green route path from login to approval",
+      "grid": null,
+      "codeDrawn": true,
+      "box": {
+        "x": 0.4054,
+        "y": 0,
+        "w": 0.3846,
+        "h": 0.378
+      },
+      "px": {
+        "x": 643,
+        "y": 0,
+        "w": 610,
+        "h": 375
+      },
+      "aspect": 1.6267,
+      "palette": [
+        {
+          "hex": "#f5f7f7",
+          "coverage": 0.8773
+        },
+        {
+          "hex": "#199a68",
+          "coverage": 0.0909
+        },
+        {
+          "hex": "#7dcbac",
+          "coverage": 0.0142
+        },
+        {
+          "hex": "#2fbd7c",
+          "coverage": 0.0097
+        },
+        {
+          "hex": "#afe6d1",
+          "coverage": 0.0079
+        }
+      ],
+      "detail": {
+        "energy": 17.1759
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 9,
+      "cropPath": "region-9.png"
+    },
+    {
+      "id": "route-middle",
+      "kind": "chrome",
+      "note": "responsive green route path through permissions and schedule",
+      "grid": null,
+      "codeDrawn": true,
+      "box": {
+        "x": 0.1589,
+        "y": 0.3387,
+        "w": 0.5813,
+        "h": 0.375
+      },
+      "px": {
+        "x": 252,
+        "y": 336,
+        "w": 922,
+        "h": 372
+      },
+      "aspect": 2.4785,
+      "palette": [
+        {
+          "hex": "#f2f7f7",
+          "coverage": 0.9361
+        },
+        {
+          "hex": "#0b9361",
+          "coverage": 0.0224
+        },
+        {
+          "hex": "#2fb97e",
+          "coverage": 0.0184
+        },
+        {
+          "hex": "#afbcce",
+          "coverage": 0.0133
+        },
+        {
+          "hex": "#7483a1",
+          "coverage": 0.0098
+        }
+      ],
+      "detail": {
+        "energy": 22.6772
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 10,
+      "cropPath": "region-10.png"
+    },
+    {
+      "id": "route-lower",
+      "kind": "chrome",
+      "note": "responsive green route path through attendance into next section",
+      "grid": null,
+      "codeDrawn": true,
+      "box": {
+        "x": 0.4357,
+        "y": 0.6099,
+        "w": 0.4634,
+        "h": 0.3579
+      },
+      "px": {
+        "x": 691,
+        "y": 605,
+        "w": 735,
+        "h": 355
+      },
+      "aspect": 2.0704,
+      "palette": [
+        {
+          "hex": "#f1f5f5",
+          "coverage": 0.9698
+        },
+        {
+          "hex": "#31ba7f",
+          "coverage": 0.0098
+        },
+        {
+          "hex": "#088f5f",
+          "coverage": 0.0074
+        },
+        {
+          "hex": "#5b7294",
+          "coverage": 0.0065
+        },
+        {
+          "hex": "#089e50",
+          "coverage": 0.0064
+        }
+      ],
+      "detail": {
+        "energy": 17.8734
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 11,
+      "cropPath": "region-11.png"
+    },
+    {
+      "id": "login-station",
+      "kind": "control",
+      "note": "primary login station panel",
+      "grid": null,
+      "container": true,
+      "box": {
+        "x": 0.4584,
+        "y": 0.0685,
+        "w": 0.3153,
+        "h": 0.2913
+      },
+      "px": {
+        "x": 727,
+        "y": 68,
+        "w": 500,
+        "h": 289
+      },
+      "aspect": 1.7301,
+      "palette": [
+        {
+          "hex": "#f6f7f7",
+          "coverage": 0.8412
+        },
+        {
+          "hex": "#189a68",
+          "coverage": 0.1291
+        },
+        {
+          "hex": "#b3e7d5",
+          "coverage": 0.0108
+        },
+        {
+          "hex": "#75829f",
+          "coverage": 0.0105
+        },
+        {
+          "hex": "#2bbb78",
+          "coverage": 0.0085
+        }
+      ],
+      "detail": {
+        "energy": 19.5032
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 12,
+      "cropPath": "region-12.png"
+    },
+    {
+      "id": "login-index",
+      "kind": "chrome",
+      "note": "station one badge and 06:30 time tab",
+      "grid": null,
+      "parentId": "login-station",
+      "box": {
+        "x": 0.442,
+        "y": 0.0454,
+        "w": 0.0921,
+        "h": 0.0484
+      },
+      "px": {
+        "x": 701,
+        "y": 45,
+        "w": 146,
+        "h": 48
+      },
+      "aspect": 3.0417,
+      "palette": [
+        {
+          "hex": "#f6f7f8",
+          "coverage": 0.5638
+        },
+        {
+          "hex": "#0b995f",
+          "coverage": 0.1875
+        },
+        {
+          "hex": "#37be84",
+          "coverage": 0.1784
+        },
+        {
+          "hex": "#7dceb5",
+          "coverage": 0.0469
+        },
+        {
+          "hex": "#beedda",
+          "coverage": 0.0234
+        }
+      ],
+      "detail": {
+        "energy": 15.0923
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 13,
+      "cropPath": "region-13.png"
+    },
+    {
+      "id": "login-heading",
+      "kind": "text",
+      "note": "Đăng nhập hệ thống station heading",
+      "grid": null,
+      "parentId": "login-station",
+      "box": {
+        "x": 0.4968,
+        "y": 0.0968,
+        "w": 0.1368,
+        "h": 0.0272
+      },
+      "px": {
+        "x": 788,
+        "y": 96,
+        "w": 217,
+        "h": 27
+      },
+      "aspect": 8.037,
+      "palette": [
+        {
+          "hex": "#f6f7f8",
+          "coverage": 0.7336
+        },
+        {
+          "hex": "#091b4e",
+          "coverage": 0.086
+        },
+        {
+          "hex": "#daf7e5",
+          "coverage": 0.0691
+        },
+        {
+          "hex": "#c0d0dc",
+          "coverage": 0.0607
+        },
+        {
+          "hex": "#284269",
+          "coverage": 0.0506
+        }
+      ],
+      "detail": {
+        "energy": 67.6608
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 14,
+      "cropPath": "region-14.png"
+    },
+    {
+      "id": "login-subcopy",
+      "kind": "text",
+      "note": "short sign in explanation",
+      "grid": null,
+      "parentId": "login-station",
+      "box": {
+        "x": 0.4975,
+        "y": 0.127,
+        "w": 0.2005,
+        "h": 0.0212
+      },
+      "px": {
+        "x": 789,
+        "y": 126,
+        "w": 318,
+        "h": 21
+      },
+      "aspect": 15.1429,
+      "palette": [
+        {
+          "hex": "#f4f6f6",
+          "coverage": 0.7763
+        },
+        {
+          "hex": "#abb7c7",
+          "coverage": 0.1348
+        },
+        {
+          "hex": "#707e9b",
+          "coverage": 0.0836
+        },
+        {
+          "hex": "#505c80",
+          "coverage": 0.0054
+        }
+      ],
+      "detail": {
+        "energy": 52.7725
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 15,
+      "cropPath": "region-15.png"
+    },
+    {
+      "id": "username-field",
+      "kind": "control",
+      "note": "username text input with person icon",
+      "grid": null,
+      "parentId": "login-station",
+      "box": {
+        "x": 0.476,
+        "y": 0.1613,
+        "w": 0.2585,
+        "h": 0.0433
+      },
+      "px": {
+        "x": 755,
+        "y": 160,
+        "w": 410,
+        "h": 43
+      },
+      "aspect": 9.5349,
+      "palette": [
+        {
+          "hex": "#f7f7f8",
+          "coverage": 0.979
+        },
+        {
+          "hex": "#b2becf",
+          "coverage": 0.0141
+        },
+        {
+          "hex": "#7d8da8",
+          "coverage": 0.0049
+        },
+        {
+          "hex": "#586890",
+          "coverage": 0.002
+        }
+      ],
+      "detail": {
+        "energy": 9.8753
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 16,
+      "cropPath": "region-16.png"
+    },
+    {
+      "id": "password-field",
+      "kind": "control",
+      "note": "password input with lock and reveal icons",
+      "grid": null,
+      "parentId": "login-station",
+      "box": {
+        "x": 0.476,
+        "y": 0.2107,
+        "w": 0.2585,
+        "h": 0.0433
+      },
+      "px": {
+        "x": 755,
+        "y": 209,
+        "w": 410,
+        "h": 43
+      },
+      "aspect": 9.5349,
+      "palette": [
+        {
+          "hex": "#f7f8f8",
+          "coverage": 0.9726
+        },
+        {
+          "hex": "#a7aec6",
+          "coverage": 0.0113
+        },
+        {
+          "hex": "#677999",
+          "coverage": 0.0083
+        },
+        {
+          "hex": "#d0d7e7",
+          "coverage": 0.0078
+        }
+      ],
+      "detail": {
+        "energy": 9.1567
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 17,
+      "cropPath": "region-17.png"
+    },
+    {
+      "id": "login-button",
+      "kind": "control",
+      "note": "jade primary Đăng nhập action",
+      "grid": null,
+      "parentId": "login-station",
+      "box": {
+        "x": 0.476,
+        "y": 0.2621,
+        "w": 0.2585,
+        "h": 0.0504
+      },
+      "px": {
+        "x": 755,
+        "y": 260,
+        "w": 410,
+        "h": 50
+      },
+      "aspect": 8.2,
+      "palette": [
+        {
+          "hex": "#189968",
+          "coverage": 0.7447
+        },
+        {
+          "hex": "#f8f8f8",
+          "coverage": 0.2432
+        },
+        {
+          "hex": "#81ceaf",
+          "coverage": 0.0087
+        },
+        {
+          "hex": "#c8ecdc",
+          "coverage": 0.0035
+        }
+      ],
+      "detail": {
+        "energy": 17.682
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 18,
+      "cropPath": "region-18.png"
+    },
+    {
+      "id": "forgot-link",
+      "kind": "text",
+      "note": "Quên mật khẩu link",
+      "grid": null,
+      "parentId": "login-station",
+      "box": {
+        "x": 0.6633,
+        "y": 0.3185,
+        "w": 0.0731,
+        "h": 0.0232
+      },
+      "px": {
+        "x": 1052,
+        "y": 316,
+        "w": 116,
+        "h": 23
+      },
+      "aspect": 5.0435,
+      "palette": [
+        {
+          "hex": "#f7f8f8",
+          "coverage": 0.7355
+        },
+        {
+          "hex": "#189054",
+          "coverage": 0.1194
+        },
+        {
+          "hex": "#c1ead8",
+          "coverage": 0.1065
+        },
+        {
+          "hex": "#7fc8aa",
+          "coverage": 0.0226
+        },
+        {
+          "hex": "#68be8e",
+          "coverage": 0.0161
+        }
+      ],
+      "detail": {
+        "energy": 20.4768
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 19,
+      "cropPath": "region-19.png"
+    },
+    {
+      "id": "approval-station",
+      "kind": "control",
+      "note": "approved center status station",
+      "grid": null,
+      "container": true,
+      "box": {
+        "x": 0.4086,
+        "y": 0.3851,
+        "w": 0.2509,
+        "h": 0.128
+      },
+      "px": {
+        "x": 648,
+        "y": 382,
+        "w": 398,
+        "h": 127
+      },
+      "aspect": 3.1339,
+      "palette": [
+        {
+          "hex": "#f5f7f8",
+          "coverage": 0.8471
+        },
+        {
+          "hex": "#ddf7e7",
+          "coverage": 0.0821
+        },
+        {
+          "hex": "#bdc8d7",
+          "coverage": 0.0261
+        },
+        {
+          "hex": "#0a8f5d",
+          "coverage": 0.0258
+        },
+        {
+          "hex": "#72829f",
+          "coverage": 0.0189
+        }
+      ],
+      "detail": {
+        "energy": 29.9297
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 20,
+      "cropPath": "region-20.png"
+    },
+    {
+      "id": "approval-index",
+      "kind": "chrome",
+      "note": "station two badge and 07:00 time tab",
+      "grid": null,
+      "parentId": "approval-station",
+      "box": {
+        "x": 0.3997,
+        "y": 0.3417,
+        "w": 0.0914,
+        "h": 0.0544
+      },
+      "px": {
+        "x": 634,
+        "y": 339,
+        "w": 145,
+        "h": 54
+      },
+      "aspect": 2.6852,
+      "palette": [
+        {
+          "hex": "#edf7f7",
+          "coverage": 0.6178
+        },
+        {
+          "hex": "#3abe85",
+          "coverage": 0.1911
+        },
+        {
+          "hex": "#09985b",
+          "coverage": 0.1339
+        },
+        {
+          "hex": "#83d0b2",
+          "coverage": 0.0343
+        },
+        {
+          "hex": "#c0e9da",
+          "coverage": 0.0229
+        }
+      ],
+      "detail": {
+        "energy": 12.9909
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 21,
+      "cropPath": "region-21.png"
+    },
+    {
+      "id": "approval-icon",
+      "kind": "chrome",
+      "note": "green center building pictogram",
+      "grid": null,
+      "parentId": "approval-station",
+      "box": {
+        "x": 0.4174,
+        "y": 0.4063,
+        "w": 0.0315,
+        "h": 0.0544
+      },
+      "px": {
+        "x": 662,
+        "y": 403,
+        "w": 50,
+        "h": 54
+      },
+      "aspect": 0.9259,
+      "palette": [
+        {
+          "hex": "#f6f8f8",
+          "coverage": 0.4346
+        },
+        {
+          "hex": "#d9f8e7",
+          "coverage": 0.3464
+        },
+        {
+          "hex": "#118a54",
+          "coverage": 0.0882
+        },
+        {
+          "hex": "#51b88a",
+          "coverage": 0.0654
+        },
+        {
+          "hex": "#9adebf",
+          "coverage": 0.0654
+        }
+      ],
+      "detail": {
+        "energy": 6.5756
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 22,
+      "cropPath": "region-22.png"
+    },
+    {
+      "id": "approval-heading",
+      "kind": "text",
+      "note": "Duyệt trung tâm heading",
+      "grid": null,
+      "parentId": "approval-station",
+      "box": {
+        "x": 0.4515,
+        "y": 0.4012,
+        "w": 0.0883,
+        "h": 0.0292
+      },
+      "px": {
+        "x": 716,
+        "y": 398,
+        "w": 140,
+        "h": 29
+      },
+      "aspect": 4.8276,
+      "palette": [
+        {
+          "hex": "#f8f8f8",
+          "coverage": 0.8853
+        },
+        {
+          "hex": "#daf8e8",
+          "coverage": 0.0411
+        },
+        {
+          "hex": "#5f6f8d",
+          "coverage": 0.0281
+        },
+        {
+          "hex": "#102354",
+          "coverage": 0.026
+        },
+        {
+          "hex": "#c6cfdf",
+          "coverage": 0.0195
+        }
+      ],
+      "detail": {
+        "energy": 17.6198
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 23,
+      "cropPath": "region-23.png"
+    },
+    {
+      "id": "approval-status",
+      "kind": "control",
+      "note": "Đã phê duyệt status pill",
+      "grid": null,
+      "parentId": "approval-station",
+      "box": {
+        "x": 0.5467,
+        "y": 0.4052,
+        "w": 0.0662,
+        "h": 0.0252
+      },
+      "px": {
+        "x": 867,
+        "y": 402,
+        "w": 105,
+        "h": 25
+      },
+      "aspect": 4.2,
+      "palette": [
+        {
+          "hex": "#f1f8f5",
+          "coverage": 0.9256
+        },
+        {
+          "hex": "#206c46",
+          "coverage": 0.0259
+        },
+        {
+          "hex": "#6aaf8f",
+          "coverage": 0.0227
+        },
+        {
+          "hex": "#abe2ce",
+          "coverage": 0.0162
+        },
+        {
+          "hex": "#08481d",
+          "coverage": 0.0097
+        }
+      ],
+      "detail": {
+        "energy": 7.7535
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 24,
+      "cropPath": "region-24.png"
+    },
+    {
+      "id": "approval-copy",
+      "kind": "text",
+      "note": "approved center readiness copy",
+      "grid": null,
+      "parentId": "approval-station",
+      "box": {
+        "x": 0.4515,
+        "y": 0.4345,
+        "w": 0.1803,
+        "h": 0.0504
+      },
+      "px": {
+        "x": 716,
+        "y": 431,
+        "w": 286,
+        "h": 50
+      },
+      "aspect": 5.72,
+      "palette": [
+        {
+          "hex": "#f5f7f7",
+          "coverage": 0.8623
+        },
+        {
+          "hex": "#bac5d5",
+          "coverage": 0.0676
+        },
+        {
+          "hex": "#828fab",
+          "coverage": 0.0426
+        },
+        {
+          "hex": "#233665",
+          "coverage": 0.0163
+        },
+        {
+          "hex": "#3c547a",
+          "coverage": 0.0113
+        }
+      ],
+      "detail": {
+        "energy": 40.028
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 25,
+      "cropPath": "region-25.png"
+    },
+    {
+      "id": "permission-station",
+      "kind": "control",
+      "note": "role assignment station panel",
+      "grid": null,
+      "container": true,
+      "box": {
+        "x": 0.6772,
+        "y": 0.4829,
+        "w": 0.2547,
+        "h": 0.1552
+      },
+      "px": {
+        "x": 1074,
+        "y": 479,
+        "w": 404,
+        "h": 154
+      },
+      "aspect": 2.6234,
+      "palette": [
+        {
+          "hex": "#f3f6f6",
+          "coverage": 0.9416
+        },
+        {
+          "hex": "#a2aebe",
+          "coverage": 0.0182
+        },
+        {
+          "hex": "#f8daaa",
+          "coverage": 0.0167
+        },
+        {
+          "hex": "#7a87a3",
+          "coverage": 0.0127
+        },
+        {
+          "hex": "#f8f5d5",
+          "coverage": 0.0109
+        }
+      ],
+      "detail": {
+        "energy": 19.9383
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 26,
+      "cropPath": "region-26.png"
+    },
+    {
+      "id": "permission-index",
+      "kind": "chrome",
+      "note": "station three badge and 07:15 time tab",
+      "grid": null,
+      "parentId": "permission-station",
+      "box": {
+        "x": 0.6898,
+        "y": 0.4425,
+        "w": 0.0927,
+        "h": 0.0575
+      },
+      "px": {
+        "x": 1094,
+        "y": 439,
+        "w": 147,
+        "h": 57
+      },
+      "aspect": 2.5789,
+      "palette": [
+        {
+          "hex": "#f6f7f8",
+          "coverage": 0.6497
+        },
+        {
+          "hex": "#f8d9aa",
+          "coverage": 0.1801
+        },
+        {
+          "hex": "#ea8a1a",
+          "coverage": 0.1414
+        },
+        {
+          "hex": "#099b66",
+          "coverage": 0.0166
+        },
+        {
+          "hex": "#f4a958",
+          "coverage": 0.0122
+        }
+      ],
+      "detail": {
+        "energy": 10.3309
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 27,
+      "cropPath": "region-27.png"
+    },
+    {
+      "id": "permission-icon",
+      "kind": "chrome",
+      "note": "apricot role assignment pictogram",
+      "grid": null,
+      "parentId": "permission-station",
+      "box": {
+        "x": 0.6841,
+        "y": 0.504,
+        "w": 0.0296,
+        "h": 0.0514
+      },
+      "px": {
+        "x": 1085,
+        "y": 500,
+        "w": 47,
+        "h": 51
+      },
+      "aspect": 0.9216,
+      "palette": [
+        {
+          "hex": "#f6f4ef",
+          "coverage": 0.9023
+        },
+        {
+          "hex": "#ed8d23",
+          "coverage": 0.0338
+        },
+        {
+          "hex": "#1a9f78",
+          "coverage": 0.0263
+        },
+        {
+          "hex": "#f8e8c8",
+          "coverage": 0.0226
+        },
+        {
+          "hex": "#9cd8c8",
+          "coverage": 0.015
+        }
+      ],
+      "detail": {
+        "energy": 3.1552
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 28,
+      "cropPath": "region-28.png"
+    },
+    {
+      "id": "permission-heading",
+      "kind": "text",
+      "note": "Phân quyền station heading",
+      "grid": null,
+      "parentId": "permission-station",
+      "box": {
+        "x": 0.7207,
+        "y": 0.501,
+        "w": 0.0895,
+        "h": 0.0282
+      },
+      "px": {
+        "x": 1143,
+        "y": 497,
+        "w": 142,
+        "h": 28
+      },
+      "aspect": 5.0714,
+      "palette": [
+        {
+          "hex": "#f7f7f7",
+          "coverage": 0.9191
+        },
+        {
+          "hex": "#a8b7c6",
+          "coverage": 0.0277
+        },
+        {
+          "hex": "#f8f8d8",
+          "coverage": 0.0234
+        },
+        {
+          "hex": "#08184a",
+          "coverage": 0.0213
+        },
+        {
+          "hex": "#405c84",
+          "coverage": 0.0085
+        }
+      ],
+      "detail": {
+        "energy": 15.0292
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 29,
+      "cropPath": "region-29.png"
+    },
+    {
+      "id": "permission-copy",
+      "kind": "text",
+      "note": "role assignment helper text",
+      "grid": null,
+      "parentId": "permission-station",
+      "box": {
+        "x": 0.7207,
+        "y": 0.5333,
+        "w": 0.1734,
+        "h": 0.0242
+      },
+      "px": {
+        "x": 1143,
+        "y": 529,
+        "w": 275,
+        "h": 24
+      },
+      "aspect": 11.4583,
+      "palette": [
+        {
+          "hex": "#f6f6f6",
+          "coverage": 0.8638
+        },
+        {
+          "hex": "#b2bdcc",
+          "coverage": 0.0511
+        },
+        {
+          "hex": "#8491ae",
+          "coverage": 0.0411
+        },
+        {
+          "hex": "#f8f7de",
+          "coverage": 0.0312
+        },
+        {
+          "hex": "#44567a",
+          "coverage": 0.0128
+        }
+      ],
+      "detail": {
+        "energy": 39.4483
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 30,
+      "cropPath": "region-30.png"
+    },
+    {
+      "id": "permission-chips",
+      "kind": "control",
+      "note": "four role choice chips",
+      "grid": null,
+      "parentId": "permission-station",
+      "box": {
+        "x": 0.686,
+        "y": 0.5665,
+        "w": 0.2383,
+        "h": 0.0524
+      },
+      "px": {
+        "x": 1088,
+        "y": 562,
+        "w": 378,
+        "h": 52
+      },
+      "aspect": 7.2692,
+      "palette": [
+        {
+          "hex": "#eef7f5",
+          "coverage": 0.9095
+        },
+        {
+          "hex": "#b0dcca",
+          "coverage": 0.033
+        },
+        {
+          "hex": "#77bf9b",
+          "coverage": 0.0294
+        },
+        {
+          "hex": "#bfc7d6",
+          "coverage": 0.0195
+        },
+        {
+          "hex": "#7d88a1",
+          "coverage": 0.0086
+        }
+      ],
+      "detail": {
+        "energy": 17.4599
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 31,
+      "cropPath": "region-31.png"
+    },
+    {
+      "id": "schedule-station",
+      "kind": "control",
+      "note": "daily schedule station panel",
+      "grid": null,
+      "container": true,
+      "box": {
+        "x": 0.1797,
+        "y": 0.6058,
+        "w": 0.3064,
+        "h": 0.2651
+      },
+      "px": {
+        "x": 285,
+        "y": 601,
+        "w": 486,
+        "h": 263
+      },
+      "aspect": 1.8479,
+      "palette": [
+        {
+          "hex": "#f3f7f5",
+          "coverage": 0.9526
+        },
+        {
+          "hex": "#bbc5d3",
+          "coverage": 0.0146
+        },
+        {
+          "hex": "#189f6d",
+          "coverage": 0.0136
+        },
+        {
+          "hex": "#697797",
+          "coverage": 0.0103
+        },
+        {
+          "hex": "#909cb3",
+          "coverage": 0.0089
+        }
+      ],
+      "detail": {
+        "energy": 17.366
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 32,
+      "cropPath": "region-32.png"
+    },
+    {
+      "id": "schedule-index",
+      "kind": "chrome",
+      "note": "station four badge and 07:30 time tab",
+      "grid": null,
+      "parentId": "schedule-station",
+      "box": {
+        "x": 0.1948,
+        "y": 0.5645,
+        "w": 0.0933,
+        "h": 0.0554
+      },
+      "px": {
+        "x": 309,
+        "y": 560,
+        "w": 148,
+        "h": 55
+      },
+      "aspect": 2.6909,
+      "palette": [
+        {
+          "hex": "#f5f7f8",
+          "coverage": 0.7572
+        },
+        {
+          "hex": "#0c9564",
+          "coverage": 0.099
+        },
+        {
+          "hex": "#32bc82",
+          "coverage": 0.099
+        },
+        {
+          "hex": "#cbf0e4",
+          "coverage": 0.0245
+        },
+        {
+          "hex": "#7ccbb2",
+          "coverage": 0.0202
+        }
+      ],
+      "detail": {
+        "energy": 10.4554
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 33,
+      "cropPath": "region-33.png"
+    },
+    {
+      "id": "schedule-icon",
+      "kind": "chrome",
+      "note": "green calendar pictogram",
+      "grid": null,
+      "parentId": "schedule-station",
+      "box": {
+        "x": 0.1929,
+        "y": 0.631,
+        "w": 0.034,
+        "h": 0.0524
+      },
+      "px": {
+        "x": 306,
+        "y": 626,
+        "w": 54,
+        "h": 52
+      },
+      "aspect": 1.0385,
+      "palette": [
+        {
+          "hex": "#f7f8f8",
+          "coverage": 0.5047
+        },
+        {
+          "hex": "#d7f7e6",
+          "coverage": 0.347
+        },
+        {
+          "hex": "#0b8557",
+          "coverage": 0.0789
+        },
+        {
+          "hex": "#56b288",
+          "coverage": 0.041
+        },
+        {
+          "hex": "#9ad6ba",
+          "coverage": 0.0284
+        }
+      ],
+      "detail": {
+        "energy": 5.3431
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 34,
+      "cropPath": "region-34.png"
+    },
+    {
+      "id": "schedule-heading",
+      "kind": "text",
+      "note": "Xếp lịch station heading",
+      "grid": null,
+      "parentId": "schedule-station",
+      "box": {
+        "x": 0.2339,
+        "y": 0.631,
+        "w": 0.0662,
+        "h": 0.0292
+      },
+      "px": {
+        "x": 371,
+        "y": 626,
+        "w": 105,
+        "h": 29
+      },
+      "aspect": 3.6207,
+      "palette": [
+        {
+          "hex": "#f6f8f8",
+          "coverage": 0.9371
+        },
+        {
+          "hex": "#2bb179",
+          "coverage": 0.0543
+        },
+        {
+          "hex": "#088858",
+          "coverage": 0.0029
+        },
+        {
+          "hex": "#8898b8",
+          "coverage": 0.0029
+        },
+        {
+          "hex": "#c8f8e8",
+          "coverage": 0.0029
+        }
+      ],
+      "detail": {
+        "energy": 4.3937
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 35,
+      "cropPath": "region-35.png"
+    },
+    {
+      "id": "schedule-copy",
+      "kind": "text",
+      "note": "schedule helper text",
+      "grid": null,
+      "parentId": "schedule-station",
+      "box": {
+        "x": 0.2339,
+        "y": 0.6613,
+        "w": 0.1677,
+        "h": 0.0232
+      },
+      "px": {
+        "x": 371,
+        "y": 656,
+        "w": 266,
+        "h": 23
+      },
+      "aspect": 11.5652,
+      "palette": [
+        {
+          "hex": "#f8f8f8",
+          "coverage": 0.9173
+        },
+        {
+          "hex": "#091245",
+          "coverage": 0.0371
+        },
+        {
+          "hex": "#394973",
+          "coverage": 0.0185
+        },
+        {
+          "hex": "#8396aa",
+          "coverage": 0.0143
+        },
+        {
+          "hex": "#0a1838",
+          "coverage": 0.0128
+        }
+      ],
+      "detail": {
+        "energy": 31.6098
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 36,
+      "cropPath": "region-36.png"
+    },
+    {
+      "id": "schedule-table",
+      "kind": "control",
+      "note": "four row teaching timetable with room and teacher",
+      "grid": null,
+      "parentId": "schedule-station",
+      "box": {
+        "x": 0.1917,
+        "y": 0.7006,
+        "w": 0.2818,
+        "h": 0.1583
+      },
+      "px": {
+        "x": 304,
+        "y": 695,
+        "w": 447,
+        "h": 157
+      },
+      "aspect": 2.8471,
+      "palette": [
+        {
+          "hex": "#f3f8f4",
+          "coverage": 0.9561
+        },
+        {
+          "hex": "#ced2e1",
+          "coverage": 0.0143
+        },
+        {
+          "hex": "#6c7a99",
+          "coverage": 0.0127
+        },
+        {
+          "hex": "#98a4b9",
+          "coverage": 0.0102
+        },
+        {
+          "hex": "#187d4b",
+          "coverage": 0.0067
+        }
+      ],
+      "detail": {
+        "energy": 13.4848
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 37,
+      "cropPath": "region-37.png"
+    },
+    {
+      "id": "attendance-station",
+      "kind": "control",
+      "note": "attendance summary station panel",
+      "grid": null,
+      "container": true,
+      "box": {
+        "x": 0.5208,
+        "y": 0.6623,
+        "w": 0.3512,
+        "h": 0.2429
+      },
+      "px": {
+        "x": 826,
+        "y": 657,
+        "w": 557,
+        "h": 241
+      },
+      "aspect": 2.3112,
+      "palette": [
+        {
+          "hex": "#f6f6f6",
+          "coverage": 0.9334
+        },
+        {
+          "hex": "#27af78",
+          "coverage": 0.0251
+        },
+        {
+          "hex": "#d8f7e6",
+          "coverage": 0.0212
+        },
+        {
+          "hex": "#5b7398",
+          "coverage": 0.0111
+        },
+        {
+          "hex": "#08a14d",
+          "coverage": 0.0092
+        }
+      ],
+      "detail": {
+        "energy": 24.577
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 38,
+      "cropPath": "region-38.png"
+    },
+    {
+      "id": "attendance-index",
+      "kind": "chrome",
+      "note": "station five badge and lesson time tab",
+      "grid": null,
+      "parentId": "attendance-station",
+      "box": {
+        "x": 0.534,
+        "y": 0.621,
+        "w": 0.1129,
+        "h": 0.0575
+      },
+      "px": {
+        "x": 847,
+        "y": 616,
+        "w": 179,
+        "h": 57
+      },
+      "aspect": 3.1404,
+      "palette": [
+        {
+          "hex": "#e9f7f8",
+          "coverage": 0.7325
+        },
+        {
+          "hex": "#2ab27b",
+          "coverage": 0.193
+        },
+        {
+          "hex": "#0d8b5f",
+          "coverage": 0.0404
+        },
+        {
+          "hex": "#69c3a3",
+          "coverage": 0.0211
+        },
+        {
+          "hex": "#a9decc",
+          "coverage": 0.0132
+        }
+      ],
+      "detail": {
+        "energy": 12.119
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 39,
+      "cropPath": "region-39.png"
+    },
+    {
+      "id": "attendance-icon",
+      "kind": "chrome",
+      "note": "green attendance checkbox pictogram",
+      "grid": null,
+      "parentId": "attendance-station",
+      "box": {
+        "x": 0.5322,
+        "y": 0.6865,
+        "w": 0.0322,
+        "h": 0.0534
+      },
+      "px": {
+        "x": 844,
+        "y": 681,
+        "w": 51,
+        "h": 53
+      },
+      "aspect": 0.9623,
+      "palette": [
+        {
+          "hex": "#f4f8f8",
+          "coverage": 0.4608
+        },
+        {
+          "hex": "#d8f7e5",
+          "coverage": 0.402
+        },
+        {
+          "hex": "#0b8853",
+          "coverage": 0.0948
+        },
+        {
+          "hex": "#96d6ba",
+          "coverage": 0.0327
+        },
+        {
+          "hex": "#239d78",
+          "coverage": 0.0098
+        }
+      ],
+      "detail": {
+        "energy": 6.0181
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 40,
+      "cropPath": "region-40.png"
+    },
+    {
+      "id": "attendance-heading",
+      "kind": "text",
+      "note": "Điểm danh station heading",
+      "grid": null,
+      "parentId": "attendance-station",
+      "box": {
+        "x": 0.5763,
+        "y": 0.6804,
+        "w": 0.0801,
+        "h": 0.0302
+      },
+      "px": {
+        "x": 914,
+        "y": 675,
+        "w": 127,
+        "h": 30
+      },
+      "aspect": 4.2333,
+      "palette": [
+        {
+          "hex": "#f6f8f8",
+          "coverage": 0.8042
+        },
+        {
+          "hex": "#2fb57b",
+          "coverage": 0.1675
+        },
+        {
+          "hex": "#088d65",
+          "coverage": 0.0142
+        },
+        {
+          "hex": "#0d1d4d",
+          "coverage": 0.0071
+        },
+        {
+          "hex": "#93a3b8",
+          "coverage": 0.0071
+        }
+      ],
+      "detail": {
+        "energy": 9.117
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 41,
+      "cropPath": "region-41.png"
+    },
+    {
+      "id": "attendance-link",
+      "kind": "text",
+      "note": "Xem chi tiết action link",
+      "grid": null,
+      "parentId": "attendance-station",
+      "box": {
+        "x": 0.8077,
+        "y": 0.6865,
+        "w": 0.0593,
+        "h": 0.0242
+      },
+      "px": {
+        "x": 1281,
+        "y": 681,
+        "w": 94,
+        "h": 24
+      },
+      "aspect": 3.9167,
+      "palette": [
+        {
+          "hex": "#f6f8f8",
+          "coverage": 1
+        }
+      ],
+      "detail": {
+        "energy": 1.1071
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": true,
+        "rules": false
+      },
+      "number": 42,
+      "cropPath": "region-42.png"
+    },
+    {
+      "id": "attendance-copy",
+      "kind": "text",
+      "note": "attendance helper text",
+      "grid": null,
+      "parentId": "attendance-station",
+      "box": {
+        "x": 0.5763,
+        "y": 0.7137,
+        "w": 0.1765,
+        "h": 0.0222
+      },
+      "px": {
+        "x": 914,
+        "y": 708,
+        "w": 280,
+        "h": 22
+      },
+      "aspect": 12.7273,
+      "palette": [
+        {
+          "hex": "#f7f8f8",
+          "coverage": 0.9119
+        },
+        {
+          "hex": "#0a204f",
+          "coverage": 0.0427
+        },
+        {
+          "hex": "#9cadc1",
+          "coverage": 0.02
+        },
+        {
+          "hex": "#617594",
+          "coverage": 0.0147
+        },
+        {
+          "hex": "#2e4e70",
+          "coverage": 0.0107
+        }
+      ],
+      "detail": {
+        "energy": 29.8207
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 43,
+      "cropPath": "region-43.png"
+    },
+    {
+      "id": "attendance-class",
+      "kind": "control",
+      "note": "active class and room summary row",
+      "grid": null,
+      "parentId": "attendance-station",
+      "box": {
+        "x": 0.5322,
+        "y": 0.745,
+        "w": 0.3184,
+        "h": 0.0454
+      },
+      "px": {
+        "x": 844,
+        "y": 739,
+        "w": 505,
+        "h": 45
+      },
+      "aspect": 11.2222,
+      "palette": [
+        {
+          "hex": "#f8f8f8",
+          "coverage": 0.9342
+        },
+        {
+          "hex": "#d9f8e8",
+          "coverage": 0.0271
+        },
+        {
+          "hex": "#b9c5d4",
+          "coverage": 0.0183
+        },
+        {
+          "hex": "#8391ad",
+          "coverage": 0.0132
+        },
+        {
+          "hex": "#426286",
+          "coverage": 0.0072
+        }
+      ],
+      "detail": {
+        "energy": 14.4068
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 44,
+      "cropPath": "region-44.png"
+    },
+    {
+      "id": "attendance-count",
+      "kind": "text",
+      "note": "large 22 of 24 attendance count",
+      "grid": null,
+      "parentId": "attendance-station",
+      "box": {
+        "x": 0.5303,
+        "y": 0.7994,
+        "w": 0.0952,
+        "h": 0.0938
+      },
+      "px": {
+        "x": 841,
+        "y": 793,
+        "w": 151,
+        "h": 93
+      },
+      "aspect": 1.6237,
+      "palette": [
+        {
+          "hex": "#f7f8f8",
+          "coverage": 0.8486
+        },
+        {
+          "hex": "#586e93",
+          "coverage": 0.0677
+        },
+        {
+          "hex": "#0a5b46",
+          "coverage": 0.0518
+        },
+        {
+          "hex": "#adbecd",
+          "coverage": 0.0249
+        },
+        {
+          "hex": "#8b98b5",
+          "coverage": 0.007
+        }
+      ],
+      "detail": {
+        "energy": 17.7418
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 45,
+      "cropPath": "region-45.png"
+    },
+    {
+      "id": "attendance-chart",
+      "kind": "control",
+      "note": "ninety two percent circular attendance chart",
+      "grid": null,
+      "codeDrawn": true,
+      "parentId": "attendance-station",
+      "box": {
+        "x": 0.6469,
+        "y": 0.7994,
+        "w": 0.07,
+        "h": 0.0948
+      },
+      "px": {
+        "x": 1026,
+        "y": 793,
+        "w": 111,
+        "h": 94
+      },
+      "aspect": 1.1809,
+      "palette": [
+        {
+          "hex": "#f8f8f8",
+          "coverage": 0.8582
+        },
+        {
+          "hex": "#0ba051",
+          "coverage": 0.0823
+        },
+        {
+          "hex": "#cdefde",
+          "coverage": 0.0255
+        },
+        {
+          "hex": "#5ac090",
+          "coverage": 0.0195
+        },
+        {
+          "hex": "#97ddbb",
+          "coverage": 0.0144
+        }
+      ],
+      "detail": {
+        "energy": 6.6722
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 46,
+      "cropPath": "region-46.png"
+    },
+    {
+      "id": "attendance-exceptions",
+      "kind": "control",
+      "note": "two absent students exception panel",
+      "grid": null,
+      "parentId": "attendance-station",
+      "box": {
+        "x": 0.7377,
+        "y": 0.7923,
+        "w": 0.1122,
+        "h": 0.1048
+      },
+      "px": {
+        "x": 1170,
+        "y": 786,
+        "w": 178,
+        "h": 104
+      },
+      "aspect": 1.7115,
+      "palette": [
+        {
+          "hex": "#f8efee",
+          "coverage": 0.939
+        },
+        {
+          "hex": "#dd1f2c",
+          "coverage": 0.0174
+        },
+        {
+          "hex": "#707595",
+          "coverage": 0.0159
+        },
+        {
+          "hex": "#bfc0cd",
+          "coverage": 0.0154
+        },
+        {
+          "hex": "#979bae",
+          "coverage": 0.0124
+        }
+      ],
+      "detail": {
+        "energy": 15.3477
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 47,
+      "cropPath": "region-47.png"
+    },
+    {
+      "id": "note-login",
+      "kind": "text",
+      "note": "handwritten login starts operations annotation",
+      "grid": null,
+      "box": {
+        "x": 0.8417,
+        "y": 0.1119,
+        "w": 0.1217,
+        "h": 0.1542
+      },
+      "px": {
+        "x": 1335,
+        "y": 111,
+        "w": 193,
+        "h": 153
+      },
+      "aspect": 1.2614,
+      "palette": [
+        {
+          "hex": "#d8f5e4",
+          "coverage": 0.4833
+        },
+        {
+          "hex": "#f6f7f7",
+          "coverage": 0.4723
+        },
+        {
+          "hex": "#2b7262",
+          "coverage": 0.0265
+        },
+        {
+          "hex": "#7ab1a1",
+          "coverage": 0.0149
+        },
+        {
+          "hex": "#0b4538",
+          "coverage": 0.003
+        }
+      ],
+      "detail": {
+        "energy": 13.3004
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 48,
+      "cropPath": "region-48.png"
+    },
+    {
+      "id": "note-permission",
+      "kind": "text",
+      "note": "handwritten right people right task annotation",
+      "grid": null,
+      "box": {
+        "x": 0.8373,
+        "y": 0.4143,
+        "w": 0.0895,
+        "h": 0.1008
+      },
+      "px": {
+        "x": 1328,
+        "y": 411,
+        "w": 142,
+        "h": 100
+      },
+      "aspect": 1.42,
+      "palette": [
+        {
+          "hex": "#f6f7f8",
+          "coverage": 0.9045
+        },
+        {
+          "hex": "#dea466",
+          "coverage": 0.0253
+        },
+        {
+          "hex": "#eac29f",
+          "coverage": 0.0253
+        },
+        {
+          "hex": "#da853d",
+          "coverage": 0.0228
+        },
+        {
+          "hex": "#f1e1c7",
+          "coverage": 0.0222
+        }
+      ],
+      "detail": {
+        "energy": 10.8841
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 49,
+      "cropPath": "region-49.png"
+    },
+    {
+      "id": "note-schedule",
+      "kind": "text",
+      "note": "handwritten schedule clarity annotation",
+      "grid": null,
+      "box": {
+        "x": 0.0794,
+        "y": 0.6875,
+        "w": 0.0958,
+        "h": 0.1099
+      },
+      "px": {
+        "x": 126,
+        "y": 682,
+        "w": 152,
+        "h": 109
+      },
+      "aspect": 1.3945,
+      "palette": [
+        {
+          "hex": "#f1f7f8",
+          "coverage": 0.9239
+        },
+        {
+          "hex": "#348073",
+          "coverage": 0.0293
+        },
+        {
+          "hex": "#b2d7d4",
+          "coverage": 0.0245
+        },
+        {
+          "hex": "#7db1aa",
+          "coverage": 0.0181
+        },
+        {
+          "hex": "#0e624c",
+          "coverage": 0.0043
+        }
+      ],
+      "detail": {
+        "energy": 13.2462
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 50,
+      "cropPath": "region-50.png"
+    },
+    {
+      "id": "note-attendance",
+      "kind": "text",
+      "note": "handwritten timely support annotation",
+      "grid": null,
+      "box": {
+        "x": 0.8701,
+        "y": 0.7046,
+        "w": 0.0958,
+        "h": 0.1119
+      },
+      "px": {
+        "x": 1380,
+        "y": 699,
+        "w": 152,
+        "h": 111
+      },
+      "aspect": 1.3694,
+      "palette": [
+        {
+          "hex": "#f3f7f8",
+          "coverage": 0.9413
+        },
+        {
+          "hex": "#cd5365",
+          "coverage": 0.0205
+        },
+        {
+          "hex": "#e0a4b0",
+          "coverage": 0.0167
+        },
+        {
+          "hex": "#e9ccd1",
+          "coverage": 0.0118
+        },
+        {
+          "hex": "#e0848f",
+          "coverage": 0.0097
+        }
+      ],
+      "detail": {
+        "energy": 12.3281
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 51,
+      "cropPath": "region-51.png"
+    },
+    {
+      "id": "book-doodle",
+      "kind": "chrome",
+      "note": "simple blue open book margin doodle",
+      "grid": null,
+      "codeDrawn": true,
+      "box": {
+        "x": 0.0416,
+        "y": 0.5161,
+        "w": 0.1047,
+        "h": 0.1119
+      },
+      "px": {
+        "x": 66,
+        "y": 512,
+        "w": 166,
+        "h": 111
+      },
+      "aspect": 1.4955,
+      "palette": [
+        {
+          "hex": "#f6f8f8",
+          "coverage": 0.8792
+        },
+        {
+          "hex": "#c4d4e5",
+          "coverage": 0.1145
+        },
+        {
+          "hex": "#99a9c6",
+          "coverage": 0.0063
+        }
+      ],
+      "detail": {
+        "energy": 8.5475
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 52,
+      "cropPath": "region-52.png"
+    },
+    {
+      "id": "calendar-doodle",
+      "kind": "chrome",
+      "note": "simple blue calendar margin doodle",
+      "grid": null,
+      "codeDrawn": true,
+      "box": {
+        "x": 0.1255,
+        "y": 0.7853,
+        "w": 0.0479,
+        "h": 0.0988
+      },
+      "px": {
+        "x": 199,
+        "y": 779,
+        "w": 76,
+        "h": 98
+      },
+      "aspect": 0.7755,
+      "palette": [
+        {
+          "hex": "#eff6f8",
+          "coverage": 0.8763
+        },
+        {
+          "hex": "#acc4da",
+          "coverage": 0.1015
+        },
+        {
+          "hex": "#9dcfc6",
+          "coverage": 0.0082
+        },
+        {
+          "hex": "#53a390",
+          "coverage": 0.007
+        },
+        {
+          "hex": "#0d7d50",
+          "coverage": 0.007
+        }
+      ],
+      "detail": {
+        "energy": 6.5001
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 53,
+      "cropPath": "region-53.png"
+    },
+    {
+      "id": "next-section-ground",
+      "kind": "plate",
+      "note": "soft apricot and jade curved paper transition into the next section",
+      "grid": null,
+      "bleed": true,
+      "box": {
+        "x": 0,
+        "y": 0.88,
+        "w": 1,
+        "h": 0.12
+      },
+      "px": {
+        "x": 0,
+        "y": 873,
+        "w": 1586,
+        "h": 119
+      },
+      "aspect": 13.3277,
+      "palette": [
+        {
+          "hex": "#f2f3e9",
+          "coverage": 0.8961
+        },
+        {
+          "hex": "#e6e7f7",
+          "coverage": 0.0841
+        },
+        {
+          "hex": "#091743",
+          "coverage": 0.0086
+        },
+        {
+          "hex": "#b1b4bb",
+          "coverage": 0.0083
+        },
+        {
+          "hex": "#08a24b",
+          "coverage": 0.0028
+        }
+      ],
+      "detail": {
+        "energy": 16.9578
+      },
+      "medium": "raster",
+      "plate": "assets/plates/next-section-ground.png",
+      "text": null,
+      "number": 54,
+      "reference": {
+        "policy": "plate-reference-v2",
+        "excludedPixels": 89039,
+        "totalPixels": 188734,
+        "remainingPixels": 99695,
+        "excludedFraction": 0.4717697924062437,
+        "fullyExcluded": false,
+        "regions": [
+          {
+            "id": "route-lower",
+            "kind": "chrome",
+            "cropPx": {
+              "x": 691,
+              "y": 0,
+              "w": 735,
+              "h": 87
+            },
+            "pixels": 63945
+          },
+          {
+            "id": "attendance-count",
+            "kind": "text",
+            "cropPx": {
+              "x": 841,
+              "y": 0,
+              "w": 151,
+              "h": 13
+            },
+            "pixels": 1963
+          },
+          {
+            "id": "attendance-chart",
+            "kind": "control",
+            "cropPx": {
+              "x": 1026,
+              "y": 0,
+              "w": 111,
+              "h": 14
+            },
+            "pixels": 1554
+          },
+          {
+            "id": "attendance-exceptions",
+            "kind": "control",
+            "cropPx": {
+              "x": 1170,
+              "y": 0,
+              "w": 178,
+              "h": 17
+            },
+            "pixels": 3026
+          },
+          {
+            "id": "calendar-doodle",
+            "kind": "chrome",
+            "cropPx": {
+              "x": 199,
+              "y": 0,
+              "w": 76,
+              "h": 4
+            },
+            "pixels": 304
+          },
+          {
+            "id": "next-section-kicker",
+            "kind": "text",
+            "cropPx": {
+              "x": 65,
+              "y": 34,
+              "w": 118,
+              "h": 19
+            },
+            "pixels": 2242
+          },
+          {
+            "id": "next-section-title",
+            "kind": "text",
+            "cropPx": {
+              "x": 64,
+              "y": 61,
+              "w": 289,
+              "h": 40
+            },
+            "pixels": 11560
+          },
+          {
+            "id": "next-section-note",
+            "kind": "text",
+            "cropPx": {
+              "x": 1324,
+              "y": 41,
+              "w": 224,
+              "h": 70
+            },
+            "pixels": 15680
+          },
+          {
+            "id": "route-down-control",
+            "kind": "control",
+            "cropPx": {
+              "x": 770,
+              "y": 27,
+              "w": 52,
+              "h": 53
+            },
+            "pixels": 2756
+          }
+        ],
+        "ignoredContainers": [
+          "attendance-station"
+        ]
+      },
+      "cropPath": "region-54.png",
+      "referencePath": "reference-54.png"
+    },
+    {
+      "id": "next-section-kicker",
+      "kind": "text",
+      "note": "Sau bước này section kicker",
+      "grid": null,
+      "box": {
+        "x": 0.041,
+        "y": 0.9143,
+        "w": 0.0744,
+        "h": 0.0192
+      },
+      "px": {
+        "x": 65,
+        "y": 907,
+        "w": 118,
+        "h": 19
+      },
+      "aspect": 6.2105,
+      "palette": [
+        {
+          "hex": "#f8f8da",
+          "coverage": 1
+        }
+      ],
+      "detail": {
+        "energy": 0.3889
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": true,
+        "rules": false
+      },
+      "number": 55,
+      "cropPath": "region-55.png"
+    },
+    {
+      "id": "next-section-title",
+      "kind": "text",
+      "note": "Báo cáo và đánh giá next section heading",
+      "grid": null,
+      "box": {
+        "x": 0.0404,
+        "y": 0.9415,
+        "w": 0.1822,
+        "h": 0.0403
+      },
+      "px": {
+        "x": 64,
+        "y": 934,
+        "w": 289,
+        "h": 40
+      },
+      "aspect": 7.225,
+      "palette": [
+        {
+          "hex": "#f7f7e6",
+          "coverage": 0.8194
+        },
+        {
+          "hex": "#0a1849",
+          "coverage": 0.1194
+        },
+        {
+          "hex": "#102040",
+          "coverage": 0.0209
+        },
+        {
+          "hex": "#3f4764",
+          "coverage": 0.0202
+        },
+        {
+          "hex": "#656e7f",
+          "coverage": 0.0202
+        }
+      ],
+      "detail": {
+        "energy": 53.6732
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 56,
+      "cropPath": "region-56.png"
+    },
+    {
+      "id": "next-section-note",
+      "kind": "text",
+      "note": "handwritten daily data supports tomorrow note",
+      "grid": null,
+      "box": {
+        "x": 0.8348,
+        "y": 0.9214,
+        "w": 0.1412,
+        "h": 0.0706
+      },
+      "px": {
+        "x": 1324,
+        "y": 914,
+        "w": 224,
+        "h": 70
+      },
+      "aspect": 3.2,
+      "palette": [
+        {
+          "hex": "#f7ead9",
+          "coverage": 0.725
+        },
+        {
+          "hex": "#e7eff5",
+          "coverage": 0.2133
+        },
+        {
+          "hex": "#b1b5b9",
+          "coverage": 0.0578
+        },
+        {
+          "hex": "#8191a1",
+          "coverage": 0.0039
+        }
+      ],
+      "detail": {
+        "energy": 10.404
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 57,
+      "cropPath": "region-57.png"
+    },
+    {
+      "id": "route-down-control",
+      "kind": "control",
+      "note": "circular down arrow continuation control",
+      "grid": null,
+      "box": {
+        "x": 0.4855,
+        "y": 0.9073,
+        "w": 0.0328,
+        "h": 0.0534
+      },
+      "px": {
+        "x": 770,
+        "y": 900,
+        "w": 52,
+        "h": 53
+      },
+      "aspect": 0.9811,
+      "palette": [
+        {
+          "hex": "#eaf7f5",
+          "coverage": 0.8673
+        },
+        {
+          "hex": "#0a9362",
+          "coverage": 0.0957
+        },
+        {
+          "hex": "#b6e2d4",
+          "coverage": 0.0247
+        },
+        {
+          "hex": "#88ccb4",
+          "coverage": 0.0123
+        }
+      ],
+      "detail": {
+        "energy": 4.1998
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "surface": {
+        "flat": false,
+        "rules": false
+      },
+      "number": 58,
+      "cropPath": "region-58.png"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "error",
+      "code": "invalid-parent",
+      "regionId": "login-index",
+      "message": "Parent must be a distinct container enclosing this region."
+    },
+    {
+      "severity": "error",
+      "code": "invalid-parent",
+      "regionId": "approval-index",
+      "message": "Parent must be a distinct container enclosing this region."
+    },
+    {
+      "severity": "error",
+      "code": "invalid-parent",
+      "regionId": "permission-index",
+      "message": "Parent must be a distinct container enclosing this region."
+    },
+    {
+      "severity": "error",
+      "code": "invalid-parent",
+      "regionId": "schedule-index",
+      "message": "Parent must be a distinct container enclosing this region."
+    },
+    {
+      "severity": "error",
+      "code": "invalid-parent",
+      "regionId": "attendance-index",
+      "message": "Parent must be a distinct container enclosing this region."
+    },
+    {
+      "severity": "warning",
+      "code": "foreground-mask",
+      "regionId": "next-section-ground",
+      "message": "route-lower, attendance-count, attendance-chart, attendance-exceptions, calendar-doodle, next-section-kicker, next-section-title, next-section-note, route-down-control exclude 47.2% of this reference. Check that the excluded pixels contain foreground, not artwork between separate text elements. Split overly broad foreground bounds; review grouping must not change geometry."
+    },
+    {
+      "severity": "warning",
+      "code": "measurement-warning",
+      "regionId": null,
+      "message": "region route-upper: \"codeDrawn\": true set in the regions file (the painted-material refusal is overridden: code draws this region)"
+    },
+    {
+      "severity": "warning",
+      "code": "measurement-warning",
+      "regionId": null,
+      "message": "region route-middle: \"codeDrawn\": true set in the regions file (the painted-material refusal is overridden: code draws this region)"
+    },
+    {
+      "severity": "warning",
+      "code": "measurement-warning",
+      "regionId": null,
+      "message": "region route-lower: \"codeDrawn\": true set in the regions file (the painted-material refusal is overridden: code draws this region)"
+    },
+    {
+      "severity": "warning",
+      "code": "measurement-warning",
+      "regionId": null,
+      "message": "region login-station: \"container\": true set in the regions file (the region-size refusal is overridden: one undivided element)"
+    },
+    {
+      "severity": "warning",
+      "code": "measurement-warning",
+      "regionId": null,
+      "message": "region approval-station: \"container\": true set in the regions file (the region-size refusal is overridden: one undivided element)"
+    },
+    {
+      "severity": "warning",
+      "code": "measurement-warning",
+      "regionId": null,
+      "message": "region permission-station: \"container\": true set in the regions file (the region-size refusal is overridden: one undivided element)"
+    },
+    {
+      "severity": "warning",
+      "code": "measurement-warning",
+      "regionId": null,
+      "message": "region schedule-station: \"container\": true set in the regions file (the region-size refusal is overridden: one undivided element)"
+    },
+    {
+      "severity": "warning",
+      "code": "measurement-warning",
+      "regionId": null,
+      "message": "region attendance-station: \"container\": true set in the regions file (the region-size refusal is overridden: one undivided element)"
+    },
+    {
+      "severity": "warning",
+      "code": "measurement-warning",
+      "regionId": null,
+      "message": "region attendance-chart: \"codeDrawn\": true set in the regions file (the painted-material refusal is overridden: code draws this region)"
+    },
+    {
+      "severity": "warning",
+      "code": "measurement-warning",
+      "regionId": null,
+      "message": "region book-doodle: \"codeDrawn\": true set in the regions file (the painted-material refusal is overridden: code draws this region)"
+    },
+    {
+      "severity": "warning",
+      "code": "measurement-warning",
+      "regionId": null,
+      "message": "region calendar-doodle: \"codeDrawn\": true set in the regions file (the painted-material refusal is overridden: code draws this region)"
+    },
+    {
+      "severity": "warning",
+      "code": "measurement-warning",
+      "regionId": null,
+      "message": "region next-section-ground: \"bleed\": true set in the regions file (the clipped-artwork refusal is overridden: the page crops it there)"
+    },
+    {
+      "severity": "warning",
+      "code": "uncovered-ink",
+      "regionId": null,
+      "message": "3 grid cells have detail outside named regions. This is a coverage heuristic, not proof of missing components."
+    }
+  ],
+  "overlaps": [
+    {
+      "a": "primary-nav",
+      "b": "route-upper",
+      "pixels": 576.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "top-utilities",
+      "b": "route-upper",
+      "pixels": 7245.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "hero-title",
+      "b": "route-middle",
+      "pixels": 1735.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "hero-copy",
+      "b": "route-middle",
+      "pixels": 25830.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "hero-proof",
+      "b": "route-middle",
+      "pixels": 10240.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-upper",
+      "b": "route-middle",
+      "pixels": 20709.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-upper",
+      "b": "login-station",
+      "pixels": 144500.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "route-upper",
+      "b": "login-index",
+      "pixels": 7008.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-upper",
+      "b": "login-heading",
+      "pixels": 5859.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-upper",
+      "b": "login-subcopy",
+      "pixels": 6678.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-upper",
+      "b": "username-field",
+      "pixels": 17630.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-upper",
+      "b": "password-field",
+      "pixels": 17630.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-upper",
+      "b": "login-button",
+      "pixels": 20500.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-upper",
+      "b": "forgot-link",
+      "pixels": 2668.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-upper",
+      "b": "approval-index",
+      "pixels": 4896.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "route-lower",
+      "pixels": 49749.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "login-station",
+      "pixels": 9387.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "route-middle",
+      "b": "forgot-link",
+      "pixels": 348.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "approval-station",
+      "pixels": 50546.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "route-middle",
+      "b": "approval-index",
+      "pixels": 7830.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "approval-icon",
+      "pixels": 2700.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "approval-heading",
+      "pixels": 4060.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "approval-status",
+      "pixels": 2625.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "approval-copy",
+      "pixels": 14300.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "permission-station",
+      "pixels": 15400.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "route-middle",
+      "b": "permission-index",
+      "pixels": 4560.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "permission-icon",
+      "pixels": 2397.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "permission-heading",
+      "pixels": 868.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "permission-copy",
+      "pixels": 744.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "permission-chips",
+      "pixels": 4472.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "schedule-station",
+      "pixels": 52002.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "route-middle",
+      "b": "schedule-index",
+      "pixels": 8140.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "schedule-icon",
+      "pixels": 2808.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "schedule-heading",
+      "pixels": 3045.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "schedule-copy",
+      "pixels": 6118.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "schedule-table",
+      "pixels": 5811.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "attendance-station",
+      "pixels": 17748.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "route-middle",
+      "b": "attendance-index",
+      "pixels": 10203.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "attendance-icon",
+      "pixels": 1377.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "attendance-heading",
+      "pixels": 3810.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-middle",
+      "b": "note-schedule",
+      "pixels": 676.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-lower",
+      "b": "permission-station",
+      "pixels": 9856.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "route-lower",
+      "b": "permission-chips",
+      "pixels": 3042.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-lower",
+      "b": "schedule-station",
+      "pixels": 20720.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "route-lower",
+      "b": "schedule-table",
+      "pixels": 9420.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-lower",
+      "b": "attendance-station",
+      "pixels": 134237.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "route-lower",
+      "b": "attendance-index",
+      "pixels": 10203.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-lower",
+      "b": "attendance-icon",
+      "pixels": 2703.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-lower",
+      "b": "attendance-heading",
+      "pixels": 3810.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-lower",
+      "b": "attendance-link",
+      "pixels": 2256.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-lower",
+      "b": "attendance-copy",
+      "pixels": 6160.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-lower",
+      "b": "attendance-class",
+      "pixels": 22725.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-lower",
+      "b": "attendance-count",
+      "pixels": 14043.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-lower",
+      "b": "attendance-chart",
+      "pixels": 10434.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-lower",
+      "b": "attendance-exceptions",
+      "pixels": 18512.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-lower",
+      "b": "note-attendance",
+      "pixels": 5106.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-lower",
+      "b": "next-section-ground",
+      "pixels": 63945.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-lower",
+      "b": "next-section-note",
+      "pixels": 4692.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "route-lower",
+      "b": "route-down-control",
+      "pixels": 2756.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "login-station",
+      "b": "login-index",
+      "pixels": 3000.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "login-station",
+      "b": "login-heading",
+      "pixels": 5859.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "login-station",
+      "b": "login-subcopy",
+      "pixels": 6678.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "login-station",
+      "b": "username-field",
+      "pixels": 17630.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "login-station",
+      "b": "password-field",
+      "pixels": 17630.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "login-station",
+      "b": "login-button",
+      "pixels": 20500.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "login-station",
+      "b": "forgot-link",
+      "pixels": 2668.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "login-station",
+      "b": "approval-index",
+      "pixels": 936.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "approval-station",
+      "b": "approval-index",
+      "pixels": 1441.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "approval-station",
+      "b": "approval-icon",
+      "pixels": 2700.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "approval-station",
+      "b": "approval-heading",
+      "pixels": 4060.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "approval-station",
+      "b": "approval-status",
+      "pixels": 2625.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "approval-station",
+      "b": "approval-copy",
+      "pixels": 14300.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "permission-station",
+      "b": "permission-index",
+      "pixels": 2499.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "permission-station",
+      "b": "permission-icon",
+      "pixels": 2397.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "permission-station",
+      "b": "permission-heading",
+      "pixels": 3976.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "permission-station",
+      "b": "permission-copy",
+      "pixels": 6600.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "permission-station",
+      "b": "permission-chips",
+      "pixels": 19656.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "permission-station",
+      "b": "note-permission",
+      "pixels": 4544.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "schedule-station",
+      "b": "schedule-index",
+      "pixels": 2072.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "schedule-station",
+      "b": "schedule-icon",
+      "pixels": 2808.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "schedule-station",
+      "b": "schedule-heading",
+      "pixels": 3045.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "schedule-station",
+      "b": "schedule-copy",
+      "pixels": 6118.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "schedule-station",
+      "b": "schedule-table",
+      "pixels": 70179.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "attendance-station",
+      "b": "attendance-index",
+      "pixels": 2864.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "attendance-station",
+      "b": "attendance-icon",
+      "pixels": 2703.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "attendance-station",
+      "b": "attendance-heading",
+      "pixels": 3810.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "attendance-station",
+      "b": "attendance-link",
+      "pixels": 2256.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "attendance-station",
+      "b": "attendance-copy",
+      "pixels": 6160.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "attendance-station",
+      "b": "attendance-class",
+      "pixels": 22725.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "attendance-station",
+      "b": "attendance-count",
+      "pixels": 14043.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "attendance-station",
+      "b": "attendance-chart",
+      "pixels": 10434.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "attendance-station",
+      "b": "attendance-exceptions",
+      "pixels": 18512.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "attendance-station",
+      "b": "note-attendance",
+      "pixels": 333.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "attendance-station",
+      "b": "next-section-ground",
+      "pixels": 13925.0,
+      "relationship": "container extent"
+    },
+    {
+      "a": "attendance-count",
+      "b": "next-section-ground",
+      "pixels": 1963.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "attendance-chart",
+      "b": "next-section-ground",
+      "pixels": 1554.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "attendance-exceptions",
+      "b": "next-section-ground",
+      "pixels": 3026.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "note-schedule",
+      "b": "calendar-doodle",
+      "pixels": 912.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "calendar-doodle",
+      "b": "next-section-ground",
+      "pixels": 304.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "next-section-ground",
+      "b": "next-section-kicker",
+      "pixels": 2242.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "next-section-ground",
+      "b": "next-section-title",
+      "pixels": 11560.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "next-section-ground",
+      "b": "next-section-note",
+      "pixels": 15680.0,
+      "relationship": "overlapping elements"
+    },
+    {
+      "a": "next-section-ground",
+      "b": "route-down-control",
+      "pixels": 2756.0,
+      "relationship": "overlapping elements"
+    }
+  ],
+  "reviewGroups": {},
+  "uncoveredInkCells": [
+    "A3",
+    "B3",
+    "B6"
+  ],
+  "comparisonSheets": [
+    {
+      "path": "comparison-1.png",
+      "regionIds": [
+        "next-section-ground"
+      ]
+    }
+  ]
+}

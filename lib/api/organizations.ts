@@ -1,0 +1,190 @@
+import { apiRequest } from "./http";
+import type { Center, CenterChangeRequest, CenterStatusChange, Room, TeachingPage } from "./types";
+
+export interface CenterStatusCounts {
+  pendingApproval: number;
+  approved: number;
+  suspended: number;
+  rejected: number;
+  total: number;
+}
+
+export type CenterStatusFilter = "PendingApproval" | "Approved" | "Rejected" | "Suspended";
+export type ChangeQueueStatus = "Pending" | "Approved" | "Rejected" | "Withdrawn" | "All";
+
+export interface CreateCenterInput {
+  legalName: string;
+  displayName: string;
+  taxCode: string;
+  businessRegistrationNumber?: string | null;
+  address: string;
+  contactEmail: string;
+  contactPhone: string;
+}
+
+export interface RequestCenterChangeInput {
+  legalName: string;
+  displayName: string;
+  taxCode: string;
+  businessRegistrationNumber?: string | null;
+  registeredAddress: string;
+  contactEmail: string;
+  contactPhone: string;
+  reason: string;
+  evidenceReference: string;
+}
+
+export interface RoomInput {
+  code: string;
+  name: string;
+  locationNote?: string | null;
+}
+
+export const organizationsApi = {
+  getCenterProfile(centerId: string) {
+    return apiRequest<Center>(`/centers/${centerId}/profile`);
+  },
+
+  listCenterChanges(centerId: string) {
+    return apiRequest<CenterChangeRequest[]>(`/centers/${centerId}/change-requests`);
+  },
+
+  /** D10: the owner takes back a pending change request. */
+  withdrawCenterChange(centerId: string, requestId: string) {
+    return apiRequest<CenterChangeRequest>(`/centers/${centerId}/change-requests/${requestId}/withdraw`, {
+      method: "POST",
+    });
+  },
+
+  /** D4: owner opts the center in or out of the public directory. */
+  setDirectoryListing(centerId: string, listed: boolean) {
+    return apiRequest<Center>(`/centers/${centerId}/directory`, { method: "PUT", body: { listed } });
+  },
+
+  centerStatusHistory(centerId: string) {
+    return apiRequest<CenterStatusChange[]>(`/centers/${centerId}/status-history`);
+  },
+
+  requestCenterChange(centerId: string, input: RequestCenterChangeInput) {
+    return apiRequest<CenterChangeRequest>(`/centers/${centerId}/change-requests`, {
+      method: "POST",
+      body: input,
+    });
+  },
+
+  platformCreateCenter(input: CreateCenterInput) {
+    return apiRequest<Center>("/platform/centers", { method: "POST", body: input });
+  },
+
+  platformListCenters(query: { status?: CenterStatusFilter; search?: string; page?: number; pageSize?: number } = {}) {
+    return apiRequest<TeachingPage<Center>>("/platform/centers", { query });
+  },
+
+  platformGetCenter(centerId: string) {
+    return apiRequest<Center>(`/platform/centers/${centerId}`);
+  },
+
+  platformCenterCounts() {
+    return apiRequest<CenterStatusCounts>("/platform/center-counts");
+  },
+
+  /** D8: correct a rejected application and send it back for review. */
+  platformResubmitCenter(centerId: string, input: CreateCenterInput & { note?: string | null }) {
+    return apiRequest<Center>(`/platform/centers/${centerId}/resubmit`, { method: "POST", body: input });
+  },
+
+  platformCenterHistory(centerId: string) {
+    return apiRequest<CenterStatusChange[]>(`/platform/centers/${centerId}/history`);
+  },
+
+  platformChangeQueue(query: { status?: ChangeQueueStatus; page?: number; pageSize?: number } = {}) {
+    return apiRequest<TeachingPage<CenterChangeRequest>>("/platform/change-requests", { query });
+  },
+
+  platformApproveCenter(centerId: string) {
+    return apiRequest<Center>(`/platform/centers/${centerId}/approve`, { method: "POST" });
+  },
+
+  platformRejectCenter(centerId: string, reason: string) {
+    return apiRequest<Center>(`/platform/centers/${centerId}/reject`, {
+      method: "POST",
+      body: { reason },
+    });
+  },
+
+  platformSuspendCenter(centerId: string, reason: string) {
+    return apiRequest<Center>(`/platform/centers/${centerId}/suspend`, {
+      method: "POST",
+      body: { reason },
+    });
+  },
+
+  platformReinstateCenter(centerId: string, reason: string) {
+    return apiRequest<Center>(`/platform/centers/${centerId}/reinstate`, {
+      method: "POST",
+      body: { reason },
+    });
+  },
+
+  platformListCenterChanges(centerId: string) {
+    return apiRequest<CenterChangeRequest[]>(`/platform/centers/${centerId}/change-requests`);
+  },
+
+  platformApproveCenterChange(centerId: string, requestId: string, reviewNote: string) {
+    return apiRequest<CenterChangeRequest>(
+      `/platform/centers/${centerId}/change-requests/${requestId}/approve`,
+      { method: "POST", body: { reviewNote } },
+    );
+  },
+
+  platformRejectCenterChange(centerId: string, requestId: string, reviewNote: string) {
+    return apiRequest<CenterChangeRequest>(
+      `/platform/centers/${centerId}/change-requests/${requestId}/reject`,
+      { method: "POST", body: { reviewNote } },
+    );
+  },
+
+  /** C5: paged like the other catalogs. Use listAllRooms for lookups. */
+  listRooms(centerId: string, query: { includeArchived?: boolean; search?: string; page?: number; pageSize?: number } = {}) {
+    return apiRequest<TeachingPage<Room>>(`/centers/${centerId}/rooms`, { query });
+  },
+
+  async listAllRooms(centerId: string, includeArchived = false) {
+    const items: Room[] = [];
+    for (let page = 1; page <= 20; page += 1) {
+      const result = await organizationsApi.listRooms(centerId, { includeArchived, page, pageSize: 100 });
+      items.push(...result.items);
+      if (page * result.pageSize >= result.totalCount) break;
+    }
+    return items;
+  },
+
+  getRoom(centerId: string, roomId: string) {
+    return apiRequest<Room>(`/centers/${centerId}/rooms/${roomId}`);
+  },
+
+  createRoom(centerId: string, input: RoomInput) {
+    return apiRequest<Room>(`/centers/${centerId}/rooms`, { method: "POST", body: input });
+  },
+
+  updateRoom(centerId: string, roomId: string, input: RoomInput & { expectedVersion: number }) {
+    return apiRequest<Room>(`/centers/${centerId}/rooms/${roomId}`, {
+      method: "PUT",
+      body: input,
+    });
+  },
+
+  archiveRoom(centerId: string, roomId: string, expectedVersion: number) {
+    return apiRequest<Room>(`/centers/${centerId}/rooms/${roomId}/archive`, {
+      method: "POST",
+      body: { expectedVersion },
+    });
+  },
+
+  reactivateRoom(centerId: string, roomId: string, expectedVersion: number) {
+    return apiRequest<Room>(`/centers/${centerId}/rooms/${roomId}/reactivate`, {
+      method: "POST",
+      body: { expectedVersion },
+    });
+  },
+};

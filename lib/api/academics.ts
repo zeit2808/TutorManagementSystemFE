@@ -1,0 +1,577 @@
+import { apiRequest } from "./http";
+import type {
+  ActivationLink,
+  ActivationPreview,
+  ActivationResult,
+  ClassInvite,
+  ClassInviteJoin,
+  ClassInviteJoinResult,
+  ClassInvitePreview,
+  MergeResult,
+  ApplicationCheck,
+  AttendanceRevision,
+  AttendanceMark,
+  AttendanceSheet,
+  ClassApplication,
+  ClassApplicationStatus,
+  ClassStudent,
+  DirectoryCenter,
+  DirectoryCenterDetail,
+  Enrollment,
+  Guid,
+  IsoDate,
+  IsoDateTime,
+  LocalTime,
+  MyNoticePage,
+  MySchedule,
+  MyTeaching,
+  OpenClass,
+  ScheduleChange,
+  SessionImpact,
+  StudentRequest,
+  StudentRequestKind,
+  StudentRequestStatus,
+  SchedulePreview,
+  ScheduleSeries,
+  ScheduleSeriesCreated,
+  ScheduleSeriesReplaced,
+  ScheduleSeriesStopped,
+  Student,
+  StudentSession,
+  Subject,
+  Teacher,
+  TeachingClass,
+  TeachingPage,
+  TeachingSession,
+} from "./types";
+
+export interface PageQuery {
+  [key: string]: string | number | boolean | null | undefined;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface CreateScheduleSeriesInput {
+  requestId: Guid;
+  classId: Guid;
+  teacherId: Guid;
+  roomId: Guid;
+  /** Optional: the server always schedules in Vietnam time (Asia/Ho_Chi_Minh). */
+  timeZoneId?: string;
+  startDate: IsoDate;
+  endDate: IsoDate;
+  localStartTime: LocalTime;
+  durationMinutes: number;
+  weekdays: string[];
+  excludedDates?: IsoDate[] | null;
+}
+
+export interface AttendanceOverrideInput {
+  studentId: Guid;
+  mark: AttendanceMark;
+  note?: string | null;
+}
+
+export const academicsApi = {
+  /** C5: paged like the other catalogs. Use listAllSubjects for lookups. */
+  listSubjects(centerId: Guid, query: PageQuery & { includeArchived?: boolean; search?: string } = {}) {
+    return apiRequest<TeachingPage<Subject>>(`/centers/${centerId}/subjects`, { query });
+  },
+  async listAllSubjects(centerId: Guid, includeArchived = false) {
+    const items: Subject[] = [];
+    for (let page = 1; page <= 20; page += 1) {
+      const result = await academicsApi.listSubjects(centerId, { includeArchived, page, pageSize: 100 });
+      items.push(...result.items);
+      if (page * result.pageSize >= result.totalCount) break;
+    }
+    return items;
+  },
+  getSubject(centerId: Guid, subjectId: Guid) {
+    return apiRequest<Subject>(`/centers/${centerId}/subjects/${subjectId}`);
+  },
+  createSubject(centerId: Guid, input: { code: string; name: string; description?: string | null }) {
+    return apiRequest<Subject>(`/centers/${centerId}/subjects`, { method: "POST", body: input });
+  },
+  updateSubject(
+    centerId: Guid,
+    subjectId: Guid,
+    input: { code: string; name: string; description?: string | null; expectedVersion: number },
+  ) {
+    return apiRequest<Subject>(`/centers/${centerId}/subjects/${subjectId}`, {
+      method: "PUT",
+      body: input,
+    });
+  },
+  archiveSubject(centerId: Guid, subjectId: Guid, expectedVersion: number) {
+    return apiRequest<Subject>(`/centers/${centerId}/subjects/${subjectId}/archive`, {
+      method: "POST",
+      body: { expectedVersion },
+    });
+  },
+  reactivateSubject(centerId: Guid, subjectId: Guid, expectedVersion: number) {
+    return apiRequest<Subject>(`/centers/${centerId}/subjects/${subjectId}/reactivate`, {
+      method: "POST",
+      body: { expectedVersion },
+    });
+  },
+
+  listClasses(centerId: Guid, query: PageQuery & { includeArchived?: boolean; search?: string } = {}) {
+    return apiRequest<TeachingPage<TeachingClass>>(`/centers/${centerId}/classes`, { query });
+  },
+  getClass(centerId: Guid, classId: Guid) {
+    return apiRequest<TeachingClass>(`/centers/${centerId}/classes/${classId}`);
+  },
+  createClass(
+    centerId: Guid,
+    input: { subjectId: Guid; code: string; name: string; maxStudents: number },
+  ) {
+    return apiRequest<TeachingClass>(`/centers/${centerId}/classes`, { method: "POST", body: input });
+  },
+  updateClass(
+    centerId: Guid,
+    classId: Guid,
+    input: { name: string; maxStudents: number; expectedVersion: number },
+  ) {
+    return apiRequest<TeachingClass>(`/centers/${centerId}/classes/${classId}`, {
+      method: "PUT",
+      body: input,
+    });
+  },
+  archiveClass(centerId: Guid, classId: Guid, expectedVersion: number) {
+    return apiRequest<TeachingClass>(`/centers/${centerId}/classes/${classId}/archive`, {
+      method: "POST",
+      body: { expectedVersion },
+    });
+  },
+  reactivateClass(centerId: Guid, classId: Guid, expectedVersion: number) {
+    return apiRequest<TeachingClass>(`/centers/${centerId}/classes/${classId}/reactivate`, {
+      method: "POST",
+      body: { expectedVersion },
+    });
+  },
+  listEnrollments(
+    centerId: Guid,
+    classId: Guid,
+    query: PageQuery & { status?: "active" | "withdrawn" | "all" } = {},
+  ) {
+    return apiRequest<TeachingPage<ClassStudent>>(
+      `/centers/${centerId}/classes/${classId}/enrollments`,
+      { query },
+    );
+  },
+  /** B5: 409 student_schedule_conflict carries a ScheduleCheck in ApiError.data; resend with acknowledgeConflicts. */
+  enrollStudent(centerId: Guid, classId: Guid, studentId: Guid, acknowledgeConflicts = false) {
+    return apiRequest<Enrollment>(`/centers/${centerId}/classes/${classId}/enrollments`, {
+      method: "POST",
+      body: { studentId, acknowledgeConflicts },
+    });
+  },
+  /** Takes effect now; a reason is required (D7). */
+  withdrawStudent(centerId: Guid, classId: Guid, studentId: Guid, reason: string) {
+    return apiRequest<Enrollment>(
+      `/centers/${centerId}/classes/${classId}/enrollments/${studentId}/withdraw`,
+      { method: "POST", body: { reason } },
+    );
+  },
+
+  /** search matches code, name or parent phone on the server. */
+  listStudents(centerId: Guid, query: PageQuery & { includeArchived?: boolean; search?: string } = {}) {
+    return apiRequest<TeachingPage<Student>>(`/centers/${centerId}/students`, { query });
+  },
+  getStudent(centerId: Guid, studentId: Guid) {
+    return apiRequest<Student>(`/centers/${centerId}/students/${studentId}`);
+  },
+  /** Leave code empty to get the next HS-000001 code. */
+  createStudent(centerId: Guid, input: { code?: string | null; fullName: string; parentName: string; parentPhone: string }) {
+    return apiRequest<Student>(`/centers/${centerId}/students`, { method: "POST", body: input });
+  },
+  updateStudent(
+    centerId: Guid,
+    studentId: Guid,
+    input: { fullName: string; parentName: string; parentPhone: string; expectedVersion: number },
+  ) {
+    return apiRequest<Student>(`/centers/${centerId}/students/${studentId}`, {
+      method: "PUT",
+      body: input,
+    });
+  },
+  archiveStudent(centerId: Guid, studentId: Guid, expectedVersion: number) {
+    return apiRequest<Student>(`/centers/${centerId}/students/${studentId}/archive`, {
+      method: "POST",
+      body: { expectedVersion },
+    });
+  },
+  reactivateStudent(centerId: Guid, studentId: Guid, expectedVersion: number) {
+    return apiRequest<Student>(`/centers/${centerId}/students/${studentId}/reactivate`, {
+      method: "POST",
+      body: { expectedVersion },
+    });
+  },
+
+  listTeachers(centerId: Guid, query: PageQuery & { includeArchived?: boolean; search?: string } = {}) {
+    return apiRequest<TeachingPage<Teacher>>(`/centers/${centerId}/teachers`, { query });
+  },
+  /** Link a teacher profile to a member's login, or unlink with null. Owner only. */
+  linkTeacherAccount(centerId: Guid, teacherId: Guid, userId: Guid | null, expectedVersion: number) {
+    return apiRequest<Teacher>(`/centers/${centerId}/teachers/${teacherId}/account`, {
+      method: "PUT",
+      body: { userId, expectedVersion },
+    });
+  },
+  /** The caller's own teacher profile in this center and its sessions (≤ 31 days). */
+  myTeaching(centerId: Guid, fromUtc: IsoDateTime, toUtc: IsoDateTime) {
+    return apiRequest<MyTeaching>(`/centers/${centerId}/my/teaching`, { query: { fromUtc, toUtc } });
+  },
+  getTeacher(centerId: Guid, teacherId: Guid) {
+    return apiRequest<Teacher>(`/centers/${centerId}/teachers/${teacherId}`);
+  },
+  createTeacher(centerId: Guid, input: { code: string; fullName: string }) {
+    return apiRequest<Teacher>(`/centers/${centerId}/teachers`, { method: "POST", body: input });
+  },
+  updateTeacher(centerId: Guid, teacherId: Guid, input: { fullName: string; expectedVersion: number }) {
+    return apiRequest<Teacher>(`/centers/${centerId}/teachers/${teacherId}`, {
+      method: "PUT",
+      body: input,
+    });
+  },
+  archiveTeacher(centerId: Guid, teacherId: Guid, expectedVersion: number) {
+    return apiRequest<Teacher>(`/centers/${centerId}/teachers/${teacherId}/archive`, {
+      method: "POST",
+      body: { expectedVersion },
+    });
+  },
+  reactivateTeacher(centerId: Guid, teacherId: Guid, expectedVersion: number) {
+    return apiRequest<Teacher>(`/centers/${centerId}/teachers/${teacherId}/reactivate`, {
+      method: "POST",
+      body: { expectedVersion },
+    });
+  },
+
+  listSessions(
+    centerId: Guid,
+    fromUtc: IsoDateTime,
+    toUtc: IsoDateTime,
+    filter: { classId?: Guid; teacherId?: Guid; roomId?: Guid } = {},
+  ) {
+    return apiRequest<TeachingSession[]>(`/centers/${centerId}/sessions`, {
+      query: { fromUtc, toUtc, ...filter },
+    });
+  },
+  createSession(
+    centerId: Guid,
+    input: {
+      classId: Guid;
+      teacherId: Guid;
+      roomId: Guid;
+      startUtc: IsoDateTime;
+      endUtc: IsoDateTime;
+      /** D6: the cancelled or not-held session this one makes up for. */
+      makeupForSessionId?: Guid | null;
+    },
+  ) {
+    return apiRequest<TeachingSession>(`/centers/${centerId}/sessions`, {
+      method: "POST",
+      body: input,
+    });
+  },
+  rescheduleSession(
+    centerId: Guid,
+    sessionId: Guid,
+    input: {
+      teacherId: Guid;
+      roomId: Guid;
+      startUtc: IsoDateTime;
+      endUtc: IsoDateTime;
+      expectedVersion: number;
+      /** D7: required, shown to staff and students. */
+      reason: string;
+    },
+  ) {
+    return apiRequest<TeachingSession>(`/centers/${centerId}/sessions/${sessionId}`, {
+      method: "PUT",
+      body: input,
+    });
+  },
+  /** D7: a future session, with a required reason. */
+  cancelSession(centerId: Guid, sessionId: Guid, expectedVersion: number, reason: string) {
+    return apiRequest<TeachingSession>(`/centers/${centerId}/sessions/${sessionId}/cancel`, {
+      method: "POST",
+      body: { expectedVersion, reason },
+    });
+  },
+  /** D6: a session that has started but did not take place. */
+  markSessionNotHeld(centerId: Guid, sessionId: Guid, expectedVersion: number, reason: string) {
+    return apiRequest<TeachingSession>(`/centers/${centerId}/sessions/${sessionId}/not-held`, {
+      method: "POST",
+      body: { expectedVersion, reason },
+    });
+  },
+
+  /** D4: public directory of centers that opted in, with classes open for registration. */
+  directoryCenters(query: PageQuery & { search?: string; subject?: string } = {}) {
+    return apiRequest<TeachingPage<DirectoryCenter>>("/directory/centers", { query });
+  },
+  directorySubjects() {
+    return apiRequest<string[]>("/directory/subjects");
+  },
+  directoryCenter(centerId: Guid, subject?: string) {
+    return apiRequest<DirectoryCenterDetail>(`/directory/centers/${centerId}`, { query: { subject } });
+  },
+
+  listScheduleSeries(centerId: Guid, query: PageQuery & { classId?: Guid } = {}) {
+    return apiRequest<TeachingPage<ScheduleSeries>>(`/centers/${centerId}/schedule-series`, { query });
+  },
+  getScheduleSeries(centerId: Guid, seriesId: Guid) {
+    return apiRequest<ScheduleSeries>(`/centers/${centerId}/schedule-series/${seriesId}`);
+  },
+  previewScheduleSeries(centerId: Guid, input: CreateScheduleSeriesInput) {
+    return apiRequest<SchedulePreview>(`/centers/${centerId}/schedule-series/preview`, {
+      method: "POST",
+      body: input,
+    });
+  },
+  createScheduleSeries(centerId: Guid, input: CreateScheduleSeriesInput) {
+    return apiRequest<ScheduleSeriesCreated>(`/centers/${centerId}/schedule-series`, {
+      method: "POST",
+      body: input,
+    });
+  },
+  /** B6: reason required; under 7 days' notice fails with schedule_short_notice unless acknowledged. */
+  stopScheduleSeries(
+    centerId: Guid,
+    seriesId: Guid,
+    input: { fromDate: IsoDate; expectedVersion: number; reason: string; acknowledgeShortNotice?: boolean },
+  ) {
+    return apiRequest<ScheduleSeriesStopped>(`/centers/${centerId}/schedule-series/${seriesId}/stop`, {
+      method: "POST",
+      body: input,
+    });
+  },
+  replaceFutureScheduleSeries(
+    centerId: Guid,
+    seriesId: Guid,
+    input: {
+      fromDate: IsoDate;
+      expectedVersion: number;
+      replacement: CreateScheduleSeriesInput;
+      reason: string;
+      acknowledgeShortNotice?: boolean;
+    },
+  ) {
+    return apiRequest<ScheduleSeriesReplaced>(
+      `/centers/${centerId}/schedule-series/${seriesId}/replace-future`,
+      { method: "POST", body: input },
+    );
+  },
+
+  getAttendance(centerId: Guid, sessionId: Guid) {
+    return apiRequest<AttendanceSheet>(`/centers/${centerId}/sessions/${sessionId}/attendance`);
+  },
+  saveAttendanceDraft(
+    centerId: Guid,
+    sessionId: Guid,
+    input: {
+      expectedVersion: number;
+      actualTeacherId?: Guid | null;
+      note?: string | null;
+      defaultMark: AttendanceMark;
+      overrides: AttendanceOverrideInput[];
+    },
+  ) {
+    return apiRequest<AttendanceSheet>(`/centers/${centerId}/sessions/${sessionId}/attendance/draft`, {
+      method: "PUT",
+      body: input,
+    });
+  },
+  submitAttendance(centerId: Guid, sessionId: Guid, expectedVersion: number) {
+    return apiRequest<AttendanceSheet>(`/centers/${centerId}/sessions/${sessionId}/attendance/submit`, {
+      method: "POST",
+      body: { expectedVersion },
+    });
+  },
+  correctAttendance(
+    centerId: Guid,
+    sessionId: Guid,
+    input: {
+      expectedVersion: number;
+      actualTeacherId: Guid;
+      note?: string | null;
+      reason: string;
+      changes: AttendanceOverrideInput[];
+    },
+  ) {
+    return apiRequest<AttendanceSheet>(`/centers/${centerId}/sessions/${sessionId}/attendance/correction`, {
+      method: "PATCH",
+      body: input,
+    });
+  },
+  attendanceHistory(centerId: Guid, sessionId: Guid) {
+    return apiRequest<AttendanceRevision[]>(
+      `/centers/${centerId}/sessions/${sessionId}/attendance/history`,
+    );
+  },
+
+  listOpenClasses(centerId: Guid, query: PageQuery = {}) {
+    return apiRequest<TeachingPage<OpenClass>>(`/centers/${centerId}/open-classes`, { query });
+  },
+  submitClassApplications(
+    centerId: Guid,
+    input: { fullName: string; parentName: string; parentPhone: string; classIds: Guid[] },
+    idempotencyKey: Guid,
+  ) {
+    return apiRequest<ClassApplication[]>(`/centers/${centerId}/class-applications`, {
+      method: "POST",
+      body: input,
+      idempotencyKey,
+    });
+  },
+  myClassApplications(centerId: Guid, query: PageQuery = {}) {
+    return apiRequest<TeachingPage<ClassApplication>>(`/centers/${centerId}/my/class-applications`, {
+      query,
+    });
+  },
+  myClasses(centerId: Guid) {
+    return apiRequest<OpenClass[]>(`/centers/${centerId}/my/classes`);
+  },
+  mySessions(centerId: Guid, fromUtc: IsoDateTime, toUtc: IsoDateTime) {
+    return apiRequest<StudentSession[]>(`/centers/${centerId}/my/sessions`, {
+      query: { fromUtc, toUtc },
+    });
+  },
+  setClassRegistration(centerId: Guid, classId: Guid, open: boolean, expectedVersion: number) {
+    return apiRequest<TeachingClass>(`/centers/${centerId}/classes/${classId}/registration`, {
+      method: "PUT",
+      body: { open, expectedVersion },
+    });
+  },
+  listClassApplications(
+    centerId: Guid,
+    query: PageQuery & { status?: ClassApplicationStatus; classId?: Guid } = {},
+  ) {
+    return apiRequest<TeachingPage<ClassApplication>>(`/centers/${centerId}/class-applications`, {
+      query,
+    });
+  },
+  /** B5: like enrollStudent, a clash in this center returns 409 with the list until acknowledged. */
+  approveClassApplication(centerId: Guid, applicationId: Guid, acknowledgeConflicts = false) {
+    return apiRequest<ClassApplication>(
+      `/centers/${centerId}/class-applications/${applicationId}/approve`,
+      { method: "POST", body: { acknowledgeConflicts } },
+    );
+  },
+  /** F3: the student's own clashes for the chosen classes (any center), before submitting. */
+  checkClassApplications(centerId: Guid, classIds: Guid[]) {
+    return apiRequest<ApplicationCheck>(`/centers/${centerId}/class-applications/check`, {
+      method: "POST",
+      body: { classIds },
+    });
+  },
+
+  /** B5/B6: students affected by adding or moving a session (sessionId when moving). */
+  sessionImpact(centerId: Guid, input: { classId: Guid; startUtc: IsoDateTime; endUtc: IsoDateTime; sessionId?: Guid | null; teacherId?: Guid | null }) {
+    return apiRequest<SessionImpact>(`/centers/${centerId}/sessions/impact`, { method: "POST", body: input });
+  },
+  sessionChanges(centerId: Guid, sessionId: Guid) {
+    return apiRequest<ScheduleChange[]>(`/centers/${centerId}/sessions/${sessionId}/changes`);
+  },
+  scheduleChanges(centerId: Guid, query: PageQuery & { classId?: Guid } = {}) {
+    return apiRequest<TeachingPage<ScheduleChange>>(`/centers/${centerId}/schedule-changes`, { query });
+  },
+
+  /** B4: the caller's sessions in every center (≤ 42 days), as student and as teacher. */
+  mySchedule(fromUtc: IsoDateTime, toUtc: IsoDateTime) {
+    return apiRequest<MySchedule>("/me/schedule", { query: { fromUtc, toUtc } });
+  },
+  myNotices(query: PageQuery & { unreadOnly?: boolean } = {}) {
+    return apiRequest<MyNoticePage>("/me/notices", { query });
+  },
+  acknowledgeNotice(noticeId: Guid) {
+    return apiRequest<string>(`/me/notices/${noticeId}/acknowledge`, { method: "POST" });
+  },
+  markNoticesSeen() {
+    return apiRequest<number>("/me/notices/seen", { method: "POST" });
+  },
+  myRequests(query: PageQuery = {}) {
+    return apiRequest<TeachingPage<StudentRequest>>("/me/requests", { query });
+  },
+  submitStudentRequest(
+    centerId: Guid,
+    input: { kind: StudentRequestKind; classId: Guid; sessionId?: Guid | null; targetClassId?: Guid | null; noticeId?: Guid | null; reason: string },
+  ) {
+    return apiRequest<StudentRequest>(`/centers/${centerId}/my/requests`, { method: "POST", body: input });
+  },
+  cancelStudentRequest(centerId: Guid, requestId: Guid) {
+    return apiRequest<StudentRequest>(`/centers/${centerId}/my/requests/${requestId}/cancel`, { method: "POST" });
+  },
+  listStudentRequests(
+    centerId: Guid,
+    query: PageQuery & { status?: StudentRequestStatus; kind?: StudentRequestKind; classId?: Guid } = {},
+  ) {
+    return apiRequest<TeachingPage<StudentRequest>>(`/centers/${centerId}/student-requests`, { query });
+  },
+  approveStudentRequest(centerId: Guid, requestId: Guid, input: { expectedVersion: number; note?: string | null; acknowledgeConflicts?: boolean }) {
+    return apiRequest<StudentRequest>(`/centers/${centerId}/student-requests/${requestId}/approve`, { method: "POST", body: input });
+  },
+  rejectStudentRequest(centerId: Guid, requestId: Guid, input: { expectedVersion: number; reason: string }) {
+    return apiRequest<StudentRequest>(`/centers/${centerId}/student-requests/${requestId}/reject`, { method: "POST", body: input });
+  },
+  // ---- M3: activation links, class invite links, merge ----
+  createActivationLink(centerId: Guid, studentId: Guid) {
+    return apiRequest<ActivationLink>(`/centers/${centerId}/students/${studentId}/activation-link`, { method: "POST" });
+  },
+  revokeActivationLink(centerId: Guid, studentId: Guid) {
+    return apiRequest<boolean>(`/centers/${centerId}/students/${studentId}/activation-link/revoke`, { method: "POST" });
+  },
+  createClassActivationLinks(centerId: Guid, classId: Guid) {
+    return apiRequest<ActivationLink[]>(`/centers/${centerId}/classes/${classId}/activation-links`, { method: "POST" });
+  },
+  unlinkStudentAccount(centerId: Guid, studentId: Guid, expectedVersion: number) {
+    return apiRequest<Student>(`/centers/${centerId}/students/${studentId}/unlink-account`, { method: "POST", body: { expectedVersion } });
+  },
+  dismissStudentDuplicate(centerId: Guid, studentId: Guid, expectedVersion: number) {
+    return apiRequest<Student>(`/centers/${centerId}/students/${studentId}/dismiss-duplicate`, { method: "POST", body: { expectedVersion } });
+  },
+  /** Moves the source profile into the target (the target keeps its code). */
+  mergeStudents(centerId: Guid, targetStudentId: Guid, sourceStudentId: Guid) {
+    return apiRequest<MergeResult>(`/centers/${centerId}/students/${targetStudentId}/merge`, { method: "POST", body: { sourceStudentId } });
+  },
+  listClassInvites(centerId: Guid, classId: Guid) {
+    return apiRequest<ClassInvite[]>(`/centers/${centerId}/classes/${classId}/invite-links`);
+  },
+  createClassInvite(centerId: Guid, classId: Guid, input: { validDays: 1 | 7 | 30; maxUses?: number | null }) {
+    return apiRequest<ClassInvite>(`/centers/${centerId}/classes/${classId}/invite-links`, { method: "POST", body: input });
+  },
+  revokeClassInvite(centerId: Guid, inviteId: Guid) {
+    return apiRequest<ClassInvite>(`/centers/${centerId}/invite-links/${inviteId}/revoke`, { method: "POST" });
+  },
+  recodeClassInvite(centerId: Guid, inviteId: Guid) {
+    return apiRequest<ClassInvite>(`/centers/${centerId}/invite-links/${inviteId}/recode`, { method: "POST" });
+  },
+  listClassInviteJoins(centerId: Guid, classId?: Guid) {
+    return apiRequest<ClassInviteJoin[]>(`/centers/${centerId}/class-invite-joins`, { query: { classId } });
+  },
+  previewActivation(token: string) {
+    return apiRequest<ActivationPreview>(`/student-activation/${encodeURIComponent(token)}`);
+  },
+  acceptActivation(token: string) {
+    return apiRequest<ActivationResult>(`/student-activation/${encodeURIComponent(token)}/accept`, { method: "POST" });
+  },
+  declineActivation(token: string) {
+    return apiRequest<boolean>(`/student-activation/${encodeURIComponent(token)}/decline`, { method: "POST" });
+  },
+  previewClassInvite(token: string) {
+    return apiRequest<ClassInvitePreview>(`/class-invites/${encodeURIComponent(token)}`);
+  },
+  joinClassInvite(
+    token: string,
+    input: { code: string; fullName?: string | null; parentName?: string | null; parentPhone?: string | null; studiedHereBefore?: boolean; acknowledgeConflicts?: boolean },
+  ) {
+    return apiRequest<ClassInviteJoinResult>(`/class-invites/${encodeURIComponent(token)}/join`, { method: "POST", body: input });
+  },
+  rejectClassApplication(centerId: Guid, applicationId: Guid, reason: string) {
+    return apiRequest<ClassApplication>(
+      `/centers/${centerId}/class-applications/${applicationId}/reject`,
+      { method: "POST", body: { reason } },
+    );
+  },
+};

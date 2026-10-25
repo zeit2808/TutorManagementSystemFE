@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-22T15:22:00.000Z",
+  "title": "Design System: Quản Lý Dạy Thêm",
+  "extensions": {
+    "colorMeta": {
+      "sidebar": { "role": "primary", "displayName": "Sidebar Indigo", "canonical": "#19184f", "tonalRamp": ["#09081f", "#111037", "#19184f", "#2b296d", "#504d8e", "#817fb3", "#b7b6d5", "#eeeeF6"] },
+      "sidebar-active": { "role": "primary", "displayName": "Sidebar Active", "canonical": "#353276", "tonalRamp": ["#111027", "#24214f", "#353276", "#4b478f", "#6c69a7", "#9694c0", "#c4c3db", "#f0eff7"] },
+      "brand": { "role": "primary", "displayName": "Action Violet", "canonical": "#5b4cf0", "tonalRamp": ["#160f52", "#2b1fa0", "#4435d1", "#5b4cf0", "#796df4", "#9b93f7", "#c5c0fb", "#f1efff"] },
+      "accent-blue": { "role": "secondary", "displayName": "Operational Blue", "canonical": "#2d6cdf", "tonalRamp": ["#0a1b3d", "#12386f", "#1e51a5", "#2d6cdf", "#568ae7", "#89afef", "#bdd3f7", "#edf5ff"] },
+      "workspace": { "role": "neutral", "displayName": "Workspace", "canonical": "#f4f6fa", "tonalRamp": ["#1d1e20", "#3a3b3d", "#5d5e61", "#838589", "#abb0b5", "#d0d4d9", "#e4e7eb", "#f4f6fa"] },
+      "surface": { "role": "neutral", "displayName": "Surface", "canonical": "#ffffff", "tonalRamp": ["#202020", "#404040", "#606060", "#858585", "#ababab", "#d0d0d0", "#e8e8e8", "#ffffff"] },
+      "text": { "role": "neutral", "displayName": "Primary Text", "canonical": "#242842", "tonalRamp": ["#0b0d16", "#181b2d", "#242842", "#3d425f", "#676c85", "#9296aa", "#c2c4ce", "#f1f2f5"] },
+      "muted": { "role": "neutral", "displayName": "Muted Text", "canonical": "#747b91", "tonalRamp": ["#17191e", "#30333d", "#4a4f5e", "#747b91", "#9096a8", "#b1b5c2", "#d4d6dd", "#f4f5f7"] },
+      "line": { "role": "neutral", "displayName": "Divider", "canonical": "#e5e8f0", "tonalRamp": ["#1b1c1f", "#37383d", "#595b62", "#7f828b", "#a8abb3", "#ced1d9", "#e5e8f0", "#f7f8fa"] },
+      "success": { "role": "tertiary", "displayName": "Success Green", "canonical": "#16835f", "tonalRamp": ["#052219", "#0a4331", "#106348", "#16835f", "#3a9e7d", "#73bca4", "#aedac9", "#edf8f4"] },
+      "warning": { "role": "tertiary", "displayName": "Attention Amber", "canonical": "#b97708", "tonalRamp": ["#2c1b01", "#553702", "#815305", "#b97708", "#d79a35", "#e8bc73", "#f4dcb2", "#fff8e9"] },
+      "danger": { "role": "tertiary", "displayName": "Exception Red", "canonical": "#c33c4a", "tonalRamp": ["#300b10", "#5d1821", "#8e2934", "#c33c4a", "#d86672", "#e99ca4", "#f4cdd1", "#fff1f2"] }
+    },
+    "typographyMeta": {
+      "headline": { "displayName": "Page Headline", "purpose": "Một tiêu đề chính cho mỗi workspace." },
+      "title": { "displayName": "Panel Title", "purpose": "Tiêu đề panel, bảng và nhóm thao tác." },
+      "body": { "displayName": "Operational Body", "purpose": "Dữ liệu, mô tả và nội dung form." },
+      "label": { "displayName": "Compact Label", "purpose": "Field label, metadata, table header và status." },
+      "mono": { "displayName": "Operational Mono", "purpose": "OTP, mã định danh và nội dung kỹ thuật ngắn cần canh ký tự." }
+    },
+    "shadows": [
+      { "name": "panel", "value": "0 3px 13px rgba(38,42,67,.045)", "purpose": "Tách panel và bảng khỏi nền workspace." },
+      { "name": "primary-action", "value": "0 5px 13px rgba(91,76,240,.18)", "purpose": "Nâng nhẹ CTA chính." },
+      { "name": "attendance-context", "value": "0 9px 22px rgba(61,75,208,.16)", "purpose": "Nhấn ngữ cảnh buổi học hiện tại." }
+    ],
+    "motion": [
+      { "name": "control-state", "value": "140–180ms ease", "purpose": "Hover, focus và đổi trạng thái control." },
+      { "name": "primary-flood", "value": "460ms cubic-bezier(.16,1,.3,1)", "purpose": "Lớp màu xanh–tím lan từ đáy CTA chính khi hover hoặc focus." },
+      { "name": "route-handoff", "value": "exit 130ms; enter 300ms + 45ms delay", "purpose": "Chuyển cảnh nội dung bằng View Transition trong khi shell giữ nguyên." },
+      { "name": "route-fallback", "value": "320ms cubic-bezier(.16,1,.3,1)", "purpose": "Fade-rise khi trình duyệt chưa bật native View Transition API." },
+      { "name": "pending-spin", "value": "800ms linear infinite", "purpose": "Spinner cho loading và mutation pending." },
+      { "name": "reduced-motion", "value": "100–120ms opacity only", "purpose": "Bỏ chuyển dịch và hiệu ứng tràn, chỉ giữ fade phản hồi." }
+    ],
+    "breakpoints": [
+      { "name": "compact-desktop", "value": "980px", "purpose": "Thu sidebar và chuyển dashboard thành một cột." },
+      { "name": "mobile-shell", "value": "760px", "purpose": "Sidebar thành top strip, nav cuộn ngang và form xếp dọc." },
+      { "name": "narrow-mobile", "value": "520px", "purpose": "Ẩn nhãn nav, full-width actions và stack toolbar/footer." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "CTA duy nhất nổi trội trong một vùng thao tác.",
+      "html": "<button class=\"ds-button-primary\" type=\"button\">Nộp điểm danh</button>",
+      "css": ".ds-button-primary { min-height:38px; padding:0 15px; border:1px solid #5b4cf0; border-radius:7px; color:#fff; background:#5b4cf0; box-shadow:0 5px 13px rgba(91,76,240,.18); font:650 11px/1.2 \"Be Vietnam Pro\",sans-serif; cursor:pointer; transition:background 160ms ease, transform 160ms ease; } .ds-button-primary:hover { background:#4e40d9; } .ds-button-primary:active { transform:translateY(1px); } .ds-button-primary:focus-visible { outline:3px solid rgba(91,76,240,.2); outline-offset:2px; } .ds-button-primary:disabled { opacity:.52; cursor:not-allowed; box-shadow:none; }"
+    },
+    {
+      "name": "Secondary Action",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Hành động phụ giữ nền trắng và viền neutral.",
+      "html": "<button class=\"ds-button-secondary\" type=\"button\">Lưu nháp</button>",
+      "css": ".ds-button-secondary { min-height:38px; padding:0 15px; border:1px solid #d8dce7; border-radius:7px; color:#4d536b; background:#fff; font:650 11px/1.2 \"Be Vietnam Pro\",sans-serif; cursor:pointer; transition:border-color 160ms ease, background 160ms ease; } .ds-button-secondary:hover { border-color:#b9bfce; background:#fafbfc; } .ds-button-secondary:focus-visible { outline:3px solid rgba(91,76,240,.18); outline-offset:2px; } .ds-button-secondary:disabled { opacity:.52; cursor:not-allowed; }"
+    },
+    {
+      "name": "Operational Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Field gọn cho form và filter trong workspace.",
+      "html": "<label class=\"ds-field\"><span>Giáo viên dạy buổi này</span><input value=\"Lê Thị Mai\"></label>",
+      "css": ".ds-field { display:grid; gap:6px; color:#565c72; font:600 9px/1.4 \"Be Vietnam Pro\",sans-serif; } .ds-field input { height:36px; padding:0 10px; border:1px solid #dfe2eb; border-radius:6px; outline:0; color:#34394f; background:#f8f9fb; font:400 10px/1.2 \"Be Vietnam Pro\",sans-serif; } .ds-field input:hover { border-color:#c8cbd5; } .ds-field input:focus { border-color:#8076ee; box-shadow:0 0 0 3px rgba(91,76,240,.09); } .ds-field input:disabled { opacity:.65; cursor:not-allowed; }"
+    },
+    {
+      "name": "Success Status",
+      "kind": "chip",
+      "refersTo": "status-success",
+      "description": "Trạng thái hợp lệ luôn có nhãn chữ.",
+      "html": "<span class=\"ds-status-success\">Đang hoạt động</span>",
+      "css": ".ds-status-success { display:inline-flex; align-items:center; padding:4px 7px; border-radius:5px; color:#12694e; background:#e8f6f0; font:650 9px/1.2 \"Be Vietnam Pro\",sans-serif; }"
+    },
+    {
+      "name": "Operational Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Container chuẩn cho bảng, danh sách và nhóm form.",
+      "html": "<section class=\"ds-panel\"><h3>Danh sách học sinh</h3><p>25 học sinh</p></section>",
+      "css": ".ds-panel { padding:16px; border:1px solid #e5e8f0; border-radius:10px; color:#242842; background:#fff; box-shadow:0 3px 13px rgba(38,42,67,.045); font-family:\"Be Vietnam Pro\",sans-serif; } .ds-panel h3 { margin:0; font-size:14px; } .ds-panel p { margin:6px 0 0; color:#747b91; font-size:10px; }"
+    },
+    {
+      "name": "Sidebar Navigation Item",
+      "kind": "nav",
+      "refersTo": "panel",
+      "description": "Mục điều hướng indigo với active state rõ và không dùng underline trang trí.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item ds-active\" href=\"#\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6v-9h-6v9Zm0-16v5h6V4h-6Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/></svg><span>Tổng quan</span></a></nav>",
+      "css": ".ds-nav { width:220px; padding:10px; background:#19184f; font-family:\"Be Vietnam Pro\",sans-serif; } .ds-nav-item { display:flex; align-items:center; gap:11px; min-height:36px; padding:0 11px; border-radius:7px; color:#c8c9df; font-size:11px; text-decoration:none; transition:color 140ms ease, background 140ms ease; } .ds-nav-item svg { width:16px; } .ds-nav-item:hover { color:#fff; background:rgba(255,255,255,.065); } .ds-nav-item.ds-active { color:#fff; background:#353276; } .ds-nav-item:focus-visible { outline:3px solid rgba(145,136,255,.4); outline-offset:2px; }"
+    },
+    {
+      "name": "Attendance Mark Group",
+      "kind": "custom",
+      "refersTo": "status-warning",
+      "description": "Segmented control cho bốn trạng thái điểm danh nghiệp vụ.",
+      "html": "<div class=\"ds-marks\" aria-label=\"Trạng thái điểm danh\"><button class=\"ds-mark ds-present\">Có mặt</button><button class=\"ds-mark\">Muộn</button><button class=\"ds-mark\">Có phép</button><button class=\"ds-mark\">Không phép</button></div>",
+      "css": ".ds-marks { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; max-width:520px; } .ds-mark { min-height:31px; padding:0 6px; border:1px solid #e1e3ea; border-radius:5px; color:#717688; background:#fff; font:500 9px/1.2 \"Be Vietnam Pro\",sans-serif; cursor:pointer; } .ds-mark:hover { border-color:#aaa6dd; background:#fafaff; } .ds-mark.ds-present { border-color:#87d1b5; color:#11684d; background:#ebf8f2; font-weight:650; } .ds-mark:focus-visible { outline:3px solid rgba(91,76,240,.18); outline-offset:2px; } .ds-mark:disabled { opacity:.7; cursor:default; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Bàn điều hành trung tâm",
+    "overview": "Sản phẩm dùng app shell quen thuộc để người vận hành hoàn thành công việc nhanh và hiểu được trạng thái hiện tại. Sidebar indigo giữ center context, workspace sáng tổ chức bảng và form, còn màu semantic chỉ diễn đạt trạng thái. Art direction cũ với nền giấy, đường tuyến, doodle và hero marketing là anti-reference.",
+    "keyCharacteristics": [
+      "Sidebar indigo đậm và workspace sáng có mật độ vừa phải.",
+      "Bảng, form và danh sách theo convention ứng dụng quản trị.",
+      "Một CTA violet chính; màu semantic luôn kèm nhãn.",
+      "Loading, empty, error, disabled và submitted hiện rõ tại chỗ.",
+      "Module chưa có backend không được trình bày như khả năng đang hoạt động."
+    ],
+    "rules": [
+      { "name": "The Semantic Color Rule", "body": "Xanh lá, vàng và đỏ chỉ diễn đạt trạng thái nghiệp vụ tương ứng; luôn kèm nhãn chữ hoặc icon.", "section": "colors" },
+      { "name": "The One Primary Action Rule", "body": "Mỗi vùng thao tác chỉ có một CTA violet nổi trội; hành động phụ dùng nền trắng hoặc text.", "section": "colors" },
+      { "name": "The Operational Scale Rule", "body": "Một font sans hỗ trợ tiếng Việt cho toàn bộ UI; không dùng eyebrow trang trí hoặc display font.", "section": "typography" },
+      { "name": "The Border-First Rule", "body": "Divider là cách phân lớp mặc định; shadow chỉ nâng bề mặt cần thiết.", "section": "elevation" }
+    ],
+    "dos": [
+      "**Do** giữ center context, role và access state nhìn thấy được.",
+      "**Do** đặt trạng thái và prerequisite gần hành động có hậu quả.",
+      "**Do** dùng dữ liệu API cùng loading, error và empty state thật.",
+      "**Do** ưu tiên bảng, danh sách và form cho nghiệp vụ vận hành."
+    ],
+    "donts": [
+      "**Don't** đưa lại nền giấy, doodle, route illustration, chữ viết tay hoặc marketing hero.",
+      "**Don't** giả dữ liệu hoặc giả module chưa có backend.",
+      "**Don't** biến mọi khối thành floating card hay pill.",
+      "**Don't** giấu conflict, disabled, 401/403 hoặc phiên bản dữ liệu."
+    ]
+  }
+}

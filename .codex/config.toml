@@ -1,0 +1,8 @@
+[skills]
+max_context_tokens = 10000
+
+[agents]
+enabled = true
+
+[plugins."build-web-apps@openai-curated"]
+enabled = true
