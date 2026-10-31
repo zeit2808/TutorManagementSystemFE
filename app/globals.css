@@ -170,9 +170,6 @@ input[type="checkbox"] { width: 16px; min-height: 16px; height: 16px; padding: 0
 .icon-button:hover { background: var(--neutral-bg); color: var(--text); }
 .icon-button svg { width: 16px; height: 16px; }
 
-.text-link { display: inline-flex; align-items: center; gap: 4px; padding: 0; border: 0; background: none; color: var(--brand-ink); font-size: var(--text-sm); font-weight: 600; text-decoration: none; }
-.text-link:hover { text-decoration: underline; text-underline-offset: 3px; }
-.text-link svg { width: 14px; height: 14px; }
 /* Back button: arrow tile + "Quay lại" over the destination, sitting above the page header. */
 .back-button { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 14px; padding: 5px 14px 5px 5px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); color: var(--text); text-decoration: none; box-shadow: 0 1px 2px rgba(38, 42, 67, 0.05); transition: border-color 160ms ease, box-shadow 220ms var(--ease), transform 180ms var(--ease); }
 .back-button-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 7px; background: var(--brand-soft); color: var(--brand-ink); transition: background 160ms ease, color 160ms ease; }
@@ -199,7 +196,6 @@ input[type="checkbox"] { width: 16px; min-height: 16px; height: 16px; padding: 0
 .badge-info { background: var(--info-bg); color: var(--info); }
 .badge-neutral { background: var(--neutral-bg); color: var(--neutral); }
 .badge-brand { background: var(--brand-soft); color: var(--brand-ink); }
-.badge-row { display: flex; flex-wrap: wrap; gap: 6px; }
 
 .notice { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; padding: 11px 13px; border: 1px solid; border-radius: var(--radius-md); font-size: var(--text-sm); }
 .notice > svg { width: 18px; height: 18px; margin-top: 1px; }
@@ -339,7 +335,7 @@ a.side-nav-item { position: relative; isolation: isolate; overflow: hidden; }
 
 .content { min-width: 0; }
 .topbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 56px; padding: 0 28px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.94); backdrop-filter: saturate(1.4) blur(8px); }
-.topbar-center, .topbar-user { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--text-2); font-size: var(--text-sm); }
+.topbar-center { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--text-2); font-size: var(--text-sm); }
 .topbar-center { font-weight: 600; }
 .topbar-center svg { width: 16px; height: 16px; color: var(--muted); }
 .workspace { width: min(100%, 1320px); margin: 0 auto; padding: 24px 28px 56px; }
@@ -357,7 +353,6 @@ a.side-nav-item { position: relative; isolation: isolate; overflow: hidden; }
 .panel-header p { margin-top: 2px; color: var(--muted); font-size: var(--text-sm); }
 .panel-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .panel-body { padding: 16px 18px; }
-.panel-foot { padding: 10px 18px 14px; color: var(--muted); font-size: var(--text-xs); }
 .panel > .notice { margin: 12px 18px; }
 /* One bounded column: wide children (tables) scroll inside their own panel instead of stretching the stack past the page. */
 .stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
@@ -641,8 +636,7 @@ a.side-nav-item { position: relative; isolation: isolate; overflow: hidden; }
 .select-bar nav a, .select-bar nav button, .student-bar nav a, .student-bar nav button { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 10px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--text-2); font-size: var(--text-sm); text-decoration: none; }
 .select-bar nav a:hover, .select-bar nav button:hover, .student-bar nav a:hover, .student-bar nav button:hover { background: var(--neutral-bg); color: var(--text); }
 .select-bar nav svg, .student-bar nav svg { width: 16px; height: 16px; }
-.select-main, .student-main, .single-page { width: min(100%, 1040px); margin: 0 auto; padding: 28px 24px 56px; }
-.single-page { width: min(100%, 1180px); }
+.select-main, .student-main { width: min(100%, 1040px); margin: 0 auto; padding: 28px 24px 56px; }
 .student-main { width: min(100%, 1180px); }
 .select-section { display: grid; gap: 10px; margin-bottom: 26px; }
 .select-section h2 { color: var(--text-2); font-size: var(--text-md); }
@@ -745,8 +739,6 @@ a.center-card:hover { border-color: #b8b0ff; transform: translateY(-1px); }
 }
 .icon-button { transition: background 150ms ease, color 150ms ease, transform 120ms var(--ease); }
 .icon-button:active { transform: scale(0.9); }
-.text-link svg { transition: transform 200ms var(--ease); }
-.text-link:hover svg { transform: translateX(3px); }
 .side-nav-item svg { transition: transform 200ms var(--ease), color 150ms ease; }
 a.side-nav-item:hover svg { transform: translateX(2px); }
 .table td { transition: background 120ms ease; }
@@ -814,7 +806,7 @@ a.side-nav-item:hover svg { transform: translateX(2px); }
   .route-motion { animation: vt-fade-in 120ms ease both; }
   .mark-group button.active { animation: none; }
   .auth-card { animation-name: fade-in; }
-  .btn svg, .text-link svg, .back-button svg, .side-nav-item svg { transition: none; transform: none !important; }
+  .btn svg, .back-button svg, .side-nav-item svg { transition: none; transform: none !important; }
   .back-button:hover, .back-button:active { transform: none; }
   .btn[data-status] { animation: none; }
   .btn-check path, .btn-check polyline { animation: none; stroke-dashoffset: 0; }
@@ -1097,7 +1089,7 @@ a.side-nav-item:hover svg { transform: translateX(2px); }
   .agenda li > .badge, .agenda li > .btn { grid-column: 2; }
   .preview-list li { grid-template-columns: 1fr auto; }
   .toolbar-note { margin-left: 0; }
-  .select-main, .student-main, .single-page { padding: 20px 16px 48px; }
+  .select-main, .student-main { padding: 20px 16px 48px; }
   .select-bar, .student-bar { padding: 0 16px; }
   .settings-page { padding: 20px 16px 48px; }
   .settings-section { grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 22px 0; }
@@ -1375,7 +1367,6 @@ a.side-nav-item:hover svg { transform: translateX(2px); }
 .move-summary span { display: grid; gap: 2px; color: var(--muted); }
 .move-summary strong { color: var(--text); font-size: var(--text-md); font-variant-numeric: tabular-nums; }
 .move-summary svg { width: 18px; height: 18px; color: var(--muted); }
-.timetable-single .timetable-day { grid-template-columns: minmax(0, 1fr); border: 1px solid var(--line); border-radius: var(--radius-sm); }
 @media (prefers-reduced-motion: reduce) { .week-grid-block { transition: none; } }
 
 /* Lương & chia thu nhập (docs/LUONG-VA-CHIA-THU-NHAP.md) */
@@ -1422,4 +1413,3 @@ a.side-nav-item:hover svg { transform: translateX(2px); }
 .payroll-config-history li { padding: 8px 0; border-bottom: 1px solid var(--line); }
 .payroll-config-history li:last-child { border-bottom: 0; }
 .payroll-config-history li p { margin: 0; }
-.payroll-config-history .text-link { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; }
