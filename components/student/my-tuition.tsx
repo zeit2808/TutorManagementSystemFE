@@ -8,7 +8,7 @@ import { useResource } from "@/lib/hooks/use-resource";
 import { formatIsoDate, formatMoney, formatPeriod } from "@/lib/format";
 import { missedKindLabels, paymentMethodLabels } from "@/lib/labels";
 import { ChargeBadge } from "@/components/center/tuition";
-import { bankName, vietQrUrl } from "@/lib/banks";
+import { PaymentQr } from "@/components/center/payment-qr";
 import { EmptyState, ErrorNotice, Notice, PageHeader, Panel, SkeletonRows } from "@/components/ui/primitives";
 
 /** H14: what to pay in every center, how to transfer, and what was paid (read only). */
@@ -57,12 +57,8 @@ function CenterTuition({ center }: { center: StudentTuition }) {
         <div className="qr-row">
           <button type="button" className="text-link" onClick={() => setShowQr((x) => !x)}>{showQr ? "Ẩn mã QR" : "Hiện mã QR chuyển khoản"}</button>
           {showQr && (
-            <div className="qr-box">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={vietQrUrl({ ...center.bank, amount: center.owed, content: center.transferContent })} alt={`Mã VietQR chuyển ${formatMoney(center.owed)}`} width={220} height={220} />
-              <p className="cell-note">{bankName(center.bank.bankBin)} · {center.bank.accountNumber} · {center.bank.accountName}</p>
-              <p className="cell-note">Nội dung: <code className="code">{center.transferContent}</code> · Sau khi trung tâm ghi nhận, khoản sẽ chuyển sang “Đã đóng”.</p>
-            </div>
+            <PaymentQr load={() => financeApi.createMyPaymentIntent(center.studentId)} deps={[center.studentId, center.owed]}
+              note="Sau khi trung tâm ghi nhận, khoản sẽ chuyển sang “Đã đóng”." />
           )}
         </div>
       )}

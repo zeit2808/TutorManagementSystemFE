@@ -7,6 +7,7 @@ import type {
   Guid,
   IsoDate,
   MyTuition,
+  PaymentIntent,
   PaymentMethod,
   Receipt,
   StudentTuition,
@@ -54,6 +55,9 @@ export const financeApi = {
   student(centerId: Guid, studentId: Guid) {
     return apiRequest<StudentTuition>(`/centers/${centerId}/students/${studentId}/tuition`);
   },
+  createPaymentIntent(centerId: Guid, studentId: Guid, chargeIds: Guid[] = []) {
+    return apiRequest<PaymentIntent>(`/centers/${centerId}/students/${studentId}/payment-intents`, { method: "POST", body: { chargeIds } });
+  },
   recordPayment(centerId: Guid, studentId: Guid, input: RecordPaymentInput) {
     return apiRequest<Receipt>(`/centers/${centerId}/students/${studentId}/receipts`, { method: "POST", body: input });
   },
@@ -80,5 +84,8 @@ export const financeApi = {
   },
   myTuition() {
     return apiRequest<MyTuition>(`/me/tuition`);
+  },
+  createMyPaymentIntent(studentId: Guid, chargeIds: Guid[] = []) {
+    return apiRequest<PaymentIntent>(`/me/tuition/students/${studentId}/payment-intents`, { method: "POST", body: { chargeIds } });
   },
 };

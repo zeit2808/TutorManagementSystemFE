@@ -868,6 +868,19 @@ export interface BankAccount {
   accountName: string;
 }
 
+export interface PaymentIntent {
+  id: Guid;
+  studentId: Guid;
+  code: string;
+  amount: number;
+  transferContent: string;
+  /** EMVCo text the client draws as the QR code. */
+  qrPayload: string;
+  bank: BankAccount;
+  chargeIds: Guid[];
+  expiresAtUtc: IsoDateTime;
+}
+
 export interface StudentTuition {
   centerId: Guid;
   centerName: string;
