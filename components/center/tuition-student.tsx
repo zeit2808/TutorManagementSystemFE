@@ -7,7 +7,7 @@ import { financeApi, type DiscountKind, type PaymentMethod, type Receipt, type S
 import { useAction, useResource } from "@/lib/hooks/use-resource";
 import { formatDateTime, formatIsoDate, formatMoney, formatPeriod, formatPhone, newUuid, todayIso } from "@/lib/format";
 import { paymentMethodLabels } from "@/lib/labels";
-import { bankName, vietQrUrl } from "@/lib/banks";
+import { PaymentQr } from "./payment-qr";
 import { Badge, Button, Dialog, EmptyState, ErrorNotice, Field, Notice, PageHeader, Panel, Segmented, SkeletonRows } from "@/components/ui/primitives";
 import { ConfirmDialog } from "@/components/ui/reason-dialog";
 import { RoleGate, useCenter } from "./center-frame";
@@ -215,14 +215,15 @@ function PaymentPanel({ account, payChargeId, onDone }: { account: StudentTuitio
           {(id, describedBy) => <input id={id} type="number" min={0} step={1000} value={amount} aria-describedby={describedBy} onChange={(event) => setAmount(Math.max(0, Number(event.target.value) || 0))} />}
         </Field>
         <Segmented label="Hình thức" value={method} onChange={setMethod} options={[{ value: "Cash", label: "Tiền mặt" }, { value: "BankTransfer", label: "Chuyển khoản" }]} />
-        {method === "BankTransfer" && (account.bank ? (
-          <div className="qr-box">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={vietQrUrl({ ...account.bank, amount, content: account.transferContent })} alt={`Mã VietQR chuyển ${formatMoney(amount)}`} width={220} height={220} />
-            <p className="cell-note">{bankName(account.bank.bankBin)} · {account.bank.accountNumber} · {account.bank.accountName}</p>
-            <p className="cell-note">Nội dung: <code className="code">{account.transferContent}</code></p>
-          </div>
-        ) : <Notice tone="info">Chưa có tài khoản ngân hàng: chủ hoặc quản lý thêm ở Học phí → Cài đặt để hiện mã QR.</Notice>)}
+        {method === "BankTransfer" && (!account.bank ? (
+          <Notice tone="info">Chưa có tài khoản ngân hàng: chủ hoặc quản lý thêm ở Học phí → Cài đặt để hiện mã QR.</Notice>
+        ) : open.length === 0 ? (
+          <Notice tone="info">Học sinh không còn khoản nào cần đóng nên không có mã QR.</Notice>
+        ) : (
+          <PaymentQr load={() => financeApi.createPaymentIntent(centerId, account.studentId, selected)}
+            deps={[centerId, account.studentId, selected, account.owed]}
+            note="Số tiền trên mã tính theo các kỳ đã chọn, không theo ô Số tiền nhận." />
+        ))}
         <div className="form-grid">
           <Field label="Ngày nhận">
             {(id) => <input id={id} type="date" value={receivedOn} max={todayIso()} onChange={(event) => setReceivedOn(event.target.value)} />}

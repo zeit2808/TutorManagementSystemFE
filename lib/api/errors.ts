@@ -101,6 +101,8 @@ export const errorMessages: Record<string, string> = {
   tuition_concurrent_change: "Dữ liệu học phí vừa được người khác thay đổi. Tải lại rồi thử lại.",
   tuition_forbidden: "Giáo viên không xem được học phí.",
   tuition_charge_ended: "Học sinh đã nghỉ trong kỳ này; số tiền của kỳ đã được chốt.",
+  tuition_bank_not_configured: "Trung tâm chưa thêm tài khoản ngân hàng để nhận chuyển khoản.",
+  tuition_nothing_to_pay: "Học sinh không còn khoản nào cần đóng.",
   email_test_too_soon: "Vừa gửi email thử chưa tới 30 giây. Đợi một chút rồi thử lại.",
   payroll_not_found: "Không tìm thấy tháng, giáo viên hoặc mục này.",
   payroll_disabled: "Trung tâm chưa bật chức năng lương / chia thu nhập. Liên hệ quản trị nền tảng.",
