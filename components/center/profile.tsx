@@ -294,7 +294,7 @@ function ChangeComposer({ center, onClose, onSubmitted }: { center: Center; onCl
       description="Gửi toàn bộ 7 trường như mong muốn sau thay đổi. Email liên hệ của trung tâm khác email đăng nhập của bạn."
       onClose={onClose}
       onSubmit={submit}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Hủy</Button><Button type="submit" variant="primary" pending={action.pending}>Gửi yêu cầu</Button></>}
+      footer={<><Button onClick={onClose} disabled={action.pending}>Hủy</Button><Button type="submit" variant="primary" pending={action.pending} status={action.status}>Gửi yêu cầu</Button></>}
     >
       {touched && unchanged && <Notice tone="warning">Bạn chưa thay đổi trường nào so với hồ sơ hiện hành.</Notice>}
       <div className="form-grid">

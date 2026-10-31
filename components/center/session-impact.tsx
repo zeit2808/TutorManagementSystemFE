@@ -25,7 +25,8 @@ export function ImpactSummary({ centerId, classId, startUtc, endUtc, sessionId, 
   sessionId?: string;
   teacherId?: string;
   cancelling?: boolean;
-  onData?: (data: SessionImpact | null) => void;
+  /** `failed` is true once the check for the current slot errored, so callers can stop waiting for it. */
+  onData?: (data: SessionImpact | null, failed: boolean) => void;
 }) {
   const [key, setKey] = useState("");
   const wanted = `${classId}|${startUtc}|${endUtc}|${sessionId ?? ""}|${teacherId ?? ""}`;
@@ -39,8 +40,10 @@ export function ImpactSummary({ centerId, classId, startUtc, endUtc, sessionId, 
       : Promise.resolve(null),
     [centerId, key],
   );
-  const data = key === wanted && !impact.loading ? impact.data ?? null : null;
-  useEffect(() => { onData?.(data ?? null); }, [data, onData]);
+  const settled = key === wanted && !impact.loading;
+  const data = settled ? impact.data ?? null : null;
+  const failed = settled && Boolean(impact.error);
+  useEffect(() => { onData?.(data ?? null, failed); }, [data, failed, onData]);
 
   if (!data) return impact.error ? <ErrorNotice error={impact.error} /> : null;
   const teacherElsewhere = !cancelling ? data.teacherSessionsElsewhere ?? 0 : 0;
@@ -61,7 +64,7 @@ export function ImpactSummary({ centerId, classId, startUtc, endUtc, sessionId, 
           <p>{new Set(data.sameCenterConflicts.map((item) => item.studentId)).size} học sinh đang có buổi khác của trung tâm vào giờ này:</p>
           <ul className="conflict-list">
             {data.sameCenterConflicts.slice(0, 6).map((item) => (
-              <li key={`${item.studentId}-${item.otherStartUtc}`}><span><strong>{item.fullName}</strong> · {item.otherClassName} ({item.otherClassCode}) {formatSlot(item.otherStartUtc, item.otherEndUtc)}</span></li>
+              <li key={`${item.studentId}-${item.otherStartUtc}`}><span><strong>{item.fullName}</strong> · {item.otherClassName} {formatSlot(item.otherStartUtc, item.otherEndUtc)}</span></li>
             ))}
             {data.sameCenterConflicts.length > 6 && <li className="col-muted">và {data.sameCenterConflicts.length - 6} trường hợp khác.</li>}
           </ul>

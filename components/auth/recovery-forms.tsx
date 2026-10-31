@@ -45,7 +45,7 @@ export function ForgotPasswordForm() {
         {(id) => <input id={id} type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} />}
       </Field>
       <ErrorNotice error={action.error} />
-      <Button type="submit" variant="primary" className="btn-block" icon={<Send aria-hidden="true" />} pending={action.pending}>Gửi mã khôi phục</Button>
+      <Button type="submit" variant="primary" className="btn-block" icon={<Send aria-hidden="true" />} pending={action.pending} status={action.status}>Gửi mã khôi phục</Button>
     </form>
   );
 }
@@ -94,7 +94,7 @@ export function ResetPasswordForm({ initialEmail = "" }: { initialEmail?: string
       </Field>
       <Notice tone="info">Sau khi đặt lại, mọi phiên đăng nhập bị thu hồi và bạn cần đăng nhập lại.</Notice>
       <ErrorNotice error={action.error} />
-      <Button type="submit" variant="primary" className="btn-block" pending={action.pending}>Đặt lại mật khẩu</Button>
+      <Button type="submit" variant="primary" className="btn-block" pending={action.pending} status={action.status}>Đặt lại mật khẩu</Button>
     </form>
   );
 }
@@ -133,7 +133,7 @@ export function VerifyEmailForm({ initialToken = "" }: { initialToken?: string }
           {(id) => <input id={id} value={token} onChange={(event) => setToken(event.target.value)} />}
         </Field>
         <ErrorNotice error={verify.error} />
-        <Button type="submit" variant="primary" className="btn-block" icon={<MailCheck aria-hidden="true" />} pending={verify.pending} disabled={!token.trim()}>Xác minh email</Button>
+        <Button type="submit" variant="primary" className="btn-block" icon={<MailCheck aria-hidden="true" />} pending={verify.pending} status={verify.status} disabled={!token.trim()}>Xác minh email</Button>
       </form>
       <div className="divider"><span>hoặc gửi lại email xác minh</span></div>
       <div className="stack">
@@ -141,7 +141,7 @@ export function VerifyEmailForm({ initialToken = "" }: { initialToken?: string }
           {(id) => <input id={id} type="email" value={email} onChange={(event) => setEmail(event.target.value)} />}
         </Field>
         <ErrorNotice error={resend.error} />
-        <Button onClick={() => void submitResend()} pending={resend.pending} disabled={Boolean(validateEmail(email))}>Gửi lại</Button>
+        <Button onClick={() => void submitResend()} pending={resend.pending} status={resend.status} disabled={Boolean(validateEmail(email))}>Gửi lại</Button>
       </div>
     </div>
   );
@@ -198,7 +198,7 @@ export function AcceptInvitationForm({ initialToken = "" }: { initialToken?: str
         {(id) => <input id={id} type="password" autoComplete="new-password" value={confirm} onChange={(event) => setConfirm(event.target.value)} />}
       </Field>
       <ErrorNotice error={action.error} />
-      <Button type="submit" variant="primary" className="btn-block" pending={action.pending}>Tạo tài khoản và tham gia</Button>
+      <Button type="submit" variant="primary" className="btn-block" pending={action.pending} status={action.status}>Tạo tài khoản và tham gia</Button>
     </form>
   );
 }

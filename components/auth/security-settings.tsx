@@ -3,14 +3,14 @@
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowLeft, BookOpen, Building2, CheckCircle2, ExternalLink, GraduationCap, KeyRound, LoaderCircle, LogOut, ShieldCheck } from "lucide-react";
+import { BookOpen, Building2, CheckCircle2, ExternalLink, GraduationCap, KeyRound, LoaderCircle, LogOut, ShieldCheck } from "lucide-react";
 import { authApi, identityApi } from "@/lib/api";
 import { useSessionUser } from "@/lib/auth/session";
 import { useAction, useResource } from "@/lib/hooks/use-resource";
 import { isStrongPassword } from "@/lib/validation";
 import { roleLabel } from "@/lib/labels";
 import { initials } from "@/lib/format";
-import { Badge, Button, ErrorNotice, Field, Notice } from "@/components/ui/primitives";
+import { Badge, Button, ErrorNotice, Field, Notice, BackButton } from "@/components/ui/primitives";
 import { ConfirmDialog } from "@/components/ui/reason-dialog";
 import { GoogleButton } from "./google-login-button";
 import { PasswordChecklist } from "./password-checklist";
@@ -110,7 +110,7 @@ export function SecuritySettings() {
       </header>
 
       <main className="settings-page">
-        <Link className="back-link" href={home}><ArrowLeft aria-hidden="true" />{user.isStudent ? "Về cổng học sinh" : "Về nơi làm việc"}</Link>
+        <BackButton href={home}>{user.isStudent ? "Cổng học sinh" : "Nơi làm việc"}</BackButton>
 
         <div className="settings-hero">
           <span className="settings-avatar" aria-hidden="true">{initials(displayName)}</span>
@@ -157,7 +157,7 @@ export function SecuritySettings() {
               <ErrorNotice error={change.error} />
             </div>
             <footer className="settings-footer">
-              <Button type="submit" variant="primary" icon={<KeyRound aria-hidden="true" />} pending={change.pending}>Đổi mật khẩu</Button>
+              <Button type="submit" variant="primary" icon={<KeyRound aria-hidden="true" />} pending={change.pending} status={change.status}>Đổi mật khẩu</Button>
             </footer>
           </form>
           )}

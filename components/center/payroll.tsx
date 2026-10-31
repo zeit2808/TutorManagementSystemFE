@@ -164,7 +164,7 @@ function MonthView({ month, onChanged }: { month: string; onChanged: () => void 
             {draft && canEdit && <Button size="sm" icon={<Tags aria-hidden="true" />} onClick={() => setDialog({ kind: "adjust" })}>Khoản cộng / trừ</Button>}
             {draft && canEdit && share && <Button size="sm" icon={<ReceiptText aria-hidden="true" />} onClick={() => setDialog({ kind: "expense" })}>Chi phí chung</Button>}
             {draft && owner && (
-              <Button size="sm" variant="primary" icon={<Lock aria-hidden="true" />} disabled={view.closeBlockers.length > 0} pending={close.pending}
+              <Button size="sm" variant="primary" icon={<Lock aria-hidden="true" />} disabled={view.closeBlockers.length > 0} pending={close.pending} status={close.status}
                 onClick={async () => { const next = await close.run(() => payrollApi.close(centerId, month)); if (next) done(next, `Đã chốt ${formatMonth(month).toLowerCase()}.`); }}>
                 Chốt tháng
               </Button>
@@ -225,7 +225,6 @@ function MonthView({ month, onChanged }: { month: string; onChanged: () => void 
                             {expanded ? <ChevronDown aria-hidden="true" /> : <ChevronRight aria-hidden="true" />}
                             <strong>{line.teacherName}</strong>
                           </button>
-                          <p className="cell-note">{line.teacherCode}</p>
                         </td>
                         <td className="num">{line.sessions} buổi<p className="cell-note">{formatHours(line.minutes)}</p></td>
                         <td className="num">{formatMoney(line.base)}</td>
@@ -401,7 +400,7 @@ function Warnings({ view }: { view: PayrollMonth }) {
         <Notice tone="warning" title={`${view.unsubmitted.length} buổi đã diễn ra nhưng chưa nộp phiếu điểm danh — chưa tính`}
           action={<Link className="btn btn-secondary btn-sm" href={`/centers/${centerId}/attendance`}>Mở điểm danh</Link>}>
           <ul className="plain-list">
-            {view.unsubmitted.slice(0, 6).map((item) => <li key={item.sessionId}>{item.classCode} · {formatStartLabel(item.startUtc)} · {item.teacherName}</li>)}
+            {view.unsubmitted.slice(0, 6).map((item) => <li key={item.sessionId}>{item.className} · {formatStartLabel(item.startUtc)} · {item.teacherName}</li>)}
             {view.unsubmitted.length > 6 && <li>và {view.unsubmitted.length - 6} buổi khác.</li>}
           </ul>
           Chủ hoặc quản lý nộp muộn được bất cứ lúc nào; buổi tính vào tháng diễn ra.
@@ -415,7 +414,7 @@ function Warnings({ view }: { view: PayrollMonth }) {
       {view.pool && view.pool.unassignedItems.length > 0 && (
         <Notice tone="info" title={`${formatMoney(view.pool.unassigned)} chưa phân bổ được cho ai`}>
           <ul className="plain-list">
-            {view.pool.unassignedItems.map((item) => <li key={`${item.classId}${item.periodStart}`}>{item.classCode} · kỳ {formatIsoDate(item.periodStart)} – {formatIsoDate(item.periodEnd)}: {formatMoney(item.amount)}</li>)}
+            {view.pool.unassignedItems.map((item) => <li key={`${item.classId}${item.periodStart}`}>{item.className} · kỳ {formatIsoDate(item.periodStart)} – {formatIsoDate(item.periodEnd)}: {formatMoney(item.amount)}</li>)}
           </ul>
           Kỳ học phí này chưa có buổi dạy nào tính được. Khi phiếu điểm danh được nộp, tiền tự chia; hoặc chia tay bằng khoản cộng.
         </Notice>
@@ -433,7 +432,7 @@ export function LineDetail({ line, share, closed }: { line: PayrollLine; share: 
           <thead><tr><th>Lớp</th><th className="num">Buổi dạy trong tháng</th><th className="num">Giờ</th><th className="num">{share ? "Tiền chia từ lớp" : "Lương"}</th></tr></thead>
           <tbody>
             {line.classes.map((item) => (
-              <tr key={item.classId}><td>{item.classCode} · {item.className}</td><td className="num">{item.sessions}</td><td className="num">{formatHours(item.minutes)}</td><td className="num">{share ? `≈ ${formatMoney(Math.round(item.amount / 1000) * 1000)}` : formatMoney(item.amount)}</td></tr>
+              <tr key={item.classId}><td>{item.className}</td><td className="num">{item.sessions}</td><td className="num">{formatHours(item.minutes)}</td><td className="num">{share ? `≈ ${formatMoney(Math.round(item.amount / 1000) * 1000)}` : formatMoney(item.amount)}</td></tr>
             ))}
           </tbody>
         </table>
@@ -442,7 +441,7 @@ export function LineDetail({ line, share, closed }: { line: PayrollLine; share: 
         <ul className="session-chips" aria-label="Các buổi đã dạy">
           {line.items.map((item) => (
             <li key={item.sessionId} className={item.amount == null && !share ? "is-missing" : undefined}>
-              {item.classCode} · {formatStartLabel(item.startUtc)} · {item.minutes}′{item.substitute ? " · dạy thay" : ""}
+              {item.className} · {formatStartLabel(item.startUtc)} · {item.minutes}′{item.substitute ? " · dạy thay" : ""}
               {!share && <> · {item.amount != null ? formatMoney(item.amount) : "chưa có đơn giá"}</>}
             </li>
           ))}
@@ -483,12 +482,12 @@ function AdjustmentDialog({ month, lines, teacherId, onClose, onSaved }: { month
   }
   return (
     <Dialog open title="Khoản cộng / trừ" description={`Gắn vào ${formatMonth(month).toLowerCase()}. Thưởng, phụ cấp, phạt, hoặc chia tay phần chưa phân bổ.`} onClose={onClose} onSubmit={submit}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" pending={action.pending}>Ghi khoản</Button></>}>
+      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" pending={action.pending} status={action.status}>Ghi khoản</Button></>}>
       <div className="form-grid">
         <Field label="Người nhận" required error={touched ? errors.teacher : null}>
           {(id) => (
             <select id={id} value={teacher} onChange={(event) => setTeacher(event.target.value)}>
-              {teachers.map((x) => <option key={x.id} value={x.id}>{x.fullName} · {x.code}</option>)}
+              {teachers.map((x) => <option key={x.id} value={x.id}>{x.fullName}</option>)}
             </select>
           )}
         </Field>
@@ -537,7 +536,7 @@ function ExpenseDialog({ month, onClose, onSaved }: { month: string; onClose: ()
   }
   return (
     <Dialog open title="Chi phí chung" description="Trừ vào tiền của tháng trước khi chia, theo cùng tỉ lệ của mỗi người." onClose={onClose} onSubmit={submit}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" pending={action.pending}>Ghi chi phí</Button></>}>
+      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" pending={action.pending} status={action.status}>Ghi chi phí</Button></>}>
       <div className="form-grid">
         <Field label="Ngày chi" required error={touched ? errors.spentOn : null}>
           {(id) => <input id={id} type="date" value={spentOn} min={`${month}-01`} max={end} onChange={(event) => setSpentOn(event.target.value)} />}
@@ -584,7 +583,7 @@ function PayoutDialog({ month, line, advance, onClose, onSaved }: { month: strin
     <Dialog open title={advance ? `Tạm ứng cho ${line.teacherName}` : `Chi tiền cho ${line.teacherName}`}
       description={advance ? "Tháng chưa chốt: khoản này là tạm ứng, cuối tháng tự trừ vào thực nhận." : `Thực nhận ${formatMoney(line.net)} · đã chi ${formatMoney(line.paid)} · còn ${formatMoney(line.remaining)}.`}
       onClose={onClose} onSubmit={submit}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" pending={action.pending}>Ghi phiếu chi</Button></>}>
+      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" pending={action.pending} status={action.status}>Ghi phiếu chi</Button></>}>
       <div className="form-grid">
         <Field label="Số tiền (đ)" required error={touched ? error : null}>
           {(id) => <input id={id} inputMode="numeric" value={amount} onChange={(event) => setAmount(event.target.value)} />}
@@ -641,7 +640,7 @@ function RatesTab() {
                 {items.map((item) => (
                   <tr key={item.id} className={item.voidedAtUtc ? "row-voided" : undefined}>
                     <td><strong>{item.teacherName}</strong></td>
-                    <td>{item.classCode ? `Lớp ${item.classCode}` : "Mặc định (mọi lớp)"}</td>
+                    <td>{item.classId ? `Lớp ${item.className ?? ""}` : "Mặc định (mọi lớp)"}</td>
                     <td className="num">{formatMoney(item.amount)}</td>
                     <td>{formatIsoDate(item.effectiveFrom)}</td>
                     <td className="col-muted">{item.createdByName ?? "—"}{item.voidedAtUtc ? <p className="cell-note">Đã huỷ: {item.voidReason}</p> : null}</td>
@@ -659,7 +658,7 @@ function RatesTab() {
       <ReasonDialog open={Boolean(voiding)} title="Huỷ đơn giá?" confirmLabel="Huỷ đơn giá" variant="danger" minLength={3} maxLength={300}
         onClose={() => setVoiding(null)}
         onConfirm={async (reason) => { if (voiding) { await payrollApi.voidRate(centerId, voiding.id, reason); setNotice("Đã huỷ đơn giá; các tháng đã chốt sẽ có điều chỉnh ở tháng sau nếu bị ảnh hưởng."); await rates.reload(); } }}>
-        {voiding && <p>{voiding.teacherName} · {voiding.classCode ? `lớp ${voiding.classCode}` : "mặc định"} · {formatMoney(voiding.amount)} từ {formatIsoDate(voiding.effectiveFrom)}.</p>}
+        {voiding && <p>{voiding.teacherName} · {voiding.classId ? `lớp ${voiding.className ?? ""}` : "mặc định"} · {formatMoney(voiding.amount)} từ {formatIsoDate(voiding.effectiveFrom)}.</p>}
       </ReasonDialog>
     </>
   );
@@ -688,16 +687,16 @@ function RateDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () => 
   }
   return (
     <Dialog open title="Thêm đơn giá" description="Dạy thay thì người dạy thực tế nhận theo đơn giá của chính họ." onClose={onClose} onSubmit={submit}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" pending={action.pending}>Lưu đơn giá</Button></>}>
+      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" pending={action.pending} status={action.status}>Lưu đơn giá</Button></>}>
       <div className="form-grid">
         <Field label="Giáo viên" required>
-          {(id) => <select id={id} value={teacherId} onChange={(event) => setTeacherId(event.target.value)}>{teachers.map((x) => <option key={x.id} value={x.id}>{x.fullName} · {x.code}</option>)}</select>}
+          {(id) => <select id={id} value={teacherId} onChange={(event) => setTeacherId(event.target.value)}>{teachers.map((x) => <option key={x.id} value={x.id}>{x.fullName}</option>)}</select>}
         </Field>
         <Field label="Áp dụng cho">
           {(id) => (
             <select id={id} value={classId} onChange={(event) => setClassId(event.target.value)}>
               <option value="">Mặc định (mọi lớp)</option>
-              {classes.map((x) => <option key={x.id} value={x.id}>Riêng lớp {x.code} · {x.name}</option>)}
+              {classes.map((x) => <option key={x.id} value={x.id}>Riêng lớp {x.name}</option>)}
             </select>
           )}
         </Field>

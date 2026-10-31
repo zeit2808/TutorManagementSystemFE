@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CalendarDays, WalletCards } from "lucide-react";
+import { CalendarDays, QrCode, WalletCards } from "lucide-react";
 import { financeApi, type StudentTuition } from "@/lib/api";
 import { useResource } from "@/lib/hooks/use-resource";
 import { formatIsoDate, formatMoney, formatPeriod } from "@/lib/format";
 import { missedKindLabels, paymentMethodLabels } from "@/lib/labels";
 import { ChargeBadge } from "@/components/center/tuition";
 import { PaymentQr } from "@/components/center/payment-qr";
-import { EmptyState, ErrorNotice, Notice, PageHeader, Panel, SkeletonRows } from "@/components/ui/primitives";
+import { EmptyState, ErrorNotice, Notice, PageHeader, Panel, SkeletonRows, Button } from "@/components/ui/primitives";
 
 /** H14: what to pay in every center, how to transfer, and what was paid (read only). */
 export function MyTuitionPage() {
@@ -47,7 +47,7 @@ export function TuitionReminderNotice() {
 function CenterTuition({ center }: { center: StudentTuition }) {
   const [showQr, setShowQr] = useState(center.owed > 0);
   return (
-    <Panel title={center.centerName} description={`${center.studentName} · ${center.studentCode}`}>
+    <Panel title={center.centerName} description={center.studentName}>
       <dl className="money-strip money-strip-3">
         <div className={center.owed > 0 ? "is-warning" : undefined}><dt>Còn phải đóng</dt><dd>{formatMoney(center.owed)}</dd></div>
         <div className={center.overdue > 0 ? "is-danger" : undefined}><dt>Quá hạn</dt><dd>{formatMoney(center.overdue)}</dd></div>
@@ -55,7 +55,7 @@ function CenterTuition({ center }: { center: StudentTuition }) {
       </dl>
       {center.owed > 0 && center.bank && (
         <div className="qr-row">
-          <button type="button" className="text-link" onClick={() => setShowQr((x) => !x)}>{showQr ? "Ẩn mã QR" : "Hiện mã QR chuyển khoản"}</button>
+          <Button size="sm" variant="soft" icon={<QrCode aria-hidden="true" />} aria-expanded={showQr} onClick={() => setShowQr((x) => !x)}>{showQr ? "Ẩn mã QR" : "Hiện mã QR chuyển khoản"}</Button>
           {showQr && (
             <PaymentQr load={() => financeApi.createMyPaymentIntent(center.studentId)} deps={[center.studentId, center.owed]}
               note="Sau khi trung tâm ghi nhận, khoản sẽ chuyển sang “Đã đóng”." />

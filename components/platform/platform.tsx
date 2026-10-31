@@ -2,8 +2,9 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
+import { NavLink } from "@/components/ui/nav-link";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, BookOpen, Building2, Check, Coins, FileClock, Inbox, LoaderCircle, LogOut, Mail, MailPlus, Pause, Pencil, Play, Plus, RefreshCcw, Search, Send, ShieldAlert, UserCog, X } from "lucide-react";
+import { ArrowRight, BookOpen, Building2, Check, Coins, FileClock, Inbox, LoaderCircle, LogOut, Mail, MailPlus, Pause, Pencil, Play, Plus, RefreshCcw, Search, Send, ShieldAlert, UserCog, X } from "lucide-react";
 import { ApiError, authApi, identityApi, organizationsApi, type Center, type CenterChangeRequest, type CenterInvitation, type ChangeQueueStatus, type MemberInvitation } from "@/lib/api";
 import { useSessionUser } from "@/lib/auth/session";
 import { useAction, useResource } from "@/lib/hooks/use-resource";
@@ -11,7 +12,7 @@ import { useNow } from "@/lib/hooks/use-now";
 import { formatDateTime } from "@/lib/format";
 import { centerStatus, roleLabel } from "@/lib/labels";
 import { validateEmail, validateOptional, validateRequired, validateTaxCode, validateVietnamMobile } from "@/lib/validation";
-import { Badge, Button, Dialog, UserChip, EmptyState, ErrorNotice, Field, Notice, PageHeader, Pagination, Panel, Segmented, SkeletonRows } from "@/components/ui/primitives";
+import { Badge, Button, Dialog, UserChip, EmptyState, ErrorNotice, Field, Notice, PageHeader, Pagination, Panel, Segmented, SkeletonRows, BackButton, ButtonLink } from "@/components/ui/primitives";
 import { ConfirmDialog, ReasonDialog } from "@/components/ui/reason-dialog";
 import { ChangeRequestCard, ProfileFacts, StatusHistory, centerLifecycle } from "@/components/center/profile";
 import { PayrollConfigPanel } from "./payroll-config";
@@ -54,10 +55,10 @@ export function PlatformFrame({ children }: { children: ReactNode }) {
         <nav className="side-nav" aria-label="Điều hướng nền tảng">
           <div className="side-nav-group">
             <span className="side-nav-label">Nền tảng</span>
-            <Link className={`side-nav-item${pathname.startsWith("/platform") && !pathname.startsWith("/platform/changes") && !pathname.startsWith("/platform/email") && !pathname.startsWith("/platform/payroll") ? " active" : ""}`} href="/platform"><Building2 aria-hidden="true" /><span>Trung tâm</span></Link>
-            <Link className={`side-nav-item${pathname.startsWith("/platform/changes") ? " active" : ""}`} href="/platform/changes"><FileClock aria-hidden="true" /><span>Yêu cầu thay đổi</span></Link>
-            <Link className={`side-nav-item${pathname.startsWith("/platform/payroll") ? " active" : ""}`} href="/platform/payroll"><Coins aria-hidden="true" /><span>Lương & thu nhập</span></Link>
-            <Link className={`side-nav-item${pathname.startsWith("/platform/email") ? " active" : ""}`} href="/platform/email"><Mail aria-hidden="true" /><span>Email hệ thống</span></Link>
+            <NavLink href="/platform" active={pathname.startsWith("/platform") && !pathname.startsWith("/platform/changes") && !pathname.startsWith("/platform/email") && !pathname.startsWith("/platform/payroll")} icon={<Building2 aria-hidden="true" />}>Trung tâm</NavLink>
+            <NavLink href="/platform/changes" active={pathname.startsWith("/platform/changes")} icon={<FileClock aria-hidden="true" />}>Yêu cầu thay đổi</NavLink>
+            <NavLink href="/platform/payroll" active={pathname.startsWith("/platform/payroll")} icon={<Coins aria-hidden="true" />}>Lương & thu nhập</NavLink>
+            <NavLink href="/platform/email" active={pathname.startsWith("/platform/email")} icon={<Mail aria-hidden="true" />}>Email hệ thống</NavLink>
             <Link className="side-nav-item" href="/select-center"><Inbox aria-hidden="true" /><span>Trung tâm tôi là thành viên</span></Link>
           </div>
         </nav>
@@ -162,7 +163,7 @@ export function PlatformCenters() {
                       <td className="col-muted">{row.contactEmail}<br />{row.contactPhone}</td>
                       <td className="col-muted">{formatDateTime(row.createdAtUtc)}</td>
                       <td><Badge tone={status.tone}>{status.label}</Badge></td>
-                      <td className="col-actions"><Link className="text-link" href={`/platform/centers/${row.id}`}>Xử lý <ArrowRight aria-hidden="true" /></Link></td>
+                      <td className="col-actions"><ButtonLink size="sm" variant="soft" href={`/platform/centers/${row.id}`} trailing={<ArrowRight aria-hidden="true" />}>Xử lý</ButtonLink></td>
                     </tr>
                   );
                 })}
@@ -246,7 +247,7 @@ function CreateCenterDialog({ onClose, onCreated, resubmit }: { onClose: () => v
         ? `Lý do từ chối trước: ${resubmit.reviewNote ?? "—"}. Sau khi gửi, hồ sơ trở về trạng thái chờ duyệt; lần từ chối vẫn lưu trong lịch sử.`
         : "Trung tâm mới ở trạng thái chờ duyệt. Mã số thuế là duy nhất trên toàn nền tảng."}
       onClose={onClose} onSubmit={submit}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" pending={action.pending}>{resubmit ? "Gửi duyệt lại" : "Tạo trung tâm"}</Button></>}>
+      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" pending={action.pending} status={action.status}>{resubmit ? "Gửi duyệt lại" : "Tạo trung tâm"}</Button></>}>
       <div className="form-grid">
         {input("legalName", "Tên pháp lý", { span: true })}
         {input("displayName", "Tên hiển thị")}
@@ -288,7 +289,7 @@ export function PlatformCenterDetail({ centerId }: { centerId: string }) {
 
   return (
     <>
-      <Link className="back-link" href="/platform"><ArrowLeft aria-hidden="true" />Tất cả trung tâm</Link>
+      <BackButton href="/platform">Tất cả trung tâm</BackButton>
       <PageHeader
         title={center?.displayName ?? "Trung tâm"}
         description={center?.legalName}
@@ -460,7 +461,7 @@ function InviteOwnerDialog({ center, onClose, onInvited }: { center: Center; onC
   }
   return (
     <Dialog open size="sm" title={`Mời chủ trung tâm ${center.displayName}`} description="Lời mời gửi qua email, hiệu lực 48 giờ, dùng một lần. Email chưa được dùng cho tài khoản nào." onClose={onClose} onSubmit={submit}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Hủy</Button><Button type="submit" variant="primary" pending={action.pending}>Gửi lời mời</Button></>}>
+      footer={<><Button onClick={onClose} disabled={action.pending}>Hủy</Button><Button type="submit" variant="primary" pending={action.pending} status={action.status}>Gửi lời mời</Button></>}>
       <Field label="Email người nhận" required error={touched ? error : null}>
         {(id) => <input id={id} type="email" autoComplete="off" value={email} onChange={(event) => setEmail(event.target.value)} />}
       </Field>
@@ -470,24 +471,26 @@ function InviteOwnerDialog({ center, onClose, onInvited }: { center: Center; onC
 }
 
 function PlatformInvitationRow({ centerId, item, onChanged }: { centerId: string; item: MemberInvitation; onChanged: (message: string) => void }) {
-  const action = useAction();
+  const resend = useAction();
+  const revoke = useAction();
+  const busy = resend.pending || revoke.pending;
   const now = useNow();
   const expired = new Date(item.expiresAtUtc).getTime() <= now;
   const owner = item.role === "CenterOwner";
   return (
     <tr>
-      <td><strong>{item.email}</strong>{action.error ? <p className="field-error">Không thực hiện được, hãy làm mới.</p> : null}</td>
+      <td><strong>{item.email}</strong>{resend.error || revoke.error ? <p className="field-error">Không thực hiện được, hãy làm mới.</p> : null}</td>
       <td><Badge tone={owner ? "brand" : "neutral"}>{roleLabel(item.role)}</Badge></td>
       <td className="col-muted">{expired ? <Badge tone="warning">Đã hết hạn</Badge> : formatDateTime(item.expiresAtUtc)}</td>
       <td className="col-actions">
         {owner && (
           <>
-            <Button size="sm" variant="ghost" icon={<Send aria-hidden="true" />} pending={action.pending} onClick={async () => {
-              const sent = await action.run(() => identityApi.platformResendInvitation(centerId, item.id));
+            <Button size="sm" variant="ghost" icon={<Send aria-hidden="true" />} status={resend.status} disabled={busy} onClick={async () => {
+              const sent = await resend.run(() => identityApi.platformResendInvitation(centerId, item.id));
               if (sent) onChanged(`Đã gửi lại lời mời tới ${item.email}; đường dẫn cũ hết hiệu lực.`);
             }}>Gửi lại</Button>
-            <Button size="sm" variant="ghost" icon={<X aria-hidden="true" />} pending={action.pending} onClick={async () => {
-              const revoked = await action.run(() => identityApi.platformRevokeInvitation(centerId, item.id));
+            <Button size="sm" variant="ghost" icon={<X aria-hidden="true" />} status={revoke.status} disabled={busy} onClick={async () => {
+              const revoked = await revoke.run(() => identityApi.platformRevokeInvitation(centerId, item.id));
               if (revoked) onChanged(`Đã thu hồi lời mời gửi ${item.email}.`);
             }}>Thu hồi</Button>
           </>
@@ -533,7 +536,7 @@ export function PlatformChangeQueue() {
                 key={request.id}
                 request={request}
                 actions={request.centerId && (
-                  <Link className="text-link" href={`/platform/centers/${request.centerId}`}>{request.centerName ?? "Mở trung tâm"} <ArrowRight aria-hidden="true" /></Link>
+                  <ButtonLink size="sm" variant="soft" href={`/platform/centers/${request.centerId}`} trailing={<ArrowRight aria-hidden="true" />}>{request.centerName ?? "Mở trung tâm"}</ButtonLink>
                 )}
               />
             ))}

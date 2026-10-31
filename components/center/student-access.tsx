@@ -60,7 +60,7 @@ export function StudentAccountCell({ item }: { item: Student }) {
       {item.duplicateCandidateId && (
         <Badge tone={item.duplicateReason === "SameAccount" ? "danger" : "warning"}>
           {item.duplicateReason === "SameAccount" ? "Cùng một học sinh với " : "Có thể trùng "}
-          {item.duplicateCandidateCode ?? ""} {item.duplicateCandidateName ?? ""}
+          {item.duplicateCandidateName ?? ""}
         </Badge>
       )}
       {item.mergedIntoStudentId && <Badge tone="neutral">Đã gộp vào hồ sơ khác</Badge>}
@@ -156,7 +156,7 @@ function ActivationLinkDialog({ student, onClose }: { student: Student; onClose:
             <Notice tone="warning">Lần trước người mở link đã báo “không phải tôi”. Hãy kiểm tra lại người nhận trước khi gửi link mới.</Notice>
           )}
           <div className="inline-action">
-            <Button variant="primary" icon={<KeyRound aria-hidden="true" />} pending={action.pending} onClick={() => void create()}>Tạo link kích hoạt</Button>
+            <Button variant="primary" icon={<KeyRound aria-hidden="true" />} pending={action.pending} status={action.status} onClick={() => void create()}>Tạo link kích hoạt</Button>
             {hasActive && <Button variant="ghost" onClick={() => void revoke()} disabled={action.pending}>Thu hồi link hiện tại</Button>}
           </div>
         </div>
@@ -181,7 +181,7 @@ function UnlinkDialog({ student, onClose, onDone }: { student: Student; onClose:
       description="Tài khoản Google đó không còn thấy lịch, thông báo của hồ sơ này. Lớp, điểm danh và lịch sử vẫn ở nguyên hồ sơ. Dùng khi gắn nhầm người, hoặc trước khi gộp hai hồ sơ."
       onClose={onClose}
       onSubmit={() => void confirm()}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Hủy</Button><Button type="submit" variant="danger" pending={action.pending}>Gỡ tài khoản</Button></>}
+      footer={<><Button onClick={onClose} disabled={action.pending}>Hủy</Button><Button type="submit" variant="danger" pending={action.pending} status={action.status}>Gỡ tài khoản</Button></>}
     >
       <ErrorNotice error={action.error} onDismiss={action.clearError} />
     </Dialog>
@@ -202,7 +202,7 @@ function MergeDialog({ student, onClose, onDone }: { student: Student; onClose: 
     const result = await action.run(() => academicsApi.mergeStudents(centerId, target, source));
     if (result) {
       const kept = keep === "this" ? student : other.data;
-      onDone(`Đã gộp: ${result.movedEnrollments} lớp và ${result.movedAttendance} lượt điểm danh chuyển sang ${kept?.code ?? ""} ${kept?.fullName ?? ""}. Hồ sơ còn lại đã được lưu trữ.`);
+      onDone(`Đã gộp: ${result.movedEnrollments} lớp và ${result.movedAttendance} lượt điểm danh chuyển sang ${kept?.fullName ?? ""}. Hồ sơ còn lại đã được lưu trữ.`);
     }
   }
 
@@ -215,7 +215,7 @@ function MergeDialog({ student, onClose, onDone }: { student: Student; onClose: 
     <label className={`choice-card${keep === which ? " is-selected" : ""}`}>
       <input type="radio" name="keep" checked={keep === which} onChange={() => setKeep(which)} />
       <span>
-        <strong>{value ? `${value.code} · ${value.fullName}` : "…"}</strong>
+        <strong>{value ? value.fullName : "…"}</strong>
         <small>{label}{value?.hasAccount ? " · đã gắn tài khoản" : " · chưa có tài khoản"}{value?.parentPhone ? ` · PH ${value.parentName ?? ""}` : ""}</small>
       </span>
     </label>
@@ -233,7 +233,7 @@ function MergeDialog({ student, onClose, onDone }: { student: Student; onClose: 
       footer={
         <>
           <Button onClick={() => void dismiss()} disabled={action.pending}>Không phải một người</Button>
-          <Button variant="primary" icon={<UserCheck aria-hidden="true" />} pending={action.pending} onClick={() => void merge()} disabled={!other.data}>Gộp vào hồ sơ đã chọn</Button>
+          <Button variant="primary" icon={<UserCheck aria-hidden="true" />} pending={action.pending} status={action.status} onClick={() => void merge()} disabled={!other.data}>Gộp vào hồ sơ đã chọn</Button>
         </>
       }
     >
@@ -339,7 +339,7 @@ export function ClassInvitesPanel({ teachingClass }: { teachingClass: TeachingCl
                   onChange={(event) => setMaxUses(event.target.value.replace(/\D/g, "").slice(0, 3))} />
               )}
             </Field>
-            <Button variant="primary" icon={<Link2 aria-hidden="true" />} pending={action.pending} onClick={() => void create()}>Tạo link mời</Button>
+            <Button variant="primary" icon={<Link2 aria-hidden="true" />} pending={action.pending} status={action.status} onClick={() => void create()}>Tạo link mời</Button>
           </div>
         )}
 
@@ -348,7 +348,7 @@ export function ClassInvitesPanel({ teachingClass }: { teachingClass: TeachingCl
             <strong>Học sinh đã có hồ sơ trong lớp</strong>
             <p>Tạo link kích hoạt riêng cho mọi em trong lớp chưa có tài khoản, để gửi cho từng gia đình.</p>
           </div>
-          <Button icon={<KeyRound aria-hidden="true" />} pending={action.pending} onClick={() => void activationForClass()}>Link kích hoạt cho cả lớp</Button>
+          <Button icon={<KeyRound aria-hidden="true" />} pending={action.pending} status={action.status} onClick={() => void activationForClass()}>Link kích hoạt cho cả lớp</Button>
         </div>
 
         <div>
@@ -361,7 +361,7 @@ export function ClassInvitesPanel({ teachingClass }: { teachingClass: TeachingCl
             <ul className="plain-list">
               {joins.data.slice(0, 10).map((join) => (
                 <li key={join.id}>
-                  <code className="code">{join.studentCode}</code> {join.fullName}
+                  {join.fullName}
                   <span className="col-muted"> · {formatDateTime(join.joinedAtUtc)}</span>
                   {join.createdProfile && <Badge tone="info">Hồ sơ mới</Badge>}
                   {join.hadConflicts && <Badge tone="warning">Có trùng lịch</Badge>}
@@ -381,7 +381,7 @@ export function ClassInvitesPanel({ teachingClass }: { teachingClass: TeachingCl
           onClose={() => setClassLinks(null)}
           footer={
             <>
-              {classLinks.length > 0 && <CopyButton text={classLinks.map((x) => `${x.studentCode} ${x.fullName}: ${activationUrl(x.token)}`).join("\n")} label="Chép tất cả" />}
+              {classLinks.length > 0 && <CopyButton text={classLinks.map((x) => `${x.fullName}: ${activationUrl(x.token)}`).join("\n")} label="Chép tất cả" />}
               <Button onClick={() => setClassLinks(null)}>Đóng</Button>
             </>
           }
@@ -392,7 +392,7 @@ export function ClassInvitesPanel({ teachingClass }: { teachingClass: TeachingCl
             <ul className="invite-list">
               {classLinks.map((link) => (
                 <li key={link.studentId}>
-                  <strong>{link.studentCode} · {link.fullName}</strong>
+                  <strong>{link.fullName}</strong>
                   <div className="copy-row">
                     <code className="code copy-value">{activationUrl(link.token)}</code>
                     <CopyButton text={activationUrl(link.token)} />

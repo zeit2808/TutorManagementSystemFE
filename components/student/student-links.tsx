@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, CheckCircle2, GraduationCap, LoaderCircle, LogOut, UserRoundX } from "lucide-react";
+import { CalendarDays, CheckCircle2, GraduationCap, Home, LoaderCircle, LogOut, UserRoundX } from "lucide-react";
 import { academicsApi, authApi, ApiError, type ScheduleCheck, type WeeklySlot } from "@/lib/api";
 import { useSessionUser } from "@/lib/auth/session";
 import { useAction, useResource } from "@/lib/hooks/use-resource";
@@ -72,7 +71,7 @@ export function ActivationPage({ token }: { token: string }) {
     return (
       <div className="stack">
         <Notice tone="success" title="Đã kích hoạt">
-          Hồ sơ <strong>{preview.data?.fullName}</strong> ({preview.data?.studentCode}) ở <strong>{preview.data?.centerName}</strong> đã gắn với tài khoản của bạn.
+          Hồ sơ <strong>{preview.data?.fullName}</strong> ở <strong>{preview.data?.centerName}</strong> đã gắn với tài khoản của bạn.
           Từ nay chỉ cần bấm “Đăng nhập bằng Google” là thấy lịch học.
         </Notice>
         <ButtonLink href="/student" variant="primary" icon={<CalendarDays aria-hidden="true" />}>Xem lịch học</ButtonLink>
@@ -99,7 +98,7 @@ export function ActivationPage({ token }: { token: string }) {
             <GraduationCap aria-hidden="true" />
             <div>
               <strong>{preview.data.fullName}</strong>
-              <span>Mã {preview.data.studentCode}{preview.data.classNames.length > 0 ? ` · đang học ${preview.data.classNames.join(", ")}` : ""}</span>
+              {preview.data.classNames.length > 0 && <span>Đang học {preview.data.classNames.join(", ")}</span>}
             </div>
           </div>
           <p>Đây có phải là bạn không?</p>
@@ -109,7 +108,7 @@ export function ActivationPage({ token }: { token: string }) {
             </Notice>
           ) : (
             <div className="inline-action">
-              <Button variant="primary" icon={<CheckCircle2 aria-hidden="true" />} pending={action.pending} onClick={() => void accept()}>Đúng là tôi</Button>
+              <Button variant="primary" icon={<CheckCircle2 aria-hidden="true" />} pending={action.pending} status={action.status} onClick={() => void accept()}>Đúng là tôi</Button>
               <Button icon={<UserRoundX aria-hidden="true" />} disabled={action.pending} onClick={() => void decline()}>Không phải tôi</Button>
             </div>
           )}
@@ -240,7 +239,7 @@ export function JoinClassPage({ token }: { token: string }) {
                     </>
                   )}
                   <ErrorNotice error={action.error} onDismiss={action.clearError} />
-                  <Button type="submit" variant="primary" pending={action.pending} disabled={data.seatsLeft <= 0}>Vào lớp</Button>
+                  <Button type="submit" variant="primary" pending={action.pending} status={action.status} disabled={data.seatsLeft <= 0}>Vào lớp</Button>
                 </>
               )}
             </form>
@@ -252,14 +251,14 @@ export function JoinClassPage({ token }: { token: string }) {
                 <ConflictList items={clash.sameCenterConflicts} />
               </Notice>
               <div className="inline-action">
-                <Button variant="primary" pending={action.pending} onClick={() => { setClash(null); void join(true); }}>Vẫn vào lớp</Button>
+                <Button variant="primary" pending={action.pending} status={action.status} onClick={() => { setClash(null); void join(true); }}>Vẫn vào lớp</Button>
                 <Button onClick={() => setClash(null)}>Không vào nữa</Button>
               </div>
             </div>
           )}
         </>
       )}
-      <p className="cell-note">Cần giúp? <Link className="text-link" href="/student">Về cổng học sinh</Link></p>
+      <p className="cell-note help-line">Cần giúp? <ButtonLink size="sm" variant="ghost" href="/student" icon={<Home aria-hidden="true" />}>Về cổng học sinh</ButtonLink></p>
     </div>
   );
 }

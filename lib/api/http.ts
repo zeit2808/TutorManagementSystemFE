@@ -22,6 +22,14 @@ interface AccessSession {
 let session: AccessSession | null = null;
 let refreshInFlight: Promise<TokenResponse> | null = null;
 
+/** A request that hangs (API stalled, proxy dropped the response) must not leave a button spinning forever. */
+const REQUEST_TIMEOUT_MS = 30_000;
+
+function withTimeout(signal?: AbortSignal | null) {
+  const timeout = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
+  return signal ? AbortSignal.any([signal, timeout]) : timeout;
+}
+
 export class ApiError extends Error {
   readonly status: number;
   readonly errors: ApiFieldError[];
@@ -126,6 +134,7 @@ export async function refreshAccessToken(): Promise<TokenResponse> {
       credentials: "include",
       cache: "no-store",
       headers: { Accept: "application/json" },
+      signal: withTimeout(),
     });
     const envelope = await readEnvelope<TokenResponse>(response);
     if (!response.ok || !envelope?.success || !envelope.data) {
@@ -148,6 +157,7 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
     idempotencyKey,
     query,
     headers: suppliedHeaders,
+    signal,
     ...fetchOptions
   } = options;
 
@@ -167,6 +177,7 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
     body: body === undefined ? undefined : JSON.stringify(body),
     credentials: "include",
     cache: "no-store",
+    signal: withTimeout(signal),
   });
   const envelope = await readEnvelope<T>(response);
 
@@ -181,6 +192,9 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
 
 export function getApiErrorMessage(error: unknown, fallback = "Không thể xử lý yêu cầu. Vui lòng thử lại.") {
   if (!(error instanceof ApiError)) {
+    if (error instanceof DOMException && error.name === "TimeoutError") {
+      return "Máy chủ phản hồi quá lâu. Tải lại trang để kiểm tra thao tác đã được lưu chưa rồi thử lại.";
+    }
     if (error instanceof TypeError) return "Không kết nối được máy chủ. Kiểm tra mạng hoặc trạng thái API.";
     return fallback;
   }

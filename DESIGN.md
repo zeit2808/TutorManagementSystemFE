@@ -110,14 +110,16 @@ Giao diện art-directed trước đây — nền giấy, đường tuyến, doo
 
 ### Trang chào mừng `/`
 
-- Hero nền navy với lưới chấm và hai quầng sáng violet/xanh trôi chậm; tiêu đề 800 tối đa `3.5rem`, dòng thứ hai màu `#b9b3ff` (không dùng gradient text).
+- Hero nền navy với lưới chấm và hai quầng sáng violet/xanh trôi chậm (đây cũng là fallback tĩnh). Phía sau là nền 3D `components/home/hero-scene*.ts(x)` (three.js, tải lười sau khi trang rảnh): bảng lịch tuần trải thành mặt sàn chìm trong sương navy, mỗi buổi học là một chồng sách giáo khoa kèm bút chì rơi xuống ô trống, thỉnh thoảng một chồng rơi trùng ô nhấp đỏ rồi trượt sang ô trống, học sinh chibi (`components/home/hero-students.ts`: đầu to ~40% chiều cao, mắt có điểm sáng, một số đeo kính; nam: tóc ngắn lộ gáy, mái dựng, vai rộng, quần xanh than có thắt lưng; nữ: tóc dài thả qua vai kèm lọn ôm mặt hoặc tết hai bím buông trước vai, nơ cài tóc màu, dáng thon, váy xanh than với tất trắng; chung: áo trắng, khăn quàng đỏ, cặp nhiều màu, sneaker đế trắng dày với thân giày màu nổi, mũi và dây trắng, sọc hông và gót tương phản (8 phối màu); toon shading) vung tay chân khi đi tới lớp, đứng quay mặt vào chồng sách, thỉnh thoảng giơ tay phát biểu rồi tản ra; đến lớp là điểm danh: huy hiệu bật lên trên đầu (✓ xanh đúng giờ, đồng hồ vàng nếu đi muộn quá ~2,6s); cứ 15–20s đồng hồ báo thức rung, phát vòng sóng chuông và đổi ca — các lớp tan cùng lúc, lớp mới xuất hiện; rê chuột gần thì học sinh quay lại vẫy tay, bấm vào một em thì em đó nhảy xoay một vòng (link, nút và bản thu nhỏ sản phẩm giữ nguyên thao tác của chúng); mũ tốt nghiệp, sách mở, quả địa cầu, đồng hồ báo thức, táo, bút chì, thước và máy bay giấy lơ lửng. Tất cả dựng từ khối cơ bản của three.js, không tải file model. Bỏ qua khi không có WebGL, bật tiết kiệm dữ liệu hoặc máy yếu; reduced-motion chỉ vẽ một khung tĩnh; dừng khi khuất màn hình hoặc tab ẩn; tiêu đề 800 tối đa `3.5rem`, dòng thứ hai màu `#b9b3ff` (không dùng gradient text).
 - **Focal moment — “Một ngày vận hành”**: bản thu nhỏ của chính sản phẩm (`components/home/hero-stage.tsx`) phát vòng lặp ~12 giây: buổi học trượt vào làn phòng, một buổi trùng phòng bị chặn rồi được chuyển phòng, phiếu điểm danh được đánh dấu từng học sinh rồi nộp. Mỗi nhịp phản ánh một quy tắc thật của back-end; ghi rõ “dữ liệu mẫu”. Dừng khi khuất màn hình hoặc tab ẩn; reduced-motion hiện trạng thái cuối, không chạy.
 - Các phần dưới: quy trình 4 bước (đường nối vẽ khi cuộn tới), bảng vai trò, ba nguyên tắc, dải kêu gọi hành động. Không có số liệu, khách hàng hay lời chứng thực bịa.
 
 ### Chuyển động
 
 - Nút: nhấc 1px + bóng khi hover, nhấn co 0.97; nút chính có lớp màu xanh–tím lan từ đáy và một vệt sáng quét ngang, mũi tên trượt 3px.
-- Điều hướng trong khung trung tâm/nền tảng/học sinh: React View Transition rời 130ms và vào 300ms, chỉ chuyển động vùng nội dung để sidebar/topbar giữ nguyên; CSS fade-rise 320ms là fallback cho trình duyệt chưa bật API.
+- Điều hướng trong khung trung tâm/nền tảng/học sinh: React View Transition rời 130ms và vào 300ms, chỉ chuyển động vùng nội dung để sidebar/topbar giữ nguyên; CSS fade-rise 320ms là fallback cho trình duyệt chưa bật API. Vệt chọn của sidebar (`NavLink`) là một shared element trượt sang mục mới trong 340ms; mục vừa bấm hiện vạch chờ khi trang đích còn đang tải (`useLinkStatus`).
+- Nút gọi request (`Button status={useAction().status}`): đang chạy giữ nhãn + spinner và một vạch tiến trình ở đáy; thành công chuyển xanh với dấu ✓ được vẽ ra (~1,6s); lỗi chuyển đỏ, lắc nhẹ (~2,2s) cạnh notice lỗi tại chỗ.
+- Thanh công cụ: mọi control trong `.toolbar` cao chung 36px để nút, select, ô tìm và segmented thẳng mép.
 - Notice trượt vào 260ms, hộp thoại 220ms, chip điểm danh “pop” khi chọn.
 - `prefers-reduced-motion`: bỏ mọi chuyển dịch và hiệu ứng tràn, chỉ giữ fade 100–120ms cùng phản hồi màu.
 
@@ -227,7 +229,10 @@ Không dùng đường viền màu dày ở một cạnh thẻ, card xoay, đư�
 
 - **Primary:** nền Action Violet, chữ trắng, cao `38–46px`, radius `7px`, icon Lucide `14–16px` khi cần.
 - **Secondary:** nền trắng, viền Divider, chữ trung tính; không có shadow ở trạng thái nghỉ.
-- **Text button:** không nền, dùng cho thao tác hỗ trợ như “Tất cả có mặt”.
+- **Soft:** nền tím nhạt, chữ tím đậm — thao tác chính của một hàng/thẻ (“Chi tiết”, “Xử lý”, “Duyệt đơn”, “Mở lịch dạy”), thường kèm mũi tên.
+- **Ghost:** nền xám rất nhạt + viền mảnh cho thao tác phụ; vẫn là nút nhìn thấy được, không bao giờ là chữ trơn. Thao tác gỡ/thu hồi/ngừng quyền có icon đỏ.
+- **Back button (`BackButton`):** ô icon mũi tên tím nhạt + hai dòng “Quay lại” / tên trang đích, đặt trên tiêu đề trang; hover tô tím ô icon và đẩy mũi tên sang trái.
+- **Không dùng link chữ cho thao tác.** Link chữ chỉ còn ở tên bản ghi trong bảng (`row-link`). Số điện thoại hiển thị dạng chip có icon. Nút mở rộng hàng đặt chevron trong ô viền.
 - **States:** hover đổi tone nhẹ; focus ring violet rõ; disabled giảm opacity và bỏ shadow; pending giữ label và spinner.
 
 ### Statuses

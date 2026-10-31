@@ -141,7 +141,7 @@ export function ScheduleWeekGrid({ centerId, weekStart, sessions, allSessions, l
       const oStart = new Date(other.startUtc).getTime();
       const oEnd = new Date(other.endUtc).getTime();
       if (!overlaps(startMs, endMs, oStart, oEnd)) continue;
-      const label = `${other.classCode ?? lookups.classById.get(other.classId)?.code ?? "Lớp"} ${formatTimeRange(other.startUtc, other.endUtc)}`;
+      const label = `${other.className ?? lookups.classById.get(other.classId)?.name ?? "Lớp"} ${formatTimeRange(other.startUtc, other.endUtc)}`;
       if (other.classId === session.classId) lines.push(`Lớp đã có buổi ${formatTimeRange(other.startUtc, other.endUtc)}.`);
       if (other.teacherId === session.teacherId) lines.push(`Giáo viên đã bận (${other.teacherName ?? lookups.teacherById.get(other.teacherId)?.fullName ?? "—"}): ${label}.`);
       if (other.roomId === session.roomId) lines.push(`Phòng đã bận (${other.roomName ?? lookups.roomById.get(other.roomId)?.name ?? "—"}): ${label}.`);
@@ -310,7 +310,6 @@ function SessionBlock({ item, lookups, movable, dragging, onOpen, onDragStart, o
   const notHeld = session.status === "NotHeld";
   const state = notHeld ? "is-not-held" : !session.isActive ? "is-cancelled" : session.makeupForSessionId ? "is-makeup" : session.isRescheduled ? "is-moved" : "";
   const className = session.className ?? lookups.classById.get(session.classId)?.name ?? "Lớp";
-  const code = session.classCode ?? lookups.classById.get(session.classId)?.code;
   const teacher = session.teacherName ?? lookups.teacherById.get(session.teacherId)?.fullName;
   const room = session.roomName ?? lookups.roomById.get(session.roomId)?.name;
   const width = 100 / item.lanes;
@@ -328,7 +327,7 @@ function SessionBlock({ item, lookups, movable, dragging, onOpen, onDragStart, o
     >
       {movable && <GripVertical className="week-grid-grip" aria-hidden="true" />}
       <strong>{formatTimeRange(session.startUtc, session.endUtc)}</strong>
-      <span className="week-grid-title">{code ? `${code} · ` : ""}{className}</span>
+      <span className="week-grid-title">{className}</span>
       <span className="week-grid-meta">{[room, teacher].filter(Boolean).join(" · ")}</span>
     </button>
   );
@@ -347,9 +346,15 @@ export function DropRescheduleDialog({ centerId, request, lookups, onClose, onSa
   const [reason, setReason] = useState("");
   const [touched, setTouched] = useState(false);
   const [impact, setImpact] = useState<SessionImpact | null>(null);
+  const [impactFailed, setImpactFailed] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const action = useAction();
-  const onData = useCallback((data: SessionImpact | null) => setImpact(data), []);
+  const onData = useCallback((data: SessionImpact | null, failed: boolean) => {
+    setImpact(data);
+    setImpactFailed(failed);
+  }, []);
+  // The server still refuses real clashes, so a failed preview must not lock the dialog on "checking".
+  const ready = Boolean(impact) || impactFailed;
   const clash = hasImpactClash(impact);
   const trimmed = reason.trim();
   const reasonError = !trimmed || trimmed.length > 500 ? "Nhập lý do dời lịch (1–500 ký tự)." : null;
@@ -358,7 +363,7 @@ export function DropRescheduleDialog({ centerId, request, lookups, onClose, onSa
 
   async function submit() {
     setTouched(true);
-    if (reasonError || acceptError || !impact) return;
+    if (reasonError || acceptError || !ready) return;
     const saved = await action.run(() => academicsApi.rescheduleSession(centerId, session.id, {
       teacherId: session.teacherId,
       roomId: session.roomId,
@@ -378,7 +383,7 @@ export function DropRescheduleDialog({ centerId, request, lookups, onClose, onSa
       description={`${className} · giáo viên và phòng giữ nguyên. Lý do hiển thị cho học sinh và giáo viên.`}
       onClose={onClose}
       onSubmit={submit}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" pending={action.pending} disabled={!impact}>{impact ? "Dời lịch" : "Đang kiểm tra…"}</Button></>}
+      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" pending={action.pending} status={action.status} disabled={!ready}>{ready ? "Dời lịch" : "Đang kiểm tra…"}</Button></>}
     >
       <p className="move-summary">
         <span>{formatWeekday(session.startUtc)} {formatDayMonth(session.startUtc)}<strong>{formatTimeRange(session.startUtc, session.endUtc)}</strong></span>

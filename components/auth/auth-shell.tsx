@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowLeft, BookOpen, CalendarCheck2, ClipboardCheck, ShieldCheck } from "lucide-react";
+import { BookOpen, CalendarCheck2, ClipboardCheck, ShieldCheck } from "lucide-react";
+import { BackButton } from "@/components/ui/primitives";
 import type { ReactNode } from "react";
 
 interface AuthShellProps {
@@ -25,7 +26,7 @@ export function AuthShell({ title, description, children, footer }: AuthShellPro
         <p className="auth-story-foot">Tài khoản quản lý được tạo qua lời mời; học sinh đăng nhập bằng Google.</p>
       </section>
       <section className="auth-form-area">
-        <Link className="back-link auth-home" href="/"><ArrowLeft aria-hidden="true" />Trang chủ</Link>
+        <BackButton href="/" className="auth-home">Trang chủ</BackButton>
         <div className="auth-card">
           <header>
             <h1>{title}</h1>

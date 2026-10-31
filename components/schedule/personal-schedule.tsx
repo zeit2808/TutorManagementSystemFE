@@ -111,7 +111,7 @@ function EntryRow({ entry, color, showRole, href, actions }: { entry: MySchedule
         <strong>{href ? <Link href={href}>{name}</Link> : name}</strong>
         <span>
           <span className="center-dot" style={{ background: color }} aria-hidden="true" />
-          {[entry.centerName, entry.classCode, entry.teacherName, entry.roomName].filter(Boolean).join(" · ")}
+          {[entry.centerName, entry.teacherName, entry.roomName].filter(Boolean).join(" · ")}
         </span>
         {entry.isRescheduled && entry.previousStartUtc && entry.previousEndUtc && (
           <span className="entry-note">Đã dời từ {formatSlot(entry.previousStartUtc, entry.previousEndUtc)}{entry.rescheduleReason ? ` · ${entry.rescheduleReason}` : ""}</span>

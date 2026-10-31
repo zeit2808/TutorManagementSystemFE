@@ -5,8 +5,8 @@ import Link from "next/link";
 import { ArrowRight, Plus, Presentation, RefreshCcw, Search } from "lucide-react";
 import { academicsApi, type Subject, type TeachingClass } from "@/lib/api";
 import { useAction, useResource } from "@/lib/hooks/use-resource";
-import { validateCode, validateName } from "@/lib/validation";
-import { Badge, Button, Dialog, EmptyState, ErrorNotice, Field, Meter, Notice, PageHeader, Pagination, Panel, SkeletonRows, Toggle } from "@/components/ui/primitives";
+import { validateName } from "@/lib/validation";
+import { Badge, Button, Dialog, EmptyState, ErrorNotice, Field, Meter, Notice, PageHeader, Pagination, Panel, SkeletonRows, Toggle, ButtonLink } from "@/components/ui/primitives";
 import { useCenter } from "./center-frame";
 
 const PAGE_SIZE = 25;
@@ -64,7 +64,7 @@ export function ClassesWorkspace() {
           <label className="search">
             <Search aria-hidden="true" />
             <span className="sr-only">Tìm lớp</span>
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm theo mã hoặc tên lớp…" />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm theo tên lớp…" />
           </label>
           <label className="select-inline">
             <span>Môn</span>
@@ -90,18 +90,17 @@ export function ClassesWorkspace() {
           <div className="table-wrap">
             <table className="table">
               <thead>
-                <tr><th className="col-code">Mã</th><th>Tên lớp</th><th>Môn</th><th>Sĩ số</th><th>Đăng ký trực tuyến</th><th>Trạng thái</th><th className="col-actions"><span className="sr-only">Mở</span></th></tr>
+                <tr><th>Tên lớp</th><th>Môn</th><th>Sĩ số</th><th>Đăng ký trực tuyến</th><th>Trạng thái</th><th className="col-actions"><span className="sr-only">Mở</span></th></tr>
               </thead>
               <tbody>
                 {rows.map((item) => (
                   <tr key={item.id} className={item.isActive ? "" : "is-archived"}>
-                    <td className="col-code"><code className="code">{item.code}</code></td>
                     <td><Link className="row-link" href={`/centers/${centerId}/classes/${item.id}`}>{item.name}</Link></td>
                     <td className="col-muted">{subjectById.get(item.subjectId)?.name ?? "—"}</td>
                     <td><Meter value={item.enrolledCount} max={item.maxStudents} label={`Sĩ số lớp ${item.name}`} /></td>
                     <td>{item.registrationOpen ? <Badge tone="success">Đang mở</Badge> : <Badge tone="neutral">Đóng</Badge>}</td>
                     <td>{item.isActive ? <Badge tone="success">Đang hoạt động</Badge> : <Badge tone="neutral">Đã lưu trữ</Badge>}</td>
-                    <td className="col-actions"><Link className="text-link" href={`/centers/${centerId}/classes/${item.id}`}>Chi tiết <ArrowRight aria-hidden="true" /></Link></td>
+                    <td className="col-actions"><ButtonLink size="sm" variant="soft" href={`/centers/${centerId}/classes/${item.id}`} trailing={<ArrowRight aria-hidden="true" />}>Chi tiết</ButtonLink></td>
                   </tr>
                 ))}
               </tbody>
@@ -129,7 +128,6 @@ export function ClassesWorkspace() {
 export function ClassEditor({ subjects, item, onClose, onSaved, onStale }: { subjects: Subject[]; item?: TeachingClass; onClose: () => void; onSaved: (saved: TeachingClass) => void; onStale?: () => void }) {
   const { centerId } = useCenter();
   const [subjectId, setSubjectId] = useState(item?.subjectId ?? subjects[0]?.id ?? "");
-  const [code, setCode] = useState(item?.code ?? "");
   const [name, setName] = useState(item?.name ?? "");
   const [maxStudents, setMaxStudents] = useState(String(item?.maxStudents ?? 20));
   const [touched, setTouched] = useState(false);
@@ -138,7 +136,6 @@ export function ClassEditor({ subjects, item, onClose, onSaved, onStale }: { sub
   const capacity = Number(maxStudents);
   const errors = {
     subject: item ? null : subjectId ? null : "Chọn môn học đang hoạt động.",
-    code: item ? null : validateCode(code),
     name: validateName(name, "Tên lớp"),
     maxStudents: !Number.isInteger(capacity) || capacity < 1 || capacity > 500
       ? "Sĩ số tối đa từ 1 đến 500."
@@ -152,7 +149,7 @@ export function ClassEditor({ subjects, item, onClose, onSaved, onStale }: { sub
     const saved = await action.run(() =>
       item
         ? academicsApi.updateClass(centerId, item.id, { name: name.trim(), maxStudents: capacity, expectedVersion: item.version })
-        : academicsApi.createClass(centerId, { subjectId, code: code.trim().toUpperCase(), name: name.trim(), maxStudents: capacity }),
+        : academicsApi.createClass(centerId, { subjectId, name: name.trim(), maxStudents: capacity }),
     );
     if (saved) onSaved(saved);
   }
@@ -161,10 +158,10 @@ export function ClassEditor({ subjects, item, onClose, onSaved, onStale }: { sub
     <Dialog
       open
       title={item ? "Sửa lớp học" : "Mở lớp mới"}
-      description={item ? "Môn và mã lớp cố định sau khi tạo." : "Lớp mới mặc định đóng đăng ký; mở đăng ký ở trang chi tiết lớp."}
+      description={item ? "Môn học cố định sau khi tạo." : "Lớp mới mặc định đóng đăng ký; mở đăng ký ở trang chi tiết lớp."}
       onClose={onClose}
       onSubmit={submit}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Hủy</Button><Button type="submit" variant="primary" pending={action.pending}>{item ? "Lưu thay đổi" : "Mở lớp"}</Button></>}
+      footer={<><Button onClick={onClose} disabled={action.pending}>Hủy</Button><Button type="submit" variant="primary" pending={action.pending} status={action.status}>{item ? "Lưu thay đổi" : "Mở lớp"}</Button></>}
     >
       {!item && subjects.length === 0 && <Notice tone="warning">Trung tâm chưa có môn học đang hoạt động. Hãy thêm môn học trước.</Notice>}
       <div className="form-grid">
@@ -172,14 +169,9 @@ export function ClassEditor({ subjects, item, onClose, onSaved, onStale }: { sub
           <Field label="Môn học" required error={touched ? errors.subject : null}>
             {(id) => (
               <select id={id} value={subjectId} onChange={(event) => setSubjectId(event.target.value)}>
-                {subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name} · {subject.code}</option>)}
+                {subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name}</option>)}
               </select>
             )}
-          </Field>
-        )}
-        {!item && (
-          <Field label="Mã lớp" required hint="2–20 ký tự, ví dụ TOAN9-A." error={touched ? errors.code : null}>
-            {(id, describedBy) => <input id={id} aria-describedby={describedBy} className="input-code" maxLength={20} value={code} onChange={(event) => setCode(event.target.value)} />}
           </Field>
         )}
         <Field label="Tên lớp" required error={touched ? errors.name : null} className={item ? "span-2" : undefined}>

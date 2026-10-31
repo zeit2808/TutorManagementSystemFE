@@ -1,8 +1,8 @@
-import Link from "next/link";
+import { MailOpen } from "lucide-react";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { GoogleLoginButton } from "@/components/auth/google-login-button";
 import { LoginForm } from "@/components/auth/login-form";
-import { Notice } from "@/components/ui/primitives";
+import { ButtonLink, Notice } from "@/components/ui/primitives";
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const params = await searchParams;
@@ -15,7 +15,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
     <AuthShell
       title="Đăng nhập"
       description="Chủ trung tâm, quản lý và nhân viên dùng tên đăng nhập. Học sinh dùng Google."
-      footer={<>Có email mời mở trung tâm? <Link className="text-link" href="/accept-invitation">Tạo tài khoản từ lời mời</Link></>}
+      footer={<><span>Có email mời mở trung tâm?</span><ButtonLink size="sm" variant="soft" href="/accept-invitation" icon={<MailOpen aria-hidden="true" />}>Tạo tài khoản từ lời mời</ButtonLink></>}
     >
       {success && <Notice tone="success">{success}</Notice>}
       <LoginForm nextPath={nextPath} />

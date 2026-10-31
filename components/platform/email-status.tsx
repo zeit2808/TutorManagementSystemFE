@@ -59,7 +59,7 @@ export function PlatformEmailStatus() {
             <Field label="Gửi tới" error={touched ? toError : null} hint="Ví dụ: ten.ban@gmail.com">
               {(id, describedBy) => <input id={id} aria-describedby={describedBy} type="email" inputMode="email" autoComplete="email" value={to} onChange={(event) => setTo(event.target.value)} />}
             </Field>
-            <Button type="submit" variant="primary" icon={<Send aria-hidden="true" />} pending={action.pending}>Gửi email thử</Button>
+            <Button type="submit" variant="primary" icon={<Send aria-hidden="true" />} pending={action.pending} status={action.status}>Gửi email thử</Button>
           </form>
         </div>
       </Panel>

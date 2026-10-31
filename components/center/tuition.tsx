@@ -18,7 +18,7 @@ import { useCenterLookups } from "@/lib/hooks/use-lookups";
 import { formatDateTime, formatIsoDate, formatMoney, formatPeriod, formatStartLabel } from "@/lib/format";
 import { chargeStatus, missedKindLabels, paymentMethodLabels } from "@/lib/labels";
 import { BANKS, bankName, vietQrUrl } from "@/lib/banks";
-import { Badge, Button, Dialog, EmptyState, ErrorNotice, Field, Notice, PageHeader, Pagination, Panel, Segmented, SkeletonRows, Toggle } from "@/components/ui/primitives";
+import { Badge, Button, Dialog, EmptyState, ErrorNotice, Field, Notice, PageHeader, Pagination, Panel, Segmented, SkeletonRows, Toggle, ButtonLink } from "@/components/ui/primitives";
 import { ReasonDialog } from "@/components/ui/reason-dialog";
 import { RoleGate, useCenter } from "./center-frame";
 
@@ -134,12 +134,12 @@ function ChargesTab({ onChanged }: { onChanged: () => void }) {
         <label className="select-inline"><span>Lớp</span>
           <select value={classId} onChange={(event) => { setClassId(event.target.value); setPage(1); }}>
             <option value="">Mọi lớp</option>
-            {(lookups.data?.classes ?? []).map((item) => <option key={item.id} value={item.id}>{item.code} · {item.name}</option>)}
+            {(lookups.data?.classes ?? []).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
           </select>
         </label>
         <form className="search" role="search" onSubmit={(event) => { event.preventDefault(); setSearch(term.trim()); setPage(1); }}>
           <Search aria-hidden="true" />
-          <input value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Tên, mã học sinh hoặc lớp" aria-label="Tìm học sinh" maxLength={100} />
+          <input value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Tên học sinh hoặc lớp" aria-label="Tìm học sinh" maxLength={100} />
         </form>
         <Button size="sm" variant="ghost" icon={<RefreshCcw aria-hidden="true" />} onClick={() => void list.reload()} pending={list.loading && Boolean(data)}>Làm mới</Button>
       </div>
@@ -157,7 +157,7 @@ function ChargesTab({ onChanged }: { onChanged: () => void }) {
                 {data.items.map((item) => {
                   return (
                     <tr key={item.id}>
-                      <td><Link className="text-link" href={`/centers/${centerId}/tuition/students/${item.studentId}`}><strong>{item.studentName}</strong></Link><p className="cell-note"><code className="code">{item.studentCode}</code></p></td>
+                      <td><Link className="row-link" href={`/centers/${centerId}/tuition/students/${item.studentId}`}>{item.studentName}</Link></td>
                       <td><strong>{item.className}</strong><p className="cell-note">Kỳ {item.cycleNumber} · {formatPeriod(item.periodStart, item.periodEnd)}</p></td>
                       <td className="num"><strong>{formatMoney(item.amount)}</strong><ChargeNotes charge={item} /></td>
                       <td className="num">{formatMoney(item.paid)}</td>
@@ -233,7 +233,7 @@ export function MissedSessionsDialog({ charge, canManage, onClose, onSaved }: { 
         <>
           {charge.adjustmentAmount > 0 && <Button onClick={() => void save(0)} disabled={action.pending}>Bỏ giảm</Button>}
           <Button onClick={onClose} disabled={action.pending}>Đóng</Button>
-          <Button type="submit" variant="primary" pending={action.pending}>Lưu giảm học phí</Button>
+          <Button type="submit" variant="primary" pending={action.pending} status={action.status}>Lưu giảm học phí</Button>
         </>
       ) : <Button onClick={onClose}>Đóng</Button>}
     >
@@ -323,7 +323,7 @@ function ReceiptsTab({ onChanged }: { onChanged: () => void }) {
                   <tr key={item.id} className={item.voidedAtUtc ? "row-voided" : undefined}>
                     <td><code className="code">{item.numberText}</code>{item.voidedAtUtc && <p><Badge tone="danger">Đã huỷ</Badge></p>}</td>
                     <td className="col-muted">{formatIsoDate(item.receivedOn)}</td>
-                    <td><Link className="text-link" href={`/centers/${centerId}/tuition/students/${item.studentId}`}>{item.studentName}</Link><p className="cell-note">{item.studentCode}{item.payerName ? ` · ${item.payerName} nộp` : ""}</p></td>
+                    <td><Link className="row-link" href={`/centers/${centerId}/tuition/students/${item.studentId}`}>{item.studentName}</Link>{item.payerName && <p className="cell-note">{item.payerName} nộp</p>}</td>
                     <td>{paymentMethodLabels[item.method] ?? item.method}</td>
                     <td className="num"><strong>{formatMoney(item.amount)}</strong></td>
                     <td>
@@ -333,7 +333,7 @@ function ReceiptsTab({ onChanged }: { onChanged: () => void }) {
                     </td>
                     <td className="col-muted">{item.createdByName ?? "—"}<p className="cell-note">{formatDateTime(item.createdAtUtc)}</p></td>
                     <td className="col-actions">
-                      <Link className="btn btn-ghost btn-sm" href={`/centers/${centerId}/tuition/receipts/${item.id}`}><Printer aria-hidden="true" />In</Link>
+                      <ButtonLink size="sm" variant="ghost" icon={<Printer aria-hidden="true" />} href={`/centers/${centerId}/tuition/receipts/${item.id}`}>In</ButtonLink>
                       {canManage && !item.voidedAtUtc && <Button size="sm" variant="ghost" icon={<Ban aria-hidden="true" />} onClick={() => setVoiding(item)}>Huỷ</Button>}
                     </td>
                   </tr>
@@ -390,7 +390,7 @@ function FeesTab({ onChanged }: { onChanged: () => void }) {
             <tbody>
               {rows.map((row) => (
                 <tr key={row.classId}>
-                  <td><strong>{row.className}</strong><p className="cell-note"><code className="code">{row.classCode}</code>{row.isArchived ? " · đã lưu trữ" : ""}</p></td>
+                  <td><strong>{row.className}</strong>{row.isArchived && <p className="cell-note">Đã lưu trữ</p>}</td>
                   <td>
                     {row.currentPeriodStart && row.currentPeriodEnd ? formatPeriod(row.currentPeriodStart, row.currentPeriodEnd) : <span className="col-muted">Chưa học buổi nào</span>}
                     {row.firstSessionDate && <p className="cell-note">Buổi đầu: {formatIsoDate(row.firstSessionDate)}</p>}
@@ -441,7 +441,7 @@ function FeeDialog({ row, onClose, onDone }: { row: ClassFeeRow; onClose: () => 
         : `Mức mới áp dụng từ kỳ sau${row.currentPeriodEnd ? ` (từ ngày sau ${formatIsoDate(row.currentPeriodEnd)})` : ""}. Các kỳ đã lập giữ nguyên số tiền.`}
       onClose={onClose}
       onSubmit={() => void save()}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Hủy</Button><Button type="submit" variant="primary" pending={action.pending}>Lưu</Button></>}
+      footer={<><Button onClick={onClose} disabled={action.pending}>Hủy</Button><Button type="submit" variant="primary" pending={action.pending} status={action.status}>Lưu</Button></>}
     >
       <Field label="Học phí mỗi tháng (đ)" required hint={fee > 0 ? formatMoney(fee) : "Nhập 0 nếu lớp miễn phí."} error={touched ? error : null}>
         {(id, describedBy) => <input id={id} type="number" min={0} step={1000} value={fee} aria-describedby={describedBy} onChange={(event) => setFee(Math.max(0, Number(event.target.value) || 0))} />}
@@ -521,7 +521,7 @@ function SettingsForm({ initial, onSaved }: { initial: FinanceSettings; onSaved:
           <div className="field">
             <Toggle checked={emailReminders} onChange={setEmailReminders} label="Gửi email nhắc khi quá hạn" disabled={!canManage} />
           </div>
-          {canManage && <div className="field-wide"><Button type="submit" variant="primary" icon={<Settings2 aria-hidden="true" />} pending={action.pending}>Lưu cài đặt</Button></div>}
+          {canManage && <div className="field-wide"><Button type="submit" variant="primary" icon={<Settings2 aria-hidden="true" />} pending={action.pending} status={action.status}>Lưu cài đặt</Button></div>}
         </form>
         {!canManage && <p className="cell-note">Chỉ chủ hoặc quản lý trung tâm sửa được cài đặt này.</p>}
         <ErrorNotice error={action.error} onDismiss={action.clearError} />

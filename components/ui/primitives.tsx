@@ -2,41 +2,68 @@
 
 import { useEffect, useId, useRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import Link from "next/link";
-import { AlertCircle, CheckCircle2, Info, LoaderCircle, RefreshCcw, TriangleAlert, X } from "lucide-react";
+import { AlertCircle, ArrowLeft, Check, CheckCircle2, Info, LoaderCircle, RefreshCcw, TriangleAlert, X } from "lucide-react";
 import { ApiError, getApiErrorMessage } from "@/lib/api";
+import type { ActionStatus } from "@/lib/hooks/use-resource";
 import type { Tone } from "@/lib/labels";
 
 /* ───────── Button ───────── */
 
-type Variant = "primary" | "secondary" | "ghost" | "danger";
+type Variant = "primary" | "secondary" | "soft" | "ghost" | "danger";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   icon?: ReactNode;
   pending?: boolean;
+  /** Outcome of the request this button triggered (`useAction().status`): confirms success or flags failure in place. */
+  status?: ActionStatus;
   size?: "md" | "sm";
 }
 
-export function Button({ variant = "secondary", icon, pending, size = "md", children, className, disabled, type = "button", ...rest }: ButtonProps) {
+export function Button({ variant = "secondary", icon, pending, status, size = "md", children, className, disabled, type = "button", ...rest }: ButtonProps) {
+  const busy = pending || status === "pending";
+  const face = busy ? "pending" : status === "success" || status === "error" ? status : undefined;
   return (
     <button
       type={type}
       className={["btn", `btn-${variant}`, size === "sm" ? "btn-sm" : "", className ?? ""].join(" ").trim()}
-      disabled={disabled || pending}
-      aria-busy={pending || undefined}
+      disabled={disabled || busy}
+      aria-busy={busy || undefined}
+      data-status={face}
       {...rest}
     >
-      {pending ? <LoaderCircle className="spin" aria-hidden="true" /> : icon}
+      {face === "pending" ? <LoaderCircle className="spin" aria-hidden="true" />
+        : face === "success" ? <Check className="btn-check" aria-hidden="true" />
+        : face === "error" ? <AlertCircle className="btn-alert" aria-hidden="true" />
+        : icon}
       {children}
+      {face === "pending" && <span className="btn-progress" aria-hidden="true" />}
     </button>
   );
 }
 
-export function ButtonLink({ href, variant = "secondary", icon, children, size = "md" }: { href: string; variant?: Variant; icon?: ReactNode; children: ReactNode; size?: "md" | "sm" }) {
+export function ButtonLink({ href, variant = "secondary", icon, children, size = "md", trailing, className, ...rest }: { href: string; variant?: Variant; icon?: ReactNode; children?: ReactNode; size?: "md" | "sm"; trailing?: ReactNode; className?: string; title?: string; "aria-label"?: string }) {
   return (
-    <Link href={href} className={["btn", `btn-${variant}`, size === "sm" ? "btn-sm" : ""].join(" ").trim()}>
+    <Link href={href} className={["btn", `btn-${variant}`, size === "sm" ? "btn-sm" : "", className ?? ""].join(" ").trim()} {...rest}>
       {icon}
       {children}
+      {trailing}
+    </Link>
+  );
+}
+
+/**
+ * Leaves the current page for its parent. Drawn as a real control — arrow tile plus
+ * "Quay lại" over the destination — so it is never mistaken for body text.
+ */
+export function BackButton({ href, children, className }: { href: string; children: ReactNode; className?: string }) {
+  return (
+    <Link href={href} className={["back-button", className ?? ""].join(" ").trim()}>
+      <span className="back-button-icon" aria-hidden="true"><ArrowLeft /></span>
+      <span className="back-button-text">
+        <small>Quay lại</small>
+        <strong>{children}</strong>
+      </span>
     </Link>
   );
 }
@@ -115,6 +142,35 @@ export function Field({ label, hint, error, children, required, className }: { l
   );
 }
 
+/* ───────── TimeInput24 ───────── */
+
+const HOURS = Array.from({ length: 24 }, (_, hour) => String(hour).padStart(2, "0"));
+
+/**
+ * "HH:mm" on a 24-hour clock. The native time input follows the browser's locale and shows AM/PM, which made
+ * 12:30 AM (just after midnight) easy to pick for "12:30 trưa"; two selects cannot be misread.
+ */
+export function TimeInput24({ id, value, onChange, describedBy, minuteStep = 5 }: { id: string; value: string; onChange: (value: string) => void; describedBy?: string; minuteStep?: number }) {
+  const [hour = "", minute = ""] = value.split(":");
+  const minutes = Array.from({ length: Math.ceil(60 / minuteStep) }, (_, index) => String(index * minuteStep).padStart(2, "0"));
+  // Keep an existing off-step minute (e.g. 12:07 from an older session) selectable instead of silently changing it.
+  if (minute && !minutes.includes(minute)) minutes.push(minute);
+  minutes.sort();
+  return (
+    <div className="time-24" role="group" aria-describedby={describedBy}>
+      <select id={id} aria-label="Giờ" value={hour} onChange={(event) => onChange(`${event.target.value}:${minute || "00"}`)}>
+        {!hour && <option value="">--</option>}
+        {HOURS.map((item) => <option key={item} value={item}>{item}</option>)}
+      </select>
+      <span aria-hidden="true">:</span>
+      <select aria-label="Phút" value={minute} onChange={(event) => onChange(`${hour || "00"}:${event.target.value}`)}>
+        {!minute && <option value="">--</option>}
+        {minutes.map((item) => <option key={item} value={item}>{item}</option>)}
+      </select>
+    </div>
+  );
+}
+
 /* ───────── Dialog ───────── */
 
 export function Dialog({ open, title, description, onClose, children, footer, size = "md", onSubmit }: { open: boolean; title: string; description?: ReactNode; onClose: () => void; children: ReactNode; footer?: ReactNode; size?: "sm" | "md" | "lg"; onSubmit?: () => void }) {
@@ -127,6 +183,14 @@ export function Dialog({ open, title, description, onClose, children, footer, si
     if (open && !dialog.open) dialog.showModal();
     if (!open && dialog.open) dialog.close();
   }, [open]);
+
+  // Callers often unmount an open dialog (`{editor && <Dialog open …/>}`); close it first so the page never stays inert.
+  useEffect(() => {
+    const dialog = ref.current;
+    return () => {
+      if (dialog?.open) dialog.close();
+    };
+  }, []);
 
   return (
     <dialog

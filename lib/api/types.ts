@@ -1015,6 +1015,7 @@ export interface PayrollSessionItem {
   sessionId: Guid;
   classId: Guid;
   classCode: string;
+  className: string;
   startUtc: IsoDateTime;
   minutes: number;
   amount?: number | null;
@@ -1044,7 +1045,7 @@ export interface PayrollPool {
   unassigned: number;
   expenses: number;
   distributable: number;
-  unassignedItems: Array<{ classId: Guid; classCode: string; periodStart: IsoDate; periodEnd: IsoDate; amount: number }>;
+  unassignedItems: Array<{ classId: Guid; classCode: string; className: string; periodStart: IsoDate; periodEnd: IsoDate; amount: number }>;
 }
 
 export interface PayrollAdjustment {
@@ -1112,7 +1113,7 @@ export interface PayrollMonth {
   expenses: SharedExpense[];
   payouts: PayrollPayout[];
   disputes: PayrollDispute[];
-  unsubmitted: Array<{ sessionId: Guid; classCode: string; startUtc: IsoDateTime; teacherName: string }>;
+  unsubmitted: Array<{ sessionId: Guid; classCode: string; className: string; startUtc: IsoDateTime; teacherName: string }>;
   missingRates: PayrollSessionItem[];
   events: Array<{ kind: "Closed" | "Reopened"; reason?: string | null; actorName?: string | null; createdAtUtc: IsoDateTime }>;
 }
@@ -1123,6 +1124,7 @@ export interface PayRate {
   teacherName: string;
   classId?: Guid | null;
   classCode?: string | null;
+  className?: string | null;
   amount: number;
   effectiveFrom: IsoDate;
   createdByName?: string | null;

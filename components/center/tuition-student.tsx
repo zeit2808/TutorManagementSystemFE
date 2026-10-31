@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { Ban, CalendarX2, ChevronLeft, Coins, Percent, Printer, ReceiptText } from "lucide-react";
+import { Ban, CalendarX2, Coins, Percent, Printer, ReceiptText } from "lucide-react";
 import { financeApi, type DiscountKind, type PaymentMethod, type Receipt, type StudentTuition, type TuitionCharge } from "@/lib/api";
 import { useAction, useResource } from "@/lib/hooks/use-resource";
 import { formatDateTime, formatIsoDate, formatMoney, formatPeriod, formatPhone, newUuid, todayIso } from "@/lib/format";
 import { paymentMethodLabels } from "@/lib/labels";
 import { PaymentQr } from "./payment-qr";
-import { Badge, Button, Dialog, EmptyState, ErrorNotice, Field, Notice, PageHeader, Panel, Segmented, SkeletonRows } from "@/components/ui/primitives";
+import { Badge, Button, Dialog, EmptyState, ErrorNotice, Field, Notice, PageHeader, Panel, Segmented, SkeletonRows, BackButton, ButtonLink } from "@/components/ui/primitives";
 import { ConfirmDialog } from "@/components/ui/reason-dialog";
 import { RoleGate, useCenter } from "./center-frame";
 import { ChargeBadge, ChargeNotes, MissedSessionsDialog, VoidReceiptDialog } from "./tuition";
@@ -35,10 +34,10 @@ function Inner({ studentId, payChargeId }: { studentId: string; payChargeId?: st
 
   return (
     <>
-      <Link className="back-link" href={`/centers/${centerId}/tuition`}><ChevronLeft aria-hidden="true" />Học phí</Link>
+      <BackButton href={`/centers/${centerId}/tuition`}>Học phí</BackButton>
       <PageHeader
         title={data ? `Học phí · ${data.studentName}` : "Học phí học sinh"}
-        description={data ? <><code className="code">{data.studentCode}</code>{data.parentName ? ` · Phụ huynh ${data.parentName}` : ""}{data.parentPhone ? ` · ${formatPhone(data.parentPhone)}` : ""}{data.hasAccount ? " · đã kích hoạt tài khoản" : ""}</> : undefined}
+        description={data ? [data.parentName && `Phụ huynh ${data.parentName}`, data.parentPhone && formatPhone(data.parentPhone), data.hasAccount && "đã kích hoạt tài khoản"].filter(Boolean).join(" · ") || undefined : undefined}
         actions={canManage && data && data.classes.length > 0 ? <Button icon={<Percent aria-hidden="true" />} onClick={() => setDiscountOpen(true)}>Thêm miễn giảm</Button> : undefined}
       />
       <ErrorNotice error={account.error} onReload={reload} />
@@ -101,7 +100,7 @@ function Inner({ studentId, payChargeId }: { studentId: string; payChargeId?: st
                               {item.voidReason && <p className="cell-note">Lý do huỷ: {item.voidReason}</p>}
                             </td>
                             <td className="col-actions">
-                              <Link className="btn btn-ghost btn-sm" href={`/centers/${centerId}/tuition/receipts/${item.id}`}><Printer aria-hidden="true" />In</Link>
+                              <ButtonLink size="sm" variant="ghost" icon={<Printer aria-hidden="true" />} href={`/centers/${centerId}/tuition/receipts/${item.id}`}>In</ButtonLink>
                               {canManage && !item.voidedAtUtc && <Button size="sm" variant="ghost" icon={<Ban aria-hidden="true" />} onClick={() => setVoiding(item)}>Huỷ</Button>}
                             </td>
                           </tr>
@@ -235,7 +234,7 @@ function PaymentPanel({ account, payChargeId, onDone }: { account: StudentTuitio
             {(id) => <input id={id} value={note} maxLength={300} onChange={(event) => setNote(event.target.value)} />}
           </Field>
         </div>
-        <Button type="submit" variant="primary" icon={<Coins aria-hidden="true" />} pending={action.pending}>Ghi biên lai {amount > 0 ? formatMoney(amount) : ""}</Button>
+        <Button type="submit" variant="primary" icon={<Coins aria-hidden="true" />} pending={action.pending} status={action.status}>Ghi biên lai {amount > 0 ? formatMoney(amount) : ""}</Button>
         <ErrorNotice error={action.error} onDismiss={action.clearError} />
       </form>
     </Panel>
@@ -276,13 +275,13 @@ function DiscountDialog({ account, onClose, onDone }: { account: StudentTuition;
       description="Áp dụng cho các kỳ bắt đầu trong khoảng đã chọn; kỳ đã lập trong khoảng đó được tính lại (phần đã đóng dư thành số dư)."
       onClose={onClose}
       onSubmit={() => void save()}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Hủy</Button><Button type="submit" variant="primary" pending={action.pending}>Lưu miễn giảm</Button></>}
+      footer={<><Button onClick={onClose} disabled={action.pending}>Hủy</Button><Button type="submit" variant="primary" pending={action.pending} status={action.status}>Lưu miễn giảm</Button></>}
     >
       <div className="form-grid">
         <Field label="Lớp" className="field-wide">
           {(id) => (
             <select id={id} value={classId} onChange={(event) => setClassId(event.target.value)}>
-              {account.classes.map((item) => <option key={item.classId} value={item.classId}>{item.classCode} · {item.className}{item.active ? "" : " (đã rời)"}</option>)}
+              {account.classes.map((item) => <option key={item.classId} value={item.classId}>{item.className}{item.active ? "" : " (đã rời)"}</option>)}
             </select>
           )}
         </Field>
@@ -335,7 +334,7 @@ function ReceiptPrint({ receiptId }: { receiptId: string }) {
   return (
     <>
       <div className="print-hide inline-action">
-        <Link className="back-link" href={data ? `/centers/${centerId}/tuition/students/${data.studentId}` : `/centers/${centerId}/tuition`}><ChevronLeft aria-hidden="true" />Quay lại</Link>
+        <BackButton href={data ? `/centers/${centerId}/tuition/students/${data.studentId}` : `/centers/${centerId}/tuition`}>{data ? "Học phí của học sinh" : "Học phí"}</BackButton>
         <Button variant="primary" icon={<Printer aria-hidden="true" />} onClick={() => window.print()} disabled={!data}>In / lưu PDF</Button>
       </div>
       <ErrorNotice error={receipt.error} onReload={() => void receipt.reload()} />
@@ -348,7 +347,7 @@ function ReceiptPrint({ receiptId }: { receiptId: string }) {
           </header>
           {data.voidedAtUtc && <p className="receipt-void">ĐÃ HUỶ — {data.voidReason}</p>}
           <dl className="receipt-meta">
-            <div><dt>Học sinh</dt><dd>{data.studentName} ({data.studentCode})</dd></div>
+            <div><dt>Học sinh</dt><dd>{data.studentName}</dd></div>
             {data.payerName && <div><dt>Người nộp</dt><dd>{data.payerName}</dd></div>}
             <div><dt>Hình thức</dt><dd>{paymentMethodLabels[data.method]}</dd></div>
             {data.note && <div><dt>Ghi chú</dt><dd>{data.note}</dd></div>}

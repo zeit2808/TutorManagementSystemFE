@@ -2,14 +2,6 @@
 
 const collapse = (value: string) => value.trim().split(/\s+/).filter(Boolean).join(" ");
 
-export function validateCode(value: string): string | null {
-  const normalized = value.trim().toUpperCase();
-  if (!normalized) return "Nhập mã.";
-  if (normalized.length < 2 || normalized.length > 20) return "Mã cần 2–20 ký tự.";
-  if (!/^[A-Z0-9_-]+$/.test(normalized)) return "Mã chỉ gồm chữ không dấu, số, gạch nối (-) hoặc gạch dưới (_).";
-  return null;
-}
-
 export function validateName(value: string, label = "Tên"): string | null {
   const normalized = collapse(value);
   if (!normalized) return `Nhập ${label.toLowerCase()}.`;
