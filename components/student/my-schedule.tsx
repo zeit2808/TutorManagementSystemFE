@@ -7,7 +7,7 @@ import { academicsApi, type MyNotice, type MyScheduleEntry, type StudentRequest,
 import { useAction, useResource } from "@/lib/hooks/use-resource";
 import { formatDateTime, formatSlot, formatStartLabel } from "@/lib/format";
 import { changeKindLabels, requestKindLabels, requestStatus } from "@/lib/labels";
-import { Badge, Button, Dialog, EmptyState, ErrorNotice, Field, Notice, PageHeader, Pagination, Panel, SkeletonRows } from "@/components/ui/primitives";
+import { Badge, Button, Dialog, EmptyState, ErrorNotice, Field, Notice, PageHeader, Pagination, Panel, SkeletonRows, ButtonLink } from "@/components/ui/primitives";
 import { PersonalSchedule } from "@/components/schedule/personal-schedule";
 import { TuitionReminderNotice } from "./my-tuition";
 
@@ -132,7 +132,7 @@ function NoticesPanel({ reloadToken, onRequest, onChanged }: { reloadToken: numb
               <p className="cell-note">{item.centerName}{item.reason ? ` · Lý do: ${item.reason}` : ""} · {formatDateTime(item.createdAtUtc)}</p>
               {item.response === "None" && (
                 <div className="notice-actions">
-                  <Button size="sm" icon={<Check aria-hidden="true" />} onClick={() => void acknowledge(item)} pending={action.pending}>Đã xem, vẫn đi được</Button>
+                  <Button size="sm" icon={<Check aria-hidden="true" />} onClick={() => void acknowledge(item)} pending={action.pending} status={action.status}>Đã xem, vẫn đi được</Button>
                   {item.sessionId && <Button size="sm" variant="ghost" onClick={() => ask(item, item.kind === "SessionCancelled" || item.kind === "SessionNotHeld" ? "Makeup" : "ExcusedAbsence")}>{item.kind === "SessionCancelled" || item.kind === "SessionNotHeld" ? "Xin học bù" : "Xin vắng / học bù"}</Button>}
                   <Button size="sm" variant="ghost" onClick={() => ask(item, "Transfer")}>Xin chuyển lớp</Button>
                   <Button size="sm" variant="ghost" onClick={() => ask(item, "Withdrawal")}>Xin rút</Button>
@@ -173,7 +173,7 @@ function MyRequestsPanel({ reloadToken, onChanged }: { reloadToken: number; onCh
                     <td><Badge tone={status.tone}>{status.label}</Badge>{item.reviewNote && <p className="cell-note">{item.status === "Rejected" ? "Lý do" : "Ghi chú"}: {item.reviewNote}</p>}</td>
                     <td className="col-actions">
                       {item.status === "Pending" && (
-                        <Button size="sm" variant="ghost" icon={<Undo2 aria-hidden="true" />} pending={action.pending}
+                        <Button size="sm" variant="ghost" icon={<Undo2 aria-hidden="true" />} pending={action.pending} status={action.status}
                           onClick={() => void action.run(() => academicsApi.cancelStudentRequest(item.centerId, item.id)).then((done) => { if (done) onChanged(); })}>Rút lại</Button>
                       )}
                     </td>
@@ -231,7 +231,7 @@ function StudentRequestDialog({ target, onClose, onSent }: { target: RequestTarg
 
   return (
     <Dialog open title="Gửi yêu cầu tới trung tâm" description={`${target.className ?? "Lớp"} · ${target.centerName ?? ""}`} onClose={onClose} onSubmit={submit}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" icon={<Send aria-hidden="true" />} pending={action.pending}>Gửi yêu cầu</Button></>}>
+      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" icon={<Send aria-hidden="true" />} pending={action.pending} status={action.status}>Gửi yêu cầu</Button></>}>
       <fieldset className="choice-row">
         <legend className="sr-only">Loại yêu cầu</legend>
         {kinds.map((value) => (
@@ -255,7 +255,7 @@ function StudentRequestDialog({ target, onClose, onSent }: { target: RequestTarg
           {(id, describedBy) => (
             <select id={id} aria-describedby={describedBy} value={targetClassId} onChange={(event) => setTargetClassId(event.target.value)}>
               <option value="">{open.data ? (options.length ? "Chọn lớp…" : "Trung tâm chưa mở lớp nào khác") : "Đang tải…"}</option>
-              {options.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.code}</option>)}
+              {options.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           )}
         </Field>
@@ -264,7 +264,7 @@ function StudentRequestDialog({ target, onClose, onSent }: { target: RequestTarg
         {(id, describedBy) => <textarea id={id} aria-describedby={describedBy} rows={3} maxLength={500} value={reason} onChange={(event) => setReason(event.target.value)} />}
       </Field>
       <ErrorNotice error={action.error ?? open.error} />
-      <p className="cell-note"><Link className="text-link" href={`/student/centers/${target.centerId}`}>Mở trang trung tâm <ArrowRight aria-hidden="true" /></Link></p>
+      <p className="cell-note"><ButtonLink size="sm" variant="soft" href={`/student/centers/${target.centerId}`} trailing={<ArrowRight aria-hidden="true" />}>Mở trang trung tâm</ButtonLink></p>
     </Dialog>
   );
 }

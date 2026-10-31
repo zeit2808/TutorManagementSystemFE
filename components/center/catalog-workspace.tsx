@@ -9,7 +9,6 @@ import { ConfirmDialog } from "@/components/ui/reason-dialog";
 
 export interface CatalogItem {
   id: string;
-  code: string;
   isActive: boolean;
   version: number;
 }
@@ -21,9 +20,6 @@ export interface CatalogField<T> {
   multiline?: boolean;
   hint?: string;
   maxLength?: number;
-  /** false → only on create (backend keeps it immutable). */
-  editable?: boolean;
-  uppercase?: boolean;
   initial: (item?: T) => string;
   validate: (value: string) => string | null;
 }
@@ -123,7 +119,7 @@ export function CatalogWorkspace<T extends CatalogItem>({ config }: { config: Ca
           <label className="search">
             <Search aria-hidden="true" />
             <span className="sr-only">Tìm {config.noun}</span>
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={config.searchPlaceholder ?? `Tìm theo mã hoặc tên ${config.noun}…`} />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={config.searchPlaceholder ?? `Tìm theo tên ${config.noun}…`} />
           </label>
           <Toggle checked={includeArchived} onChange={(value) => { setIncludeArchived(value); setPage(1); }} label="Hiện cả bản ghi đã lưu trữ" />
           {config.paged && !config.serverSearch && <span className="toolbar-note">Tìm kiếm áp dụng trên trang đang xem</span>}
@@ -163,7 +159,7 @@ export function CatalogWorkspace<T extends CatalogItem>({ config }: { config: Ca
                             <Button size="sm" variant="ghost" icon={<Archive aria-hidden="true" />} onClick={() => setArchiving(item)}>Lưu trữ</Button>
                           </>
                         ) : (
-                          <Button size="sm" variant="ghost" icon={<ArchiveRestore aria-hidden="true" />} pending={rowAction.pending} onClick={() => void reactivate(item)}>Khôi phục</Button>
+                          <Button size="sm" variant="ghost" icon={<ArchiveRestore aria-hidden="true" />} pending={rowAction.pending} status={rowAction.status} onClick={() => void reactivate(item)}>Khôi phục</Button>
                         )}
                       </td>
                     )}
@@ -227,7 +223,7 @@ function CatalogEditor<T extends CatalogItem>({ config, editor, onClose, onSaved
   async function submit() {
     setTouched(true);
     if (invalid) return;
-    const payload = Object.fromEntries(config.fields.map((field) => [field.key, field.uppercase ? values[field.key].trim().toUpperCase() : values[field.key].trim()]));
+    const payload = Object.fromEntries(config.fields.map((field) => [field.key, values[field.key].trim()]));
     const saved = await action.run(() => (item ? config.update(centerId, item, payload) : config.create(centerId, payload)));
     if (saved) onSaved(saved, !item);
   }
@@ -242,15 +238,14 @@ function CatalogEditor<T extends CatalogItem>({ config, editor, onClose, onSaved
       footer={
         <>
           <Button onClick={onClose} disabled={action.pending}>Hủy</Button>
-          <Button type="submit" variant="primary" pending={action.pending}>{item ? "Lưu thay đổi" : `Thêm ${config.noun}`}</Button>
+          <Button type="submit" variant="primary" pending={action.pending} status={action.status}>{item ? "Lưu thay đổi" : `Thêm ${config.noun}`}</Button>
         </>
       }
     >
       <div className="form-grid">
         {config.fields.map((field) => {
-          const locked = Boolean(item) && field.editable === false;
           return (
-            <Field key={field.key} label={field.label} required={field.required} hint={locked ? "Không đổi được sau khi tạo." : field.hint} error={touched ? errors[field.key] : null} className={field.multiline ? "span-2" : undefined}>
+            <Field key={field.key} label={field.label} required={field.required} hint={field.hint} error={touched ? errors[field.key] : null} className={field.multiline ? "span-2" : undefined}>
               {(id, describedBy) =>
                 field.multiline ? (
                   <textarea id={id} aria-describedby={describedBy} rows={3} maxLength={field.maxLength} value={values[field.key]} onChange={(event) => setValues({ ...values, [field.key]: event.target.value })} />
@@ -260,8 +255,6 @@ function CatalogEditor<T extends CatalogItem>({ config, editor, onClose, onSaved
                     aria-describedby={describedBy}
                     value={values[field.key]}
                     maxLength={field.maxLength}
-                    readOnly={locked}
-                    className={field.uppercase ? "input-code" : undefined}
                     onChange={(event) => setValues({ ...values, [field.key]: event.target.value })}
                   />
                 )

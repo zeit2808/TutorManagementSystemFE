@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { AlertTriangle, CalendarCheck2, CalendarRange, CheckCircle2, Eye, Plus, RefreshCcw, Repeat, StopCircle } from "lucide-react";
+import { AlertTriangle, CalendarCheck2, CalendarRange, CalendarX2, CheckCircle2, Eye, Plus, RefreshCcw, Repeat, RotateCcw, StopCircle } from "lucide-react";
 import { academicsApi, ApiError, type CreateScheduleSeriesInput, type ScheduleOccurrence, type SchedulePreview, type ScheduleSeries } from "@/lib/api";
 import { useAction, useResource } from "@/lib/hooks/use-resource";
 import { useNow } from "@/lib/hooks/use-now";
 import { useCenterLookups, type CenterLookups } from "@/lib/hooks/use-lookups";
 import { addDays, formatDateOnly, formatDuration, formatTimeRange, formatWeekday, localInputsToUtc, newUuid, toDateInput } from "@/lib/format";
 import { conflictLabels, weekdays } from "@/lib/labels";
-import { Badge, Button, Dialog, EmptyState, ErrorNotice, Field, Notice, PageHeader, Pagination, Panel, SkeletonRows } from "@/components/ui/primitives";
+import { Badge, Button, Dialog, EmptyState, ErrorNotice, Field, Notice, PageHeader, Pagination, Panel, SkeletonRows, TimeInput24 } from "@/components/ui/primitives";
 import { useCenter } from "./center-frame";
 import { ScheduleTabs } from "./schedule-tabs";
 
@@ -53,7 +53,7 @@ export function SeriesWorkspace() {
           <label className="select-inline"><span>Lớp</span>
             <select value={classFilter} onChange={(event) => { setClassFilter(event.target.value); setPage(1); }}>
               <option value="">Tất cả lớp</option>
-              {lk?.classes.map((item) => <option key={item.id} value={item.id}>{item.code} · {item.name}</option>)}
+              {lk?.classes.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           </label>
           <Button size="sm" variant="ghost" icon={<RefreshCcw aria-hidden="true" />} onClick={() => void series.reload()} pending={series.loading && Boolean(series.data)}>Làm mới</Button>
@@ -75,7 +75,7 @@ export function SeriesWorkspace() {
                   const stopped = Boolean(item.stoppedFromDate);
                   return (
                     <tr key={item.id}>
-                      <td><strong>{item.className ?? teachingClass?.name ?? "—"}</strong><br /><code className="code">{item.classCode ?? teachingClass?.code}</code></td>
+                      <td><strong>{item.className ?? teachingClass?.name ?? "—"}</strong></td>
                       <td>
                         <span className="weekday-chips">{item.weekdays.map((day) => <span key={day}>{weekdayShort[day] ?? day}</span>)}</span>
                         <span className="col-muted"> {item.localStartTime.slice(0, 5)} · {formatDuration(item.durationMinutes)}</span>
@@ -151,7 +151,7 @@ function StopSeriesDialog({ series, onClose, onDone }: { series: ScheduleSeries;
 
   return (
     <Dialog open size="sm" title="Dừng lịch lặp từ một ngày" onClose={onClose} onSubmit={submit}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="danger" pending={action.pending} disabled={outOfRange}>Dừng lịch</Button></>}>
+      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="danger" pending={action.pending} status={action.status} disabled={outOfRange}>Dừng lịch</Button></>}>
       <p>Mọi buổi của chuỗi từ ngày này trở đi sẽ bị hủy và học sinh của lớp được báo trong ứng dụng và qua email. Thao tác bị chặn nếu trong phạm vi đó có buổi đã bắt đầu hoặc đã có phiếu điểm danh.</p>
       <Field label="Dừng từ ngày" required error={outOfRange ? `Chọn từ ${formatDateOnly(series.startDate > today ? series.startDate : today)} đến ${formatDateOnly(series.endDate)}.` : null}>
         {(id) => <input id={id} type="date" value={fromDate} min={series.startDate > today ? series.startDate : today} max={series.endDate} onChange={(event) => { setFromDate(event.target.value); setShortNotice(false); setAcknowledged(false); }} />}
@@ -302,8 +302,8 @@ function SeriesComposer({ lookups, replace, initialClassId, onClose, onDone }: {
       footer={
         <>
           <Button onClick={onClose} disabled={saveAction.pending}>Hủy</Button>
-          <Button icon={<Eye aria-hidden="true" />} onClick={() => void runPreview()} pending={previewAction.pending} disabled={invalid}>{preview ? "Xem trước lại" : "Xem trước"}</Button>
-          <Button type="submit" variant="primary" icon={<CalendarCheck2 aria-hidden="true" />} pending={saveAction.pending} disabled={!preview || conflicted.length > 0}>
+          <Button icon={<Eye aria-hidden="true" />} onClick={() => void runPreview()} pending={previewAction.pending} status={previewAction.status} disabled={invalid}>{preview ? "Xem trước lại" : "Xem trước"}</Button>
+          <Button type="submit" variant="primary" icon={<CalendarCheck2 aria-hidden="true" />} pending={saveAction.pending} status={saveAction.status} disabled={!preview || conflicted.length > 0}>
             {replace ? "Thay lịch" : `Lưu ${preview ? preview.sessionCount : ""} buổi`}
           </Button>
         </>
@@ -314,7 +314,7 @@ function SeriesComposer({ lookups, replace, initialClassId, onClose, onDone }: {
           {(id) => (
             <select id={id} value={state.classId} disabled={Boolean(replace)} onChange={(event) => update({ classId: event.target.value })}>
               {replace && !activeClasses.some((item) => item.id === replace.classId) && <option value={replace.classId}>{lookups.classById.get(replace.classId)?.name}</option>}
-              {activeClasses.map((item) => <option key={item.id} value={item.id}>{item.code} · {item.name}</option>)}
+              {activeClasses.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           )}
         </Field>
@@ -331,7 +331,7 @@ function SeriesComposer({ lookups, replace, initialClassId, onClose, onDone }: {
           {(id, describedBy) => <input id={id} aria-describedby={describedBy} type="date" value={state.endDate} min={state.startDate} onChange={(event) => update({ endDate: event.target.value })} />}
         </Field>
         <Field label="Giờ bắt đầu (giờ Việt Nam)" required error={errors.time}>
-          {(id) => <input id={id} type="time" value={state.time} onChange={(event) => update({ time: event.target.value })} />}
+          {(id) => <TimeInput24 id={id} value={state.time} onChange={(time) => update({ time })} />}
         </Field>
         <Field label="Thời lượng (phút)" required error={errors.duration}>
           {(id) => <input id={id} type="number" min={15} max={480} step={5} value={state.duration} onChange={(event) => update({ duration: event.target.value })} />}
@@ -356,7 +356,7 @@ function SeriesComposer({ lookups, replace, initialClassId, onClose, onDone }: {
       {state.excluded.length > 0 && (
         <p className="excluded-line">
           Loại trừ {state.excluded.length} ngày: {state.excluded.sort().map(formatDateOnly).join(", ")}{" "}
-          <button type="button" className="text-link" onClick={() => update({ excluded: [] })}>Bỏ loại trừ</button>
+          <Button size="sm" variant="ghost" icon={<RotateCcw aria-hidden="true" />} onClick={() => update({ excluded: [] })}>Bỏ loại trừ</Button>
         </p>
       )}
 
@@ -390,7 +390,7 @@ function SeriesComposer({ lookups, replace, initialClassId, onClose, onDone }: {
                   <span>{formatWeekday(occurrence.startUtc, true)} {formatDateOnly(occurrence.occurrenceDate)}</span>
                   <span>{formatTimeRange(occurrence.startUtc, occurrence.endUtc)}</span>
                   <span>{conflicts.length ? Array.from(new Set(conflicts.map((conflict) => conflictLabels[conflict.resourceType] ?? conflict.resourceType))).join(" · ") : "Trống lịch"}</span>
-                  <button type="button" className="text-link" onClick={() => update({ excluded: [...state.excluded, occurrence.occurrenceDate] })}>Bỏ ngày này</button>
+                  <Button size="sm" variant="ghost" icon={<CalendarX2 aria-hidden="true" />} onClick={() => update({ excluded: [...state.excluded, occurrence.occurrenceDate] })}>Bỏ ngày này</Button>
                 </li>
               );
             })}

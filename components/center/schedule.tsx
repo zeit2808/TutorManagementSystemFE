@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Ban, CalendarClock, CalendarPlus, CalendarRange, ChevronLeft, ChevronRight, ClipboardCheck, History, MoveRight, RefreshCcw, Undo2, XCircle } from "lucide-react";
+import { Ban, BookOpen, CalendarClock, CalendarPlus, CalendarRange, ChevronLeft, ChevronRight, ClipboardCheck, Clock3, History, MapPin, MoveRight, Presentation, RefreshCcw, Undo2, UserRound, UsersRound, XCircle } from "lucide-react";
 import { academicsApi, type TeachingSession } from "@/lib/api";
 import { useAction, useResource } from "@/lib/hooks/use-resource";
 import { useNow } from "@/lib/hooks/use-now";
@@ -24,7 +24,7 @@ import {
   toDateInput,
   toTimeInput,
 } from "@/lib/format";
-import { Badge, Button, ButtonLink, Dialog, EmptyState, ErrorNotice, Field, Notice, PageHeader, Panel, Segmented, SkeletonRows, Toggle } from "@/components/ui/primitives";
+import { Badge, Button, ButtonLink, Dialog, EmptyState, ErrorNotice, Field, Notice, PageHeader, Panel, Segmented, SkeletonRows, TimeInput24, Toggle } from "@/components/ui/primitives";
 import { ReasonDialog } from "@/components/ui/reason-dialog";
 import { changeKindLabels } from "@/lib/labels";
 import { useCenter } from "./center-frame";
@@ -127,7 +127,7 @@ export function ScheduleWorkspace() {
           <label className="select-inline"><span>Lớp</span>
             <select value={classFilter} onChange={(event) => setClassFilter(event.target.value)}>
               <option value="">Tất cả</option>
-              {lk?.classes.map((item) => <option key={item.id} value={item.id}>{item.code} · {item.name}</option>)}
+              {lk?.classes.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           </label>
           <label className="select-inline"><span>Giáo viên</span>
@@ -215,8 +215,10 @@ export function ScheduleWorkspace() {
           onSaved={(saved, created) => {
             setEditor(null);
             setNotice(editor.mode === "makeup" ? "Đã xếp buổi học bù." : created ? "Đã thêm buổi học." : "Đã dời lịch buổi học.");
-            setWeekStart(startOfWeek(new Date(saved.startUtc)));
-            void sessions.reload();
+            const savedWeek = startOfWeek(new Date(saved.startUtc));
+            // Another week reloads by itself through the resource's dependencies; only the same week needs a nudge.
+            if (savedWeek.getTime() === weekStart.getTime()) void sessions.reload();
+            else setWeekStart(savedWeek);
           }}
         />
       )}
@@ -255,28 +257,21 @@ export function ScheduleWorkspace() {
       </ReasonDialog>
 
       {detail && lk && (
-        <Dialog open size="lg" title={detail.className ?? lk.classById.get(detail.classId)?.name ?? "Buổi học"} description={`${formatWeekday(detail.startUtc)} ${formatDayMonth(detail.startUtc)} · ${formatTimeRange(detail.startUtc, detail.endUtc)}`}
-          onClose={() => setDetail(null)} footer={<Button onClick={() => setDetail(null)}>Đóng</Button>}>
-          <div className="timetable timetable-single">
-            <section className="timetable-day">
-              <ul>
-                <SessionRow
-                  session={detail}
-                  lookups={lk}
-                  canManage={canManage}
-                  centerId={centerId}
-                  now={now}
-                  hasMakeup={madeUp.has(detail.id)}
-                  onReschedule={() => { setDetail(null); setEditor({ mode: "reschedule", session: detail }); }}
-                  onCancel={() => { setDetail(null); setStatusChange({ kind: "cancel", session: detail }); }}
-                  onNotHeld={() => { setDetail(null); setStatusChange({ kind: "notHeld", session: detail }); }}
-                  onMakeup={() => { setDetail(null); setEditor({ mode: "makeup", session: detail }); }}
-                  onHistory={() => { setDetail(null); setHistory(detail); }}
-                />
-              </ul>
-            </section>
-          </div>
-        </Dialog>
+        <SessionDetailDialog
+          session={detail}
+          weekSessions={sessions.data ?? []}
+          lookups={lk}
+          centerId={centerId}
+          canManage={canManage}
+          now={now}
+          hasMakeup={madeUp.has(detail.id)}
+          onClose={() => setDetail(null)}
+          onReschedule={() => { setDetail(null); setEditor({ mode: "reschedule", session: detail }); }}
+          onCancel={() => { setDetail(null); setStatusChange({ kind: "cancel", session: detail }); }}
+          onNotHeld={() => { setDetail(null); setStatusChange({ kind: "notHeld", session: detail }); }}
+          onMakeup={() => { setDetail(null); setEditor({ mode: "makeup", session: detail }); }}
+          onHistory={() => { setDetail(null); setHistory(detail); }}
+        />
       )}
 
       {drop && lk && (
@@ -309,7 +304,7 @@ function SessionRow({ session, lookups, canManage, centerId, now, hasMakeup, onR
       <time>{formatTimeRange(session.startUtc, session.endUtc)}<small>{formatDuration(minutesBetween(session.startUtc, session.endUtc))}</small></time>
       <div className="timetable-main">
         <strong>{teachingClass ? <Link href={`/centers/${centerId}/classes/${teachingClass.id}`}>{teachingClass.name}</Link> : session.className ?? "Lớp không xác định"}</strong>
-        <span>{session.classCode ?? teachingClass?.code} · {session.teacherName ?? lookups.teacherById.get(session.teacherId)?.fullName ?? "—"} · {session.roomName ?? lookups.roomById.get(session.roomId)?.name ?? "—"}</span>
+        <span>{session.teacherName ?? lookups.teacherById.get(session.teacherId)?.fullName ?? "—"} · {session.roomName ?? lookups.roomById.get(session.roomId)?.name ?? "—"}</span>
         {session.isActive && session.previousStartUtc && session.previousEndUtc && (
           <span className="timetable-reason">Đã dời từ {formatSlot(session.previousStartUtc, session.previousEndUtc)}</span>
         )}
@@ -346,6 +341,108 @@ function SessionRow({ session, lookups, canManage, centerId, now, hasMakeup, onR
         </div>
       )}
     </li>
+  );
+}
+
+/** Opened from a block of the week grid: everything about one session, its actions, and the way to its attendance sheet. */
+function SessionDetailDialog({ session, weekSessions, lookups, centerId, canManage, now, hasMakeup, onClose, onReschedule, onCancel, onNotHeld, onMakeup, onHistory }: {
+  session: TeachingSession;
+  weekSessions: TeachingSession[];
+  lookups: CenterLookups;
+  centerId: string;
+  canManage: boolean;
+  now: number;
+  hasMakeup: boolean;
+  onClose: () => void;
+  onReschedule: () => void;
+  onCancel: () => void;
+  onNotHeld: () => void;
+  onMakeup: () => void;
+  onHistory: () => void;
+}) {
+  const teachingClass = lookups.classById.get(session.classId);
+  const subject = teachingClass ? lookups.subjectById.get(teachingClass.subjectId) : undefined;
+  const className = session.className ?? teachingClass?.name ?? "Buổi học";
+  const teacher = session.teacherName ?? lookups.teacherById.get(session.teacherId)?.fullName ?? "—";
+  const room = session.roomName ?? lookups.roomById.get(session.roomId)?.name ?? "—";
+  const startMs = new Date(session.startUtc).getTime();
+  const endMs = new Date(session.endUtc).getTime();
+  const started = startMs <= now;
+  const notHeld = session.status === "NotHeld";
+  const makeupOf = session.makeupForSessionId ? weekSessions.find((item) => item.id === session.makeupForSessionId) : undefined;
+  const hasHistory = session.isRescheduled || !session.isActive || Boolean(session.makeupForSessionId);
+  const attendanceHref = `/centers/${centerId}/attendance?session=${session.id}`;
+
+  const state = notHeld
+    ? { label: "Không diễn ra", tone: "warning" as const }
+    : !session.isActive
+      ? { label: "Đã hủy", tone: "danger" as const }
+      : endMs <= now
+        ? { label: "Đã kết thúc", tone: "neutral" as const }
+        : started
+          ? { label: "Đang diễn ra", tone: "success" as const }
+          : { label: "Sắp diễn ra", tone: "info" as const };
+
+  return (
+    <Dialog
+      open
+      size="md"
+      title={className}
+      description={`${formatWeekday(session.startUtc)} ${formatDate(session.startUtc)} · ${formatTimeRange(session.startUtc, session.endUtc)}`}
+      onClose={onClose}
+      footer={
+        <>
+          {hasHistory && <Button variant="ghost" icon={<History aria-hidden="true" />} onClick={onHistory}>Lịch sử</Button>}
+          {canManage && session.isActive && (started
+            ? <Button variant="ghost" icon={<Ban aria-hidden="true" />} onClick={onNotHeld}>Không diễn ra</Button>
+            : <>
+                <Button variant="ghost" icon={<XCircle aria-hidden="true" />} onClick={onCancel}>Hủy buổi</Button>
+                <Button icon={<MoveRight aria-hidden="true" />} onClick={onReschedule}>Dời lịch</Button>
+              </>)}
+          {canManage && !session.isActive && !hasMakeup && <Button icon={<Undo2 aria-hidden="true" />} onClick={onMakeup}>Xếp buổi bù</Button>}
+          {session.isActive
+            ? <ButtonLink variant="primary" href={attendanceHref} icon={<ClipboardCheck aria-hidden="true" />}>{started ? "Điểm danh" : "Mở phiên điểm danh"}</ButtonLink>
+            : <Button onClick={onClose}>Đóng</Button>}
+        </>
+      }
+    >
+      <div className="session-detail-tags">
+        <Badge tone={state.tone}>{state.label}</Badge>
+        {session.isRescheduled && session.isActive && <Badge tone="info">Đã dời</Badge>}
+        {session.makeupForSessionId && <Badge tone="brand">Học bù</Badge>}
+        {session.seriesId && <Badge tone="neutral">Lịch lặp</Badge>}
+      </div>
+
+      <dl className="session-facts">
+        <div><dt><Clock3 aria-hidden="true" />Thời gian</dt><dd>{formatTimeRange(session.startUtc, session.endUtc)} <span>· {formatDuration(minutesBetween(session.startUtc, session.endUtc))}</span></dd></div>
+        <div>
+          <dt><Presentation aria-hidden="true" />Lớp</dt>
+          <dd>{teachingClass ? <Link href={`/centers/${centerId}/classes/${teachingClass.id}`}>{className}</Link> : className}</dd>
+        </div>
+        {subject && <div><dt><BookOpen aria-hidden="true" />Môn</dt><dd>{subject.name}</dd></div>}
+        <div><dt><UserRound aria-hidden="true" />Giáo viên</dt><dd>{teacher}</dd></div>
+        <div><dt><MapPin aria-hidden="true" />Phòng</dt><dd>{room}</dd></div>
+        {teachingClass && <div><dt><UsersRound aria-hidden="true" />Sĩ số</dt><dd>{teachingClass.enrolledCount}/{teachingClass.maxStudents} học sinh</dd></div>}
+      </dl>
+
+      {session.isActive && session.previousStartUtc && session.previousEndUtc && (
+        <Notice tone="info" title={`Đã dời từ ${formatSlot(session.previousStartUtc, session.previousEndUtc)}`}>
+          {session.rescheduleReason && <p>Lý do: {session.rescheduleReason}</p>}
+        </Notice>
+      )}
+      {!session.isActive && (
+        <Notice tone={notHeld ? "warning" : "danger"} title={notHeld ? "Buổi học không diễn ra" : "Buổi học đã hủy"}>
+          {(notHeld ? session.notHeldReason : session.cancellationReason) && <p>Lý do: {notHeld ? session.notHeldReason : session.cancellationReason}</p>}
+          <p>{hasMakeup ? "Đã có buổi học bù." : "Không có phiên điểm danh cho buổi này."}</p>
+        </Notice>
+      )}
+      {session.makeupForSessionId && (
+        <p className="cell-note">Học bù cho {makeupOf ? `buổi ${formatSlot(makeupOf.startUtc, makeupOf.endUtc)}` : "một buổi đã hủy hoặc không diễn ra"}.</p>
+      )}
+      {session.isActive && !started && (
+        <p className="cell-note">Buổi chưa bắt đầu — có thể điểm danh từ {formatDateTime(session.startUtc)}.</p>
+      )}
+    </Dialog>
   );
 }
 
@@ -409,28 +506,28 @@ function SessionEditor({ lookups, session, makeupFor, defaultDate, onClose, onSa
           : "Giờ nhập theo giờ Việt Nam."}
       onClose={onClose}
       onSubmit={submit}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" pending={action.pending}>{session ? "Dời lịch" : makeupFor ? "Xếp buổi bù" : "Thêm buổi"}</Button></>}
+      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" pending={action.pending} status={action.status}>{session ? "Dời lịch" : makeupFor ? "Xếp buổi bù" : "Thêm buổi"}</Button></>}
     >
       <div className="form-grid">
         <Field label="Lớp" required error={touched ? errors.classId : null} className="span-2">
           {(id) => (
             <select id={id} value={classId} disabled={Boolean(base)} onChange={(event) => setClassId(event.target.value)}>
               {base && !activeClasses.some((item) => item.id === base.classId) && <option value={base.classId}>{lookups.classById.get(base.classId)?.name ?? "Lớp hiện tại"}</option>}
-              {activeClasses.map((item) => <option key={item.id} value={item.id}>{item.code} · {item.name}</option>)}
+              {activeClasses.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           )}
         </Field>
         <Field label="Giáo viên" required error={touched ? errors.teacherId : null}>
           {(id) => (
             <select id={id} value={teacherId} onChange={(event) => setTeacherId(event.target.value)}>
-              {activeTeachers.map((item) => <option key={item.id} value={item.id}>{item.fullName} · {item.code}</option>)}
+              {activeTeachers.map((item) => <option key={item.id} value={item.id}>{item.fullName}</option>)}
             </select>
           )}
         </Field>
         <Field label="Phòng" required error={touched ? errors.roomId : null}>
           {(id) => (
             <select id={id} value={roomId} onChange={(event) => setRoomId(event.target.value)}>
-              {activeRooms.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.code}</option>)}
+              {activeRooms.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           )}
         </Field>
@@ -438,7 +535,7 @@ function SessionEditor({ lookups, session, makeupFor, defaultDate, onClose, onSa
           {(id) => <input id={id} type="date" value={date} min={toDateInput(new Date(now))} onChange={(event) => setDate(event.target.value)} />}
         </Field>
         <Field label="Giờ bắt đầu" required>
-          {(id) => <input id={id} type="time" value={time} onChange={(event) => setTime(event.target.value)} />}
+          {(id) => <TimeInput24 id={id} value={time} onChange={setTime} />}
         </Field>
         <Field label="Thời lượng (phút)" required hint="15 phút đến 8 giờ." error={touched ? errors.duration : null}>
           {(id, describedBy) => <input id={id} aria-describedby={describedBy} type="number" min={15} max={480} step={5} value={duration} onChange={(event) => setDuration(event.target.value)} />}

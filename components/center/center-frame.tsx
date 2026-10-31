@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import Link from "next/link";
+import { NavLink } from "@/components/ui/nav-link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   BarChart3,
@@ -225,9 +226,7 @@ export function CenterFrame({ centerId, children }: { centerId: string; children
                     );
                   }
                   return (
-                    <Link className={`side-nav-item${active ? " active" : ""}`} href={item.href} key={item.href} aria-current={active ? "page" : undefined}>
-                      <Icon aria-hidden="true" /><span>{item.label}</span>
-                    </Link>
+                    <NavLink href={item.href} key={item.href} active={active} icon={<Icon aria-hidden="true" />}>{item.label}</NavLink>
                   );
                 })}
               </div>

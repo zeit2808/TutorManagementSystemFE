@@ -59,7 +59,7 @@ export function ReasonDialog({ open, title, description, label = "Lý do", place
       footer={
         <>
           <Button onClick={close} disabled={action.pending}>Đóng</Button>
-          <Button type="submit" variant={variant} pending={action.pending}>{confirmLabel}</Button>
+          <Button type="submit" variant={variant} pending={action.pending} status={action.status}>{confirmLabel}</Button>
         </>
       }
     >
@@ -107,7 +107,7 @@ export function ConfirmDialog({ open, title, children, confirmLabel, variant = "
       footer={
         <>
           <Button onClick={close} disabled={action.pending}>Đóng</Button>
-          <Button type="submit" variant={variant} pending={action.pending}>{confirmLabel}</Button>
+          <Button type="submit" variant={variant} pending={action.pending} status={action.status}>{confirmLabel}</Button>
         </>
       }
     >

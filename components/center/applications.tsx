@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Inbox, RefreshCcw, X } from "lucide-react";
+import { Check, Inbox, Phone, RefreshCcw, X } from "lucide-react";
 import { academicsApi, type ClassApplication, type ClassApplicationStatus } from "@/lib/api";
 import { useAction, useResource } from "@/lib/hooks/use-resource";
 import { useCenterLookups } from "@/lib/hooks/use-lookups";
@@ -95,7 +95,7 @@ function ApplicationsInner() {
             <span className="sr-only">Lọc theo lớp</span>
             <select value={classFilter} onChange={(event) => { setClassFilter(event.target.value); setPage(1); }}>
               <option value="">Mọi lớp</option>
-              {(lk?.classes ?? []).filter((item) => item.isActive).map((item) => <option key={item.id} value={item.id}>{item.code} · {item.name}</option>)}
+              {(lk?.classes ?? []).filter((item) => item.isActive).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           </label>
           <span className="toolbar-note">Lớp đầy: đơn vẫn ở trạng thái chờ để bạn tăng sĩ số hoặc từ chối.</span>
@@ -119,9 +119,9 @@ function ApplicationsInner() {
                     <tr key={item.id}>
                       <td>
                         <strong>{item.fullName}</strong>
-                        {item.parentPhone && <p className="cell-note">Phụ huynh: {item.parentName} · <a className="text-link" href={`tel:${item.parentPhone}`}>{formatPhone(item.parentPhone)}</a></p>}
+                        {item.parentPhone && <p className="cell-note">Phụ huynh: {item.parentName} · <a className="phone-chip" href={`tel:${item.parentPhone}`}><Phone aria-hidden="true" />{formatPhone(item.parentPhone)}</a></p>}
                       </td>
-                      <td>{item.className ?? teachingClass?.name ?? "—"}<br /><code className="code">{item.classCode ?? teachingClass?.code}</code></td>
+                      <td>{item.className ?? teachingClass?.name ?? "—"}</td>
                       <td>{teachingClass ? <Meter value={teachingClass.enrolledCount} max={teachingClass.maxStudents} label="Sĩ số" /> : "—"}</td>
                       <td className="col-muted">{formatDateTime(item.submittedAtUtc)}</td>
                       <td>
@@ -135,7 +135,7 @@ function ApplicationsInner() {
                             <Button
                               size="sm"
                               icon={<Check aria-hidden="true" />}
-                              pending={approve.pending && approvingId === item.id}
+                              status={approvingId === item.id ? approve.status : undefined}
                               disabled={approve.pending || full}
                               title={full ? "Lớp đã đủ sĩ số: tăng sĩ số ở trang lớp hoặc từ chối đơn." : undefined}
                               onClick={() => void approveOne(item)}

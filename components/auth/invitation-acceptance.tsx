@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ArrowRight, Building2, LogIn, LogOut } from "lucide-react";
@@ -72,7 +71,7 @@ function InvitationDetails({ token }: { token: string }) {
           <>
             <p className="col-muted">Đang đăng nhập: <strong>{user.username ?? "tài khoản hiện tại"}</strong>. Lời mời chỉ nhận được bằng tài khoản có email {invitation.email}.</p>
             <ErrorNotice error={accept.error} />
-            <Button variant="primary" className="btn-block" icon={<ArrowRight aria-hidden="true" />} pending={accept.pending} onClick={() => void acceptSignedIn()}>
+            <Button variant="primary" className="btn-block" icon={<ArrowRight aria-hidden="true" />} pending={accept.pending} status={accept.status} onClick={() => void acceptSignedIn()}>
               Chấp nhận và vào trung tâm
             </Button>
             <Button variant="ghost" className="btn-block" icon={<LogOut aria-hidden="true" />} onClick={() => void switchAccount()}>Đăng nhập tài khoản khác</Button>
@@ -87,7 +86,7 @@ function InvitationDetails({ token }: { token: string }) {
         <>
           <p className="col-muted">Tạo tài khoản cho email này. Lần sau bạn dùng chính tài khoản này cho mọi trung tâm mình tham gia.</p>
           <AcceptInvitationForm initialToken={token} />
-          <p className="col-muted">Đã có tài khoản với email khác? Nhờ trung tâm mời lại đúng email đó, rồi <Link className="text-link" href={`/login?next=${encodeURIComponent(here)}`}>đăng nhập</Link>.</p>
+          <div className="help-line"><p className="col-muted">Đã có tài khoản với email khác? Nhờ trung tâm mời lại đúng email đó, rồi đăng nhập.</p><ButtonLink size="sm" variant="soft" href={`/login?next=${encodeURIComponent(here)}`} trailing={<ArrowRight aria-hidden="true" />}>Đăng nhập</ButtonLink></div>
         </>
       )}
     </div>

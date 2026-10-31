@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { MailPlus, RefreshCcw, Send, ShieldOff, ShieldCheck, UsersRound, X } from "lucide-react";
+import { useId, useRef, useState } from "react";
+import { AtSign, Clock3, MailPlus, RefreshCcw, Send, ShieldOff, ShieldCheck, UsersRound, X } from "lucide-react";
 import { identityApi, type AssignableMemberRole, type CenterMember, type MemberInvitation } from "@/lib/api";
 import { useAction, useResource } from "@/lib/hooks/use-resource";
 import { useSessionUser } from "@/lib/auth/session";
 import { formatDateTime } from "@/lib/format";
 import { roleLabel } from "@/lib/labels";
 import { validateEmail } from "@/lib/validation";
-import { Badge, Button, EmptyState, ErrorNotice, Field, Notice, PageHeader, Panel, SkeletonRows } from "@/components/ui/primitives";
+import { Badge, Button, EmptyState, ErrorNotice, Field, Notice, PageHeader, Panel, Segmented, SkeletonRows } from "@/components/ui/primitives";
 import { ConfirmDialog } from "@/components/ui/reason-dialog";
 import { RoleGate, useCenter } from "./center-frame";
 
@@ -33,6 +33,7 @@ function Members() {
   const invitations = useResource(() => identityApi.listMemberInvitations(centerId), [centerId]);
   const [notice, setNotice] = useState<string | null>(null);
   const [toggling, setToggling] = useState<CenterMember | null>(null);
+  const [freshId, setFreshId] = useState<string | null>(null);
   const roleChange = useAction();
 
   function replaceMember(next: CenterMember) {
@@ -52,30 +53,37 @@ function Members() {
       <PageHeader
         title="Thành viên & phân quyền"
         description="Mỗi người dùng một tài khoản cho mọi trung tâm. Chỉ chủ trung tâm mời người, đổi vai trò và ngừng quyền; quản lý chỉ xem."
-        actions={<Button icon={<RefreshCcw aria-hidden="true" />} onClick={() => { void members.reload(); void invitations.reload(); }}>Làm mới</Button>}
+        actions={<Button icon={<RefreshCcw aria-hidden="true" />} pending={(members.loading && Boolean(members.data)) || (invitations.loading && Boolean(invitations.data))} onClick={() => { void members.reload(); void invitations.reload(); }}>Làm mới</Button>}
       />
       {notice && <Notice tone="success" onDismiss={() => setNotice(null)}>{notice}</Notice>}
 
-      {isOwner && <InviteForm onInvited={(invitation) => {
-        invitations.setData((current) => [invitation, ...(current ?? [])]);
-        setNotice(invitation.accountExists
-          ? `Đã gửi lời mời tới ${invitation.email}. Email này đã có tài khoản: người nhận đăng nhập rồi bấm chấp nhận trong email.`
-          : `Đã gửi lời mời tới ${invitation.email}. Người nhận tạo tài khoản từ đường dẫn trong email (hiệu lực 48 giờ).`);
-      }} />}
-
-      <Panel title="Lời mời đang chờ" flush>
+      <Panel
+        title="Lời mời"
+        description={isOwner
+          ? "Gửi tới email người đó dùng để đăng nhập. Email đã có tài khoản (kể cả Google) chỉ cần đăng nhập rồi chấp nhận."
+          : "Chỉ chủ trung tâm gửi, gửi lại hoặc thu hồi lời mời."}
+        actions={invitations.data && invitations.data.length > 0 ? <Badge tone="brand">{invitations.data.length} đang chờ</Badge> : undefined}
+        flush
+      >
+        {isOwner && <InviteComposer onInvited={(invitation) => {
+          invitations.setData((current) => [invitation, ...(current ?? []).filter((row) => row.id !== invitation.id)]);
+          setFreshId(invitation.id);
+          setNotice(invitation.accountExists
+            ? `Đã gửi lời mời tới ${invitation.email}. Email này đã có tài khoản: người nhận đăng nhập rồi bấm chấp nhận trong email.`
+            : `Đã gửi lời mời tới ${invitation.email}. Người nhận tạo tài khoản từ đường dẫn trong email (hiệu lực 48 giờ).`);
+        }} />}
         <ErrorNotice error={invitations.error} onReload={() => void invitations.reload()} />
         {!invitations.data ? (
           <SkeletonRows rows={2} columns={4} />
         ) : invitations.data.length === 0 ? (
-          <p className="panel-empty">Không có lời mời nào đang chờ.</p>
+          <p className="invite-empty"><Clock3 aria-hidden="true" />Không có lời mời nào đang chờ. Lời mời hết hạn sau 48 giờ nếu chưa được chấp nhận.</p>
         ) : (
           <div className="table-wrap">
             <table className="table">
-              <thead><tr><th>Email</th><th>Vai trò</th><th>Tài khoản</th><th>Hết hạn</th>{isOwner && <th className="col-actions"><span className="sr-only">Thao tác</span></th>}</tr></thead>
+              <thead><tr><th>Đang chờ chấp nhận</th><th>Vai trò</th><th>Tài khoản</th><th>Hết hạn</th>{isOwner && <th className="col-actions"><span className="sr-only">Thao tác</span></th>}</tr></thead>
               <tbody>
                 {invitations.data.map((item) => (
-                  <InvitationRow key={item.id} item={item} canRevoke={isOwner} onRevoked={() => {
+                  <InvitationRow key={item.id} item={item} fresh={item.id === freshId} canRevoke={isOwner} onRevoked={() => {
                     invitations.setData((current) => (current ?? []).filter((row) => row.id !== item.id));
                     setNotice(`Đã thu hồi lời mời gửi ${item.email}.`);
                   }} onResent={(next) => {
@@ -89,7 +97,7 @@ function Members() {
         )}
       </Panel>
 
-      <Panel title="Thành viên" flush>
+      <Panel title="Thành viên" actions={members.data ? <Badge>{members.data.filter((member) => member.isActive).length} đang hoạt động</Badge> : undefined} flush>
         <ErrorNotice error={members.error ?? roleChange.error} onReload={() => void members.reload()} onDismiss={roleChange.clearError} />
         {!members.data ? (
           <SkeletonRows rows={4} columns={5} />
@@ -158,67 +166,82 @@ function Members() {
   );
 }
 
-function InviteForm({ onInvited }: { onInvited: (invitation: MemberInvitation) => void }) {
+/**
+ * One-line composer: email, role and send sit on a shared baseline (subgrid rows: label, control, message),
+ * so the button always lines up with the inputs whatever error or hint appears below them.
+ */
+function InviteComposer({ onInvited }: { onInvited: (invitation: MemberInvitation) => void }) {
   const { centerId } = useCenter();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<AssignableMemberRole>("Teacher");
   const [touched, setTouched] = useState(false);
+  const emailRef = useRef<HTMLInputElement>(null);
   const action = useAction();
   const error = validateEmail(email);
+  const roleHintId = useId();
+  const selected = assignable.find((option) => option.value === role) ?? assignable[0];
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     setTouched(true);
-    if (error) return;
+    if (error) {
+      emailRef.current?.focus();
+      return;
+    }
     const invitation = await action.run(() => identityApi.inviteMember(centerId, email.trim(), role));
     if (invitation) {
       setEmail("");
       setTouched(false);
       onInvited(invitation);
+      // Ready for the next person straight away; the role stays as chosen since invites usually come in batches.
+      emailRef.current?.focus();
     }
   }
 
   return (
-    <Panel title="Mời thành viên" description="Gửi tới email người đó dùng để đăng nhập. Nếu email đã có tài khoản (kể cả tài khoản Google), người nhận chỉ cần đăng nhập và chấp nhận.">
-      <form className="invite-form" onSubmit={submit} noValidate>
-        <Field label="Email" required error={touched ? error : null}>
-          {(id, describedBy) => <input id={id} type="email" autoComplete="off" aria-describedby={describedBy} value={email} onChange={(event) => setEmail(event.target.value)} placeholder="giaovien@example.com" />}
+    <div className="invite-composer">
+      <form className="invite-row" onSubmit={submit} noValidate>
+        <Field label="Email người được mời" required error={touched ? error : null} className="invite-email">
+          {(id, describedBy) => (
+            <span className="input-icon">
+              <AtSign aria-hidden="true" />
+              <input ref={emailRef} id={id} type="email" inputMode="email" autoComplete="off" spellCheck={false} aria-describedby={describedBy} value={email} onChange={(event) => setEmail(event.target.value)} placeholder="giaovien@example.com" />
+            </span>
+          )}
         </Field>
-        <fieldset className="role-choices">
-          <legend>Vai trò</legend>
-          {assignable.map((option) => (
-            <label key={option.value} className={`role-choice${role === option.value ? " is-selected" : ""}`}>
-              <input type="radio" name="member-role" value={option.value} checked={role === option.value} onChange={() => setRole(option.value)} />
-              <span><strong>{roleLabel(option.value)}</strong><small>{option.hint}</small></span>
-            </label>
-          ))}
-        </fieldset>
-        <div className="invite-actions">
-          <Button type="submit" variant="primary" icon={<MailPlus aria-hidden="true" />} pending={action.pending}>Gửi lời mời</Button>
+        <div className="field invite-role">
+          <span className="field-label" aria-hidden="true">Vai trò</span>
+          <Segmented label="Vai trò được mời" value={role} onChange={setRole} options={assignable.map((option) => ({ value: option.value, label: roleLabel(option.value) }))} />
+          <p className="field-hint" id={roleHintId} aria-live="polite">{selected.hint}</p>
+        </div>
+        <div className="invite-submit">
+          <Button type="submit" variant="primary" icon={<MailPlus aria-hidden="true" />} pending={action.pending} status={action.status} aria-describedby={roleHintId}>Gửi lời mời</Button>
         </div>
       </form>
       <ErrorNotice error={action.error} onDismiss={action.clearError} />
-    </Panel>
+    </div>
   );
 }
 
-function InvitationRow({ item, canRevoke, onRevoked, onResent }: { item: MemberInvitation; canRevoke: boolean; onRevoked: () => void; onResent: (next: MemberInvitation) => void }) {
+function InvitationRow({ item, fresh, canRevoke, onRevoked, onResent }: { item: MemberInvitation; fresh: boolean; canRevoke: boolean; onRevoked: () => void; onResent: (next: MemberInvitation) => void }) {
   const { centerId } = useCenter();
-  const action = useAction();
+  const resend = useAction();
+  const revoke = useAction();
+  const busy = resend.pending || revoke.pending;
   return (
-    <tr>
-      <td><strong>{item.email}</strong>{action.error ? <p className="field-error">Không thực hiện được, hãy làm mới.</p> : null}</td>
+    <tr className={fresh ? "is-fresh" : undefined}>
+      <td><strong>{item.email}</strong>{resend.error || revoke.error ? <p className="field-error">Không thực hiện được, hãy làm mới.</p> : null}</td>
       <td><Badge>{roleLabel(item.role)}</Badge></td>
       <td className="col-muted">{item.accountExists ? "Đã có — đăng nhập rồi chấp nhận" : "Chưa có — tạo khi nhận lời mời"}</td>
       <td className="col-muted">{formatDateTime(item.expiresAtUtc)}</td>
       {canRevoke && (
         <td className="col-actions">
-          <Button size="sm" variant="ghost" icon={<Send aria-hidden="true" />} pending={action.pending} onClick={async () => {
-            const next = await action.run(() => identityApi.resendMemberInvitation(centerId, item.id));
+          <Button size="sm" variant="ghost" icon={<Send aria-hidden="true" />} status={resend.status} disabled={busy} onClick={async () => {
+            const next = await resend.run(() => identityApi.resendMemberInvitation(centerId, item.id));
             if (next) onResent(next);
           }}>Gửi lại</Button>
-          <Button size="sm" variant="ghost" icon={<X aria-hidden="true" />} pending={action.pending} onClick={async () => {
-            if (await action.run(() => identityApi.revokeMemberInvitation(centerId, item.id))) onRevoked();
+          <Button size="sm" variant="ghost" icon={<X aria-hidden="true" />} status={revoke.status} disabled={busy} onClick={async () => {
+            if (await revoke.run(() => identityApi.revokeMemberInvitation(centerId, item.id))) onRevoked();
           }}>Thu hồi</Button>
         </td>
       )}

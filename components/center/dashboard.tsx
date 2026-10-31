@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowRight, CalendarClock, ClipboardCheck, Inbox, MessageSquareReply, Presentation, RefreshCcw } from "lucide-react";
 import { academicsApi, organizationsApi } from "@/lib/api";
 import { useResource } from "@/lib/hooks/use-resource";
@@ -53,7 +52,7 @@ export function CenterDashboard() {
       <ErrorNotice error={resource.error} onReload={() => void resource.reload()} />
 
       <div className="dashboard-grid">
-        <Panel title="Lịch 7 ngày tới" description="Buổi học theo ngày, gồm cả buổi đã hủy" flush actions={<Link className="text-link" href={`/centers/${centerId}/schedule`}>Mở lịch dạy <ArrowRight aria-hidden="true" /></Link>}>
+        <Panel title="Lịch 7 ngày tới" description="Buổi học theo ngày, gồm cả buổi đã hủy" flush actions={<ButtonLink size="sm" variant="soft" href={`/centers/${centerId}/schedule`} trailing={<ArrowRight aria-hidden="true" />}>Mở lịch dạy</ButtonLink>}>
           {!data ? (
             <SkeletonRows rows={6} columns={3} />
           ) : data.sessions.length === 0 ? (
@@ -83,7 +82,7 @@ export function CenterDashboard() {
                             <div>
                               <strong>{teachingClass ? teachingClass.name : "Lớp không xác định"}</strong>
                               <span>
-                                {teachingClass?.code} · {data.lookups.teacherById.get(session.teacherId)?.fullName ?? "—"} · {data.lookups.roomById.get(session.roomId)?.name ?? "—"}
+                                {data.lookups.teacherById.get(session.teacherId)?.fullName ?? "—"} · {data.lookups.roomById.get(session.roomId)?.name ?? "—"}
                               </span>
                             </div>
                             {!session.isActive ? (
@@ -114,7 +113,7 @@ export function CenterDashboard() {
                     <strong>{data?.pending ?? "…"} đơn đăng ký chờ duyệt</strong>
                     <span>Duyệt từng lớp; lớp đầy thì đơn vẫn giữ ở trạng thái chờ.</span>
                   </div>
-                  <Link className="text-link" href={`/centers/${centerId}/applications`}>Xem</Link>
+                  <ButtonLink size="sm" variant="soft" href={`/centers/${centerId}/applications`} trailing={<ArrowRight aria-hidden="true" />}>Duyệt đơn</ButtonLink>
                 </li>
               )}
               {canManage && (
@@ -124,7 +123,7 @@ export function CenterDashboard() {
                     <strong>{data?.requests ?? "…"} yêu cầu học sinh chờ duyệt</strong>
                     <span>Xin vắng, xin học bù, chuyển lớp, rút lớp — kể cả phản hồi sau khi đổi lịch.</span>
                   </div>
-                  <Link className="text-link" href={`/centers/${centerId}/requests`}>Xem</Link>
+                  <ButtonLink size="sm" variant="soft" href={`/centers/${centerId}/requests`} trailing={<ArrowRight aria-hidden="true" />}>Xem yêu cầu</ButtonLink>
                 </li>
               )}
               <li>
@@ -133,7 +132,7 @@ export function CenterDashboard() {
                   <strong>{openClasses.length} lớp đang mở đăng ký</strong>
                   <span>{nearlyFull.length ? `${nearlyFull.length} lớp đã kín từ 85% sĩ số.` : "Chưa có lớp nào sắp kín chỗ."}</span>
                 </div>
-                <Link className="text-link" href={`/centers/${centerId}/classes`}>Lớp học</Link>
+                <ButtonLink size="sm" variant="ghost" href={`/centers/${centerId}/classes`} trailing={<ArrowRight aria-hidden="true" />}>Lớp học</ButtonLink>
               </li>
               {isOwner && (
                 <li>
@@ -142,7 +141,7 @@ export function CenterDashboard() {
                     <strong>{pendingChange ? "Yêu cầu đổi hồ sơ đang chờ duyệt" : "Không có yêu cầu đổi hồ sơ đang chờ"}</strong>
                     <span>{pendingChange ? "Hồ sơ hiện tại giữ nguyên cho tới khi nền tảng duyệt." : "Đổi thông tin pháp lý phải qua quản trị nền tảng."}</span>
                   </div>
-                  <Link className="text-link" href={`/centers/${centerId}/profile`}>Hồ sơ</Link>
+                  <ButtonLink size="sm" variant="ghost" href={`/centers/${centerId}/profile`} trailing={<ArrowRight aria-hidden="true" />}>Hồ sơ</ButtonLink>
                 </li>
               )}
             </ul>

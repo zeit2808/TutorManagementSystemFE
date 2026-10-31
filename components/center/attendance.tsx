@@ -88,7 +88,7 @@ function AttendanceInner() {
                     >
                       <span className="session-picker-when">{formatWeekday(row.startUtc, true)} {formatDayMonth(row.startUtc)} · {formatTimeRange(row.startUtc, row.endUtc)}</span>
                       <strong>{row.className ?? teachingClass?.name ?? "Lớp"}</strong>
-                      <span className="session-picker-meta">{row.classCode ?? teachingClass?.code}{!started && " · chưa bắt đầu"}</span>
+                      <span className="session-picker-meta">{[row.teacherName, !started && "chưa bắt đầu"].filter(Boolean).join(" · ")}</span>
                     </button>
                   </li>
                 );
@@ -129,6 +129,8 @@ function AttendanceSheetEditor({ sessionId, lookups, sessionStartUtc, canManage 
   const [history, setHistory] = useState<AttendanceRevision[] | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const action = useAction();
+  // Draft and submit share one request lane; only the button that was pressed shows its progress and outcome.
+  const [intent, setIntent] = useState<"draft" | "submit">("draft");
   const historyAction = useAction();
 
   const original = sheetResource.data;
@@ -203,6 +205,7 @@ function AttendanceSheetEditor({ sessionId, lookups, sessionStartUtc, canManage 
   }
 
   async function saveDraft() {
+    setIntent("draft");
     const saved = await action.run(() => academicsApi.saveAttendanceDraft(centerId, sessionId, draftPayload()));
     if (saved) {
       sheetResource.setData(saved);
@@ -212,6 +215,7 @@ function AttendanceSheetEditor({ sessionId, lookups, sessionStartUtc, canManage 
   }
 
   async function submit() {
+    setIntent("submit");
     const saved = await action.run(async () => {
       const latest = await academicsApi.saveAttendanceDraft(centerId, sessionId, draftPayload());
       return academicsApi.submitAttendance(centerId, sessionId, latest.version);
@@ -298,7 +302,7 @@ function AttendanceSheetEditor({ sessionId, lookups, sessionStartUtc, canManage 
             {(id, describedBy) => (
               <select id={id} aria-describedby={describedBy} value={actualTeacherId} disabled={!editable || action.pending} onChange={(event) => setDraft({ ...draft, actualTeacherId: event.target.value })}>
                 {!actualTeacherId && <option value="">Chọn giáo viên</option>}
-                {teacherOptions.map((teacher) => <option key={teacher.id} value={teacher.id}>{teacher.fullName} · {teacher.code}</option>)}
+                {teacherOptions.map((teacher) => <option key={teacher.id} value={teacher.id}>{teacher.fullName}</option>)}
               </select>
             )}
           </Field>
@@ -338,7 +342,7 @@ function AttendanceSheetEditor({ sessionId, lookups, sessionStartUtc, canManage 
 
         <footer className="roster-footer">
           {canManage ? (
-            <Button variant="ghost" icon={<History aria-hidden="true" />} pending={historyAction.pending} onClick={() => void toggleHistory()} disabled={original.version === 0}>
+            <Button variant="ghost" icon={<History aria-hidden="true" />} pending={historyAction.pending} status={historyAction.status} onClick={() => void toggleHistory()} disabled={original.version === 0}>
               {history ? "Ẩn lịch sử" : `Lịch sử · phiên bản ${original.version}`}
             </Button>
           ) : <span className="col-muted">Phiên bản {original.version}</span>}
@@ -347,7 +351,7 @@ function AttendanceSheetEditor({ sessionId, lookups, sessionStartUtc, canManage 
               correcting ? (
                 <>
                   <Button onClick={() => { setCorrecting(false); setReason(""); setDraft(original); }} disabled={action.pending}>Hủy hiệu chỉnh</Button>
-                  <Button variant="primary" icon={<Save aria-hidden="true" />} pending={action.pending} disabled={!dirty || !reasonValid || !actualTeacherId} onClick={() => void saveCorrection()}>Lưu hiệu chỉnh</Button>
+                  <Button variant="primary" icon={<Save aria-hidden="true" />} pending={action.pending} status={action.status} disabled={!dirty || !reasonValid || !actualTeacherId} onClick={() => void saveCorrection()}>Lưu hiệu chỉnh</Button>
                 </>
               ) : canManage ? (
                 <Button icon={<PencilLine aria-hidden="true" />} onClick={() => setCorrecting(true)}>Hiệu chỉnh phiếu</Button>
@@ -356,8 +360,8 @@ function AttendanceSheetEditor({ sessionId, lookups, sessionStartUtc, canManage 
               )
             ) : (
               <>
-                <Button icon={<Save aria-hidden="true" />} pending={action.pending} disabled={!editable} onClick={() => void saveDraft()}>Lưu nháp</Button>
-                <Button variant="primary" icon={<Send aria-hidden="true" />} pending={action.pending} disabled={!editable || summary.unknown > 0 || !actualTeacherId || draft.students.length === 0} onClick={() => void submit()}>
+                <Button icon={<Save aria-hidden="true" />} status={intent === "draft" ? action.status : undefined} disabled={!editable || action.pending} onClick={() => void saveDraft()}>Lưu nháp</Button>
+                <Button variant="primary" icon={<Send aria-hidden="true" />} status={intent === "submit" ? action.status : undefined} disabled={action.pending || !editable || summary.unknown > 0 || !actualTeacherId || draft.students.length === 0} onClick={() => void submit()}>
                   {summary.unknown > 0 ? `Còn ${summary.unknown} học sinh chưa chọn` : "Lưu và nộp phiếu"}
                 </Button>
               </>
@@ -377,7 +381,7 @@ function RosterRow({ index, row, editable, changed, noteOpen, onToggleNote, onMa
       <span className="roster-index">{index + 1}</span>
       <div className="roster-identity">
         <span className="avatar" aria-hidden="true">{initials(row.fullName)}</span>
-        <div><strong>{row.fullName}</strong><small>{row.studentCode}{row.excusedAbsenceApproved && " · đã duyệt xin vắng"}</small></div>
+        <div><strong>{row.fullName}</strong>{row.excusedAbsenceApproved && <small>Đã duyệt xin vắng</small>}</div>
       </div>
       <div className="mark-group" role="radiogroup" aria-label={`Trạng thái của ${row.fullName}`}>
         {markOptions.map((option) => (

@@ -11,7 +11,7 @@ import { useNow } from "@/lib/hooks/use-now";
 import { addDays, formatDateOnly, formatDateTime, formatDuration, formatDayMonth, formatTimeRange, formatWeekday, isSameLocalDay, newUuid, startOfWeek, formatDate } from "@/lib/format";
 import { applicationStatus } from "@/lib/labels";
 import { validateName, validateVietnamMobile } from "@/lib/validation";
-import { Badge, Button, EmptyState, ErrorNotice, Field, Meter, Notice, PageHeader, Pagination, Panel, Segmented, SkeletonRows } from "@/components/ui/primitives";
+import { Badge, Button, EmptyState, ErrorNotice, Field, Meter, Notice, PageHeader, Pagination, Panel, Segmented, SkeletonRows, BackButton } from "@/components/ui/primitives";
 import { ConflictList } from "@/components/ui/conflict-dialog";
 
 const RECENT_KEY = "tm.student.recentCenters";
@@ -249,7 +249,7 @@ export function StudentCenter({ centerId }: { centerId: string }) {
 
   return (
     <>
-      <Link className="back-link" href="/student/find"><ChevronLeft aria-hidden="true" />Đổi trung tâm</Link>
+      <BackButton href="/student/find">Chọn trung tâm khác</BackButton>
       <PageHeader
         title={listed.data?.name ?? "Trung tâm của bạn"}
         description={<>Mã trung tâm <code className="code">{centerId}</code></>}
@@ -334,7 +334,7 @@ function OpenClasses({ centerId, enrolledIds, onSubmitted }: { centerId: string;
                 <li key={item.id}>
                   <label className={`choice${checked ? " checked" : ""}${enrolled ? " disabled" : ""}`}>
                     <input type="checkbox" checked={checked} disabled={enrolled} onChange={() => toggle(item)} />
-                    <span className="choice-text"><strong>{item.name}</strong><code className="code">{item.code}</code>
+                    <span className="choice-text"><strong>{item.name}</strong>
                       {checked && (conflictsByClass.get(item.id)?.length ?? 0) > 0 && <Badge tone="danger">Trùng {conflictsByClass.get(item.id)!.length} buổi</Badge>}
                     </span>
                     {enrolled ? <Badge tone="success">Đang học</Badge> : <Meter value={item.enrolledCount} max={item.maxStudents} label={`Sĩ số ${item.name}`} />}
@@ -376,7 +376,7 @@ function OpenClasses({ centerId, enrolledIds, onSubmitted }: { centerId: string;
           )}
           <p className={touched && selectionError ? "field-error" : "col-muted"}>{selectionError && touched ? selectionError : `Đã chọn ${selected.size}/10 lớp.`}</p>
           <ErrorNotice error={action.error} onDismiss={action.clearError} />
-          <Button type="submit" variant="primary" icon={<Send aria-hidden="true" />} pending={action.pending}>Nộp đơn {selected.size ? `(${selected.size} lớp)` : ""}</Button>
+          <Button type="submit" variant="primary" icon={<Send aria-hidden="true" />} pending={action.pending} status={action.status}>Nộp đơn {selected.size ? `(${selected.size} lớp)` : ""}</Button>
         </form>
       </Panel>
     </div>
@@ -388,7 +388,7 @@ function MyApplications({ centerId }: { centerId: string }) {
   const list = useResource(() => academicsApi.myClassApplications(centerId, { page, pageSize: 25 }), [centerId, page]);
   const open = useResource(() => academicsApi.listOpenClasses(centerId, { page: 1, pageSize: 100 }), [centerId]);
   const mine = useResource(() => academicsApi.myClasses(centerId), [centerId]);
-  const names = useMemo(() => new Map([...(open.data?.items ?? []), ...(mine.data ?? [])].map((item) => [item.id, `${item.name} · ${item.code}`])), [open.data, mine.data]);
+  const names = useMemo(() => new Map([...(open.data?.items ?? []), ...(mine.data ?? [])].map((item) => [item.id, item.name])), [open.data, mine.data]);
 
   return (
     <Panel title="Đơn của tôi" flush>
@@ -406,7 +406,7 @@ function MyApplications({ centerId }: { centerId: string }) {
                 const status = applicationStatus[item.status] ?? { label: item.status, tone: "neutral" as const };
                 return (
                   <tr key={item.id}>
-                    <td><strong>{item.className ? `${item.className} · ${item.classCode}` : names.get(item.classId) ?? "Lớp đã đóng đăng ký"}</strong></td>
+                    <td><strong>{item.className ?? names.get(item.classId) ?? "Lớp đã đóng đăng ký"}</strong></td>
                     <td className="col-muted">{formatDateTime(item.submittedAtUtc)}</td>
                     <td>
                       <Badge tone={status.tone}>{status.label}</Badge>
@@ -435,7 +435,7 @@ function MyClasses({ classes, error, reload }: { classes: OpenClass[] | undefine
         <EmptyState icon={<GraduationCap aria-hidden="true" />} title="Bạn chưa học lớp nào ở trung tâm này">Lớp xuất hiện sau khi trung tâm nhận đơn của bạn.</EmptyState>
       ) : (
         <ul className="link-list">
-          {classes.map((item) => <li key={item.id}><span><GraduationCap aria-hidden="true" /><strong>{item.name}</strong> <code className="code">{item.code}</code></span><Meter value={item.enrolledCount} max={item.maxStudents} label="Sĩ số" /></li>)}
+          {classes.map((item) => <li key={item.id}><span><GraduationCap aria-hidden="true" /><strong>{item.name}</strong></span><Meter value={item.enrolledCount} max={item.maxStudents} label="Sĩ số" /></li>)}
         </ul>
       )}
     </Panel>
@@ -482,7 +482,7 @@ function MySchedule({ centerId, classes }: { centerId: string; classes: OpenClas
                       <time>{formatTimeRange(item.startUtc, item.endUtc)}</time>
                       <div>
                         <strong>{item.className ?? names.get(item.classId)?.name ?? "Lớp"}</strong>
-                        <span>{[item.classCode ?? names.get(item.classId)?.code, item.teacherName, item.roomName].filter(Boolean).join(" · ")}</span>
+                        <span>{[item.teacherName, item.roomName].filter(Boolean).join(" · ")}</span>
                         {item.statusReason && item.status !== "Scheduled" && <span className="entry-note">Lý do: {item.statusReason}</span>}
                         {item.isRescheduled && item.rescheduleReason && item.status === "Scheduled" && <span className="entry-note">Đã dời · {item.rescheduleReason}</span>}
                       </div>

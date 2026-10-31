@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, LogIn } from "lucide-react";
+import { Eye, EyeOff, KeyRound, LogIn } from "lucide-react";
 import { authApi } from "@/lib/api";
 import { resolveLandingPath } from "@/lib/auth/session";
 import { useAction } from "@/lib/hooks/use-resource";
-import { Button, ErrorNotice, Field } from "@/components/ui/primitives";
+import { Button, ButtonLink, ErrorNotice, Field } from "@/components/ui/primitives";
 
 export function LoginForm({ nextPath }: { nextPath?: string }) {
   const router = useRouter();
@@ -47,10 +46,10 @@ export function LoginForm({ nextPath }: { nextPath?: string }) {
         )}
       </Field>
       <div className="row-between">
-        <Link className="text-link" href="/forgot-password">Quên mật khẩu?</Link>
+        <ButtonLink size="sm" variant="ghost" href="/forgot-password" icon={<KeyRound aria-hidden="true" />}>Quên mật khẩu?</ButtonLink>
       </div>
       <ErrorNotice error={action.error} />
-      <Button type="submit" variant="primary" className="btn-block" icon={<LogIn aria-hidden="true" />} pending={action.pending}>Đăng nhập</Button>
+      <Button type="submit" variant="primary" className="btn-block" icon={<LogIn aria-hidden="true" />} pending={action.pending} status={action.status}>Đăng nhập</Button>
     </form>
   );
 }

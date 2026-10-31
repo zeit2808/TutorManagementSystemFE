@@ -102,7 +102,7 @@ function RequestQueue() {
           <label className="select-inline"><span>Lớp</span>
             <select value={classId} onChange={(event) => { setClassId(event.target.value); setPage(1); }}>
               <option value="">Mọi lớp</option>
-              {(lookups.data?.classes ?? []).filter((item) => item.isActive).map((item) => <option key={item.id} value={item.id}>{item.code} · {item.name}</option>)}
+              {(lookups.data?.classes ?? []).filter((item) => item.isActive).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           </label>
           <Button size="sm" variant="ghost" icon={<RefreshCcw aria-hidden="true" />} onClick={() => void list.reload()} pending={list.loading && Boolean(data)}>Làm mới</Button>
@@ -122,11 +122,11 @@ function RequestQueue() {
                   const sessionPassed = item.kind === "ExcusedAbsence" && item.sessionStartUtc && new Date(item.sessionStartUtc).getTime() < now;
                   return (
                     <tr key={item.id}>
-                      <td><strong>{item.studentName}</strong><p className="cell-note"><code className="code">{item.studentCode}</code></p></td>
-                      <td><strong>{requestKindLabels[item.kind] ?? item.kind}</strong><p className="cell-note">{item.className} · {item.classCode}</p></td>
+                      <td><strong>{item.studentName}</strong></td>
+                      <td><strong>{requestKindLabels[item.kind] ?? item.kind}</strong><p className="cell-note">{item.className}</p></td>
                       <td>
                         {item.sessionStartUtc && item.sessionEndUtc && <p>Buổi {formatSlot(item.sessionStartUtc, item.sessionEndUtc)}{sessionPassed && <> <Badge tone="neutral">Đã qua giờ học</Badge></>}</p>}
-                        {item.targetClassName && <p>Sang lớp {item.targetClassName} ({item.targetClassCode})</p>}
+                        {item.targetClassName && <p>Sang lớp {item.targetClassName}</p>}
                         <p className="cell-note">Lý do: {item.reason}</p>
                       </td>
                       <td className="col-muted">{formatDateTime(item.submittedAtUtc)}</td>
@@ -138,7 +138,7 @@ function RequestQueue() {
                       <td className="col-actions">
                         {item.status === "Pending" && (
                           <>
-                            <Button size="sm" icon={<Check aria-hidden="true" />} pending={action.pending && busyId === item.id} disabled={action.pending} onClick={() => void approve(item)}>Duyệt</Button>
+                            <Button size="sm" icon={<Check aria-hidden="true" />} status={busyId === item.id ? action.status : undefined} disabled={action.pending} onClick={() => void approve(item)}>Duyệt</Button>
                             <Button size="sm" variant="ghost" icon={<X aria-hidden="true" />} onClick={() => setRejecting(item)}>Từ chối</Button>
                           </>
                         )}

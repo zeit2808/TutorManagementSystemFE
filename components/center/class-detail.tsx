@@ -1,13 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
-import { Archive, ArchiveRestore, ArrowLeft, CalendarRange, DoorClosed, DoorOpen, Pencil, Search, UserMinus, UserPlus, UsersRound } from "lucide-react";
+import { Archive, ArchiveRestore, CalendarRange, DoorClosed, DoorOpen, Pencil, Search, UserMinus, UserPlus, UsersRound } from "lucide-react";
 import { academicsApi, type ClassStudent, type ScheduleCheck, type Student, type TeachingClass } from "@/lib/api";
 import { useAction, useResource } from "@/lib/hooks/use-resource";
 import { fetchAllPages } from "@/lib/hooks/use-lookups";
-import { formatDateTime } from "@/lib/format";
-import { Badge, Button, ButtonLink, Dialog, EmptyState, ErrorNotice, KeyValue, Meter, Notice, PageHeader, Pagination, Panel, Segmented, SkeletonRows, StateRail } from "@/components/ui/primitives";
+import { formatDateTime, formatPhone } from "@/lib/format";
+import { Badge, Button, ButtonLink, Dialog, EmptyState, ErrorNotice, KeyValue, Meter, Notice, PageHeader, Pagination, Panel, Segmented, SkeletonRows, StateRail, BackButton } from "@/components/ui/primitives";
 import { ConfirmDialog, ReasonDialog } from "@/components/ui/reason-dialog";
 import { ConflictConfirmDialog, scheduleCheckFrom } from "@/components/ui/conflict-dialog";
 import { ClassEditor } from "./classes";
@@ -66,10 +65,10 @@ export function ClassDetail({ classId }: { classId: string }) {
 
   return (
     <>
-      <Link className="back-link" href={`/centers/${centerId}/classes`}><ArrowLeft aria-hidden="true" />Tất cả lớp</Link>
+      <BackButton href={`/centers/${centerId}/classes`}>Tất cả lớp</BackButton>
       <PageHeader
         title={teachingClass.name}
-        description={<><code className="code">{teachingClass.code}</code> · {subject?.name ?? "Môn không xác định"}</>}
+        description={subject?.name ?? "Môn không xác định"}
         meta={
           <StateRail
             label="Vòng đời lớp"
@@ -119,7 +118,7 @@ export function ClassDetail({ classId }: { classId: string }) {
                   <strong>{teachingClass.registrationOpen ? "Đang nhận đơn trực tuyến" : "Không nhận đơn trực tuyến"}</strong>
                   <p>{teachingClass.registrationOpen ? "Học sinh đăng nhập Google thấy lớp này khi còn chỗ." : "Đóng không xoá các đơn đang chờ duyệt."}</p>
                 </div>
-                <Button variant={teachingClass.registrationOpen ? "secondary" : "primary"} icon={teachingClass.registrationOpen ? <DoorClosed aria-hidden="true" /> : <DoorOpen aria-hidden="true" />} pending={registration.pending} onClick={() => void toggleRegistration()}>
+                <Button variant={teachingClass.registrationOpen ? "secondary" : "primary"} icon={teachingClass.registrationOpen ? <DoorClosed aria-hidden="true" /> : <DoorOpen aria-hidden="true" />} pending={registration.pending} status={registration.status} onClick={() => void toggleRegistration()}>
                   {teachingClass.registrationOpen ? "Đóng đăng ký" : "Mở đăng ký"}
                 </Button>
               </div>
@@ -149,11 +148,10 @@ export function ClassDetail({ classId }: { classId: string }) {
           ) : (
             <div className="table-wrap">
               <table className="table">
-                <thead><tr><th className="col-code">Mã</th><th>Họ và tên</th><th>Ghi danh lúc</th><th>Trạng thái</th>{canManage && <th className="col-actions"><span className="sr-only">Thao tác</span></th>}</tr></thead>
+                <thead><tr><th>Họ và tên</th><th>Ghi danh lúc</th><th>Trạng thái</th>{canManage && <th className="col-actions"><span className="sr-only">Thao tác</span></th>}</tr></thead>
                 <tbody>
                   {enrollments.data.items.map((row) => (
                     <tr key={row.enrollmentId}>
-                      <td className="col-code"><code className="code">{row.studentCode}</code></td>
                       <td><strong>{row.fullName}</strong></td>
                       <td className="col-muted">
                         {formatDateTime(row.enrolledAtUtc)}
@@ -260,7 +258,7 @@ function EnrollDialog({ teachingClass, onClose, onEnrolled }: { teachingClass: T
   const candidates = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return (data.data?.students ?? [])
-      .filter((student) => !needle || `${student.code} ${student.fullName}`.toLowerCase().includes(needle))
+      .filter((student) => !needle || `${student.fullName} ${student.parentPhone ?? ""}`.toLowerCase().includes(needle))
       .slice(0, 60);
   }, [data.data, query]);
 
@@ -292,12 +290,12 @@ function EnrollDialog({ teachingClass, onClose, onEnrolled }: { teachingClass: T
       description={`Còn ${Math.max(0, teachingClass.maxStudents - teachingClass.enrolledCount)} chỗ. Học sinh đã kích hoạt tài khoản sẽ nhận thông báo được thêm vào lớp.`}
       onClose={onClose}
       onSubmit={submit}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Hủy</Button><Button type="submit" variant="primary" disabled={!selected} pending={action.pending}>Ghi danh {selected ? selected.fullName : ""}</Button></>}
+      footer={<><Button onClick={onClose} disabled={action.pending}>Hủy</Button><Button type="submit" variant="primary" disabled={!selected} pending={action.pending} status={action.status}>Ghi danh {selected ? selected.fullName : ""}</Button></>}
     >
       <label className="search search-block">
         <Search aria-hidden="true" />
         <span className="sr-only">Tìm học sinh</span>
-        <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm theo mã hoặc họ tên…" />
+        <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm theo họ tên hoặc số điện thoại phụ huynh…" />
       </label>
       <ErrorNotice error={data.error} onReload={() => void data.reload()} />
       {!data.data ? (
@@ -319,8 +317,11 @@ function EnrollDialog({ teachingClass, onClose, onEnrolled }: { teachingClass: T
                   className={selected?.id === student.id ? "selected" : ""}
                   onClick={() => setSelected(student)}
                 >
-                  <code className="code">{student.code}</code>
-                  <strong>{student.fullName}</strong>
+                  {/* Two students may share a name; the parent's phone tells them apart without showing internal codes. */}
+                  <span className="pick-main">
+                    <strong>{student.fullName}</strong>
+                    {student.parentPhone && <small>Phụ huynh {formatPhone(student.parentPhone)}</small>}
+                  </span>
                   {enrolled ? <Badge tone="success">Đã trong lớp</Badge> : student.hasAccount ? <Badge tone="info">Có tài khoản · sẽ được báo</Badge> : null}
                 </button>
               </li>

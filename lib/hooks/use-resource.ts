@@ -66,19 +66,42 @@ export function useResource<T>(loader: () => Promise<T>, deps: unknown[]): Resou
   return { data, error, loading, reload: run, setData };
 }
 
-/** Wraps a mutation with pending/error state and the same 401 handling. */
+export type ActionStatus = "idle" | "pending" | "success" | "error";
+
+/** How long a button keeps its success/error face after the request settles. */
+const OUTCOME_MS = { success: 1600, error: 2200 } as const;
+
+/**
+ * Wraps a mutation with pending/error state and the same 401 handling. `status`
+ * briefly holds the outcome after the request settles so the triggering button
+ * can confirm success or flag the failure in place.
+ */
 export function useAction(options: { redirectOnUnauthorized?: boolean } = {}) {
   const redirectOnUnauthorized = options.redirectOnUnauthorized ?? true;
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<unknown>(null);
+  const [outcome, setOutcome] = useState<"success" | "error" | null>(null);
+  const outcomeTimer = useRef<number | undefined>(undefined);
+
+  useEffect(() => () => window.clearTimeout(outcomeTimer.current), []);
+
+  const settle = useCallback((next: "success" | "error") => {
+    window.clearTimeout(outcomeTimer.current);
+    setOutcome(next);
+    outcomeTimer.current = window.setTimeout(() => setOutcome(null), OUTCOME_MS[next]);
+  }, []);
 
   const run = useCallback(
     async <R,>(action: () => Promise<R>): Promise<R | undefined> => {
+      window.clearTimeout(outcomeTimer.current);
+      setOutcome(null);
       setPending(true);
       setError(null);
       try {
-        return await action();
+        const result = await action();
+        settle("success");
+        return result;
       } catch (caught) {
         if (redirectOnUnauthorized && caught instanceof ApiError && caught.status === 401) {
           const next = `${window.location.pathname}${window.location.search}`;
@@ -86,13 +109,15 @@ export function useAction(options: { redirectOnUnauthorized?: boolean } = {}) {
           return undefined;
         }
         setError(caught);
+        settle("error");
         return undefined;
       } finally {
         setPending(false);
       }
     },
-    [router, redirectOnUnauthorized],
+    [router, redirectOnUnauthorized, settle],
   );
 
-  return { pending, error, run, clearError: () => setError(null) };
+  const status: ActionStatus = pending ? "pending" : outcome ?? "idle";
+  return { pending, status, error, run, clearError: () => setError(null) };
 }

@@ -24,7 +24,7 @@ export function ConflictList({ items, limit = 8 }: { items: ConflictItem[]; limi
             <strong>{formatSlot(item.startUtc, item.endUtc)}</strong>
             {" trùng "}
             {item.betweenSelected ? "lớp cũng đang chọn " : ""}
-            {item.otherClassName ? <>{item.otherClassName}{item.otherClassCode ? ` (${item.otherClassCode})` : ""}</> : "một lớp khác"}
+            {item.otherClassName ?? "một lớp khác"}
             {item.otherCenterName && !item.sameCenter ? ` · ${item.otherCenterName}` : ""}
             {" "}<span className="col-muted">{formatTimeRange(item.otherStartUtc, item.otherEndUtc)}</span>
           </span>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen, Building2, CalendarCheck2, ClipboardCheck, GraduationCap, History, MailPlus, ShieldCheck, UserCog, UsersRound } from "lucide-react";
+import { HeroScene } from "./hero-scene";
 import { HeroStage } from "./hero-stage";
 import { HeroActions, LandingNav } from "./landing-nav";
 import { Reveal } from "./reveal";
@@ -30,6 +31,7 @@ export function Landing() {
       <LandingNav />
 
       <section className="hero" aria-labelledby="hero-title">
+        <HeroScene />
         <div className="hero-glow" aria-hidden="true" />
         <div className="hero-copy">
           <h1 id="hero-title">

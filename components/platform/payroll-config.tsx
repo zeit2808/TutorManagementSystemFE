@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Coins, Settings2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Coins, Settings2 } from "lucide-react";
 import { payrollApi, type PayrollConfig, type PayrollMode } from "@/lib/api";
 import { useAction, useResource } from "@/lib/hooks/use-resource";
 import { formatDateTime, formatMonth } from "@/lib/format";
@@ -99,7 +99,7 @@ function PayrollConfigDialog({ config, centerName, onClose, onSaved }: { config:
     <Dialog open size="lg" title={`Lương & chia thu nhập — ${centerName}`}
       description={<>Tháng này: <PayrollStateBadge enabled={config.enabledThisMonth} mode={config.modeThisMonth} />{config.latestClosedMonth ? ` · đã chốt tới ${formatMonth(config.latestClosedMonth).toLowerCase()}` : ""}</>}
       onClose={onClose} onSubmit={submit}
-      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" pending={action.pending}>Lưu cấu hình</Button></>}>
+      footer={<><Button onClick={onClose} disabled={action.pending}>Đóng</Button><Button type="submit" variant="primary" pending={action.pending} status={action.status}>Lưu cấu hình</Button></>}>
       <div className="form-grid">
         <div className="span-2"><Toggle checked={enabled} onChange={setEnabled} label="Bật lương / chia thu nhập cho trung tâm này" /></div>
         <Field label="Cách tính" required className="span-2">
@@ -140,9 +140,9 @@ function PayrollConfigDialog({ config, centerName, onClose, onSaved }: { config:
             ))}
           </ol>
           {config.history.length > 3 && (
-            <button type="button" className="text-link" onClick={() => setShowAll(!showAll)}>
+            <Button size="sm" variant="ghost" icon={showAll ? <ChevronUp aria-hidden="true" /> : <ChevronDown aria-hidden="true" />} onClick={() => setShowAll(!showAll)}>
               {showAll ? "Thu gọn" : `Xem cả ${config.history.length} lần thay đổi`}
-            </button>
+            </Button>
           )}
         </div>
       )}
