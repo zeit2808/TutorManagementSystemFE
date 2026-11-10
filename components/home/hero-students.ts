@@ -17,7 +17,8 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
  * decals that follow the curve of the face: a matte iris, pupil, an upper
  * lash line and a brow, and they can blink. Faces
  * react to what happens: a grin and happy closed eyes when waving, jumping or
- * arriving on time; raised brows, a frown and a sweat drop when late.
+ * arriving on time; raised brows, a frown and a sweat drop when late. Some
+ * students read: an open book held up in both hands, pages turning now and then.
  */
 
 export interface StudentPose {
@@ -48,6 +49,10 @@ export interface StudentPose {
   squint?: number;
   /** 0…1 worried: brows tilt up in the middle, a small frown, a sweat drop (late). */
   worry?: number;
+  /** 0…1 holding an open book up in both hands and reading it, head bowed. */
+  read?: number;
+  /** 0…1 progress of a page being turned, right to left. */
+  page?: number;
 }
 
 /** Boys: textured crop, curtain middle part, side part with a quiff, short spikes. */
@@ -70,6 +75,7 @@ const SKIN = [0xf6d2b4, 0xf1c4a0, 0xe8b48c, 0xf8dcc4];
 const HAIR = [0x1d1726, 0x2a1d1a, 0x3a2620, 0x14121c, 0x4a2c20, 0x3b302f];
 const IRIS = [0x4a2c1a, 0x3a2216, 0x5a3622, 0x2e2838];
 const PACK = [0x5b4cf0, 0x2d6cdf, 0x12806a, 0xe0a63a, 0xd9576b, 0x7b6ff5, 0x2bb3c0];
+const BOOK = [0x2d6cdf, 0xd9576b, 0x12806a, 0xe0a63a, 0x7b6ff5];
 const NAVY_CLOTH = 0x23336b;
 /** Sneaker colourways: [upper, accent stripe & heel tab]. Bright uppers so feet read even from afar. */
 const SNEAKERS: Array<[number, number]> = [
@@ -283,6 +289,8 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     mouth: decal({ color: 0x7a3035 }),
     tongue: decal({ color: 0xe86a7a }),
     sweat: new THREE.MeshBasicMaterial({ color: 0xa6dcff }),
+    cover: toon(0xffffff, 0x14142a),
+    paper: toon(0xfbf7ea, 0x26263a),
     glasses: new THREE.MeshBasicMaterial({ color: 0x2a2840 }),
     // Badges are unlit stickers so their colour reads the same from every angle.
     badge: new THREE.MeshBasicMaterial({ color: 0xffffff }),
@@ -326,6 +334,13 @@ export function createStudents(parent: THREE.Object3D, count: number) {
   }
   sweat.scale(0.012, 0.012, 0.012);
   sweat.computeVertexNormals();
+  // Open book: each half hinges on the spine (the origin) and extends along +x; pages face -z, the reader.
+  const coverHalf = new RoundedBoxGeometry(0.12, 0.165, 0.01, 2, 0.004);
+  coverHalf.translate(0.06, 0, 0.004);
+  const pagesHalf = new THREE.BoxGeometry(0.11, 0.15, 0.014);
+  pagesHalf.translate(0.057, 0, -0.006);
+  const leaf = new THREE.BoxGeometry(0.106, 0.146, 0.002);
+  leaf.translate(0.055, 0, -0.014);
 
   // Attendance badge: a coin-like disc with a white rim, carrying a check (on time) or a clock face (late).
   const badgeDisc = new THREE.CylinderGeometry(0.11, 0.11, 0.02, 28);
@@ -395,6 +410,9 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     // Two strokes per student: the check's short + long arms, or the clock's hour + minute hands.
     badgeStrokes: make(stroke, materials.badgeMark, 2),
     packFlap: make(new RoundedBoxGeometry(0.24, 0.1, 0.13, 2, 0.04), materials.pack),
+    bookCovers: make(coverHalf, materials.cover, 2),
+    bookPages: make(pagesHalf, materials.paper, 2),
+    bookLeaf: make(leaf, materials.paper),
   };
 
   // Per-student identity. Styles are dealt in turn from a random start, so every class shows the full range.
@@ -436,6 +454,8 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     parts.skirt.setColorAt(index, color.setHex(NAVY_CLOTH));
     parts.pack.setColorAt(index, color.setHex(pack));
     parts.packFlap.setColorAt(index, color.setHex(pack).multiplyScalar(0.82));
+    const book = BOOK[Math.floor(Math.random() * BOOK.length)];
+    for (let k = 0; k < 2; k++) parts.bookCovers.setColorAt(index * 2 + k, color.setHex(book));
     for (let side = 0; side < 2; side++) {
       const slot = index * 2 + side;
       parts.arms.setColorAt(slot, color.setHex(skin));
@@ -554,14 +574,16 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     put(parts.collar, index, out);
 
     // Arms pivot at the shoulders, swinging against the legs; the right one can go up to ask a question.
+    // Reading brings both forearms forward and in, to hold the book in front of the chest.
+    const read = THREE.MathUtils.clamp(pose.read ?? 0, 0, 1);
     for (let side = 0; side < 2; side++) {
       const sign = side === 0 ? -1 : 1;
       const isRight = side === 1;
       const armSwing = -swing * 0.55 * sign;
       const up = isRight ? Math.max(raise, pose.wave) : 0;
-      const rx = THREE.MathUtils.lerp(armSwing, -2.85, up);
+      const rx = THREE.MathUtils.lerp(THREE.MathUtils.lerp(armSwing, -2.85, up), -1.38, read);
       // Waving rocks the raised arm side to side from the shoulder.
-      const rz = sign * THREE.MathUtils.lerp(0.14, 0.05, up) + (isRight ? pose.wave * Math.sin(pose.wavePhase) * 0.5 : 0);
+      const rz = THREE.MathUtils.lerp(sign * THREE.MathUtils.lerp(0.14, 0.05, up) + (isRight ? pose.wave * Math.sin(pose.wavePhase) * 0.5 : 0), -sign * 0.38, read);
       at(joint, torso, sign * (look.girl ? 0.162 : 0.185), 0.55, 0, rx, 0, rz);
       put(parts.sleeves, index * 2 + side, at(out, joint, 0, -0.03, 0));
       put(parts.arms, index * 2 + side, joint);
@@ -587,7 +609,18 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     put(parts.neck, index, out);
 
     // Head: big and round, with a gentle nod; everything on the face hangs off it.
-    at(head, torso, 0, 0.8, 0, pose.tilt, swing * -0.06, 0);
+    // Book: held open between the hands, tilted so the pages face the eyes; it grows in as the arms come up.
+    const book = at(joint, torso, 0, 0.53, 0.24, 0.8, 0, 0, Math.max(0.001, read) * 1.35);
+    const shut = read > 0.02;
+    put(parts.bookCovers, index * 2, at(out, book, 0, 0, 0, 0, 0.35, 0), shut);
+    put(parts.bookCovers, index * 2 + 1, at(out, book, 0, 0, 0, 0, Math.PI - 0.35, 0), shut);
+    put(parts.bookPages, index * 2, at(out, book, 0, 0, 0, 0, 0.35, 0), shut);
+    put(parts.bookPages, index * 2 + 1, at(out, book, 0, 0, 0, 0, Math.PI - 0.35, 0), shut);
+    const page = THREE.MathUtils.clamp(pose.page ?? 0, 0, 1);
+    put(parts.bookLeaf, index, at(out, book, 0, 0, 0, 0, THREE.MathUtils.lerp(0.35, Math.PI - 0.35, page), 0), shut && page > 0 && page < 1);
+
+    // Reading bows the head over the book.
+    at(head, torso, 0, 0.8, 0, pose.tilt + read * 0.42, swing * -0.06, 0);
     put(parts.head, index, head);
 
     // Face. Eyes are decals that follow the curve of the head; a blink squashes them under the lash line,
@@ -595,7 +628,8 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     const smileK = THREE.MathUtils.clamp(pose.smile ?? 0, 0, 1);
     const squint = THREE.MathUtils.clamp(pose.squint ?? 0, 0, 1);
     const worry = THREE.MathUtils.clamp(pose.worry ?? 0, 0, 1);
-    const open = Math.min(1 - THREE.MathUtils.clamp(pose.blink ?? 0, 0, 1), 1 - squint);
+    // Reading lowers the lids a little: the eyes are looking down at the page.
+    const open = Math.min(1 - THREE.MathUtils.clamp(pose.blink ?? 0, 0, 1), 1 - squint, 1 - read * 0.4);
     const lidded = squint < 0.5;
     const ey = -0.004;
     for (let side = 0; side < 2; side++) {

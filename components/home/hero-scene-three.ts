@@ -19,6 +19,7 @@ import { createStudents } from "./hero-students";
  * - Every so often the alarm clock rings: sound rings ripple out, classes end
  *   together and a new set of classes begins (a shift change on the timetable).
  * - Hover near the students and they turn to wave; click one and it jumps.
+ * - Some students read while standing still, turning a page now and then.
  * - Graduation caps, open books, a globe, apples, pencils and paper planes float
  *   slowly in the air.
  * Illustrative only.
@@ -83,6 +84,12 @@ interface Student {
   smile: number;
   squint: number;
   worry: number;
+  /** About a third of the class are readers: standing still, they open a book. */
+  reader: boolean;
+  read: number;
+  /** Seconds into a page turn, or -1; `pageWait` counts down to the next one. */
+  pageT: number;
+  pageWait: number;
 }
 
 interface Prop {
@@ -402,7 +409,7 @@ export function mountHeroScene(container: HTMLElement, options: { reduced: boole
   const randomSpot = (out: THREE.Vector3) => out.set(rand(-8, 8), 0, rand(-7, 2.4));
   const students: Student[] = Array.from({ length: STUDENTS }, () => {
     const pos = randomSpot(new THREE.Vector3());
-    return { pos, target: randomSpot(new THREE.Vector3()), heading: rand(0, Math.PI * 2), walk: 0, stride: 0, seed: Math.random() * 100, block: null, slot: 0, pause: rand(0, 2), raise: 0, raiseFor: 0, calledAt: 0, arrived: false, badgeT: -1, late: false, wave: 0, wavePhase: 0, jumpT: -1, smile: 0, squint: 0, worry: 0 };
+    return { pos, target: randomSpot(new THREE.Vector3()), heading: rand(0, Math.PI * 2), walk: 0, stride: 0, seed: Math.random() * 100, block: null, slot: 0, pause: rand(0, 2), raise: 0, raiseFor: 0, calledAt: 0, arrived: false, badgeT: -1, late: false, wave: 0, wavePhase: 0, jumpT: -1, smile: 0, squint: 0, worry: 0, reader: Math.random() < 0.35, read: 0, pageT: -1, pageWait: rand(1.5, 4) };
   });
 
   const gather = (block: Block) => {
@@ -653,7 +660,8 @@ export function mountHeroScene(container: HTMLElement, options: { reduced: boole
 
       // At class, now and then a hand goes up to ask a question.
       const settled = student.block && !moving && student.pause <= 0;
-      if (settled && student.raiseFor <= 0 && Math.random() < dt * 0.09) student.raiseFor = rand(1.4, 2.4);
+      // Readers keep their book up instead of raising a hand.
+      if (settled && !student.reader && student.raiseFor <= 0 && Math.random() < dt * 0.09) student.raiseFor = rand(1.4, 2.4);
       if (student.raiseFor > 0) student.raiseFor -= dt;
       const raising = settled && student.raiseFor > 0;
       student.raise += ((raising ? 1 : 0) - student.raise) * (1 - Math.exp(-dt * 7));
@@ -688,6 +696,21 @@ export function mountHeroScene(container: HTMLElement, options: { reduced: boole
         if (k >= 1) student.jumpT = -1;
       }
 
+      // Reading: readers standing still open a book, and put it down to wave or jump.
+      const reading = student.reader && !moving && !near && student.jumpT < 0;
+      student.read += ((reading ? 1 : 0) - student.read) * (1 - Math.exp(-dt * 5));
+      let page = 0;
+      if (student.read > 0.9) {
+        if (student.pageT >= 0) {
+          student.pageT += dt;
+          page = ease(Math.min(1, student.pageT / 0.6));
+          if (student.pageT >= 0.6) {
+            student.pageT = -1;
+            student.pageWait = rand(2.5, 5);
+          }
+        } else if ((student.pageWait -= dt) <= 0) student.pageT = 0;
+      }
+
       // Expression: grins while waving or jumping; on time it beams with closed eyes, late it looks worried.
       const onTime = !student.late ? Math.min(1, badge) : 0;
       const late = student.late ? Math.min(1, badge) : 0;
@@ -717,6 +740,8 @@ export function mountHeroScene(container: HTMLElement, options: { reduced: boole
         smile: student.smile,
         squint: student.squint,
         worry: student.worry,
+        read: student.read,
+        page: reduced ? 0 : page,
       });
     });
     rig.commit();
