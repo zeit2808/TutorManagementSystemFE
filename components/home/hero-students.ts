@@ -15,7 +15,9 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
  * strands, ponytail), so each style has a broken, clumped hairline instead of
  * one straight edge, each lock a shade apart. Eyes are layered
  * decals that follow the curve of the face: a shaded iris, pupil, two
- * catchlights, an upper lash line and a brow, and they can blink.
+ * catchlights, an upper lash line and a brow, and they can blink. Faces
+ * react to what happens: a grin and happy closed eyes when waving, jumping or
+ * arriving on time; raised brows, a frown and a sweat drop when late.
  */
 
 export interface StudentPose {
@@ -40,6 +42,12 @@ export interface StudentPose {
   late: boolean;
   /** 0 eyes open … 1 closed. */
   blink?: number;
+  /** 0…1 open-mouthed grin (waving, jumping, on time). */
+  smile?: number;
+  /** 0…1 eyes closed into happy arcs (^ ^). */
+  squint?: number;
+  /** 0…1 worried: brows tilt up in the middle, a small frown, a sweat drop (late). */
+  worry?: number;
 }
 
 /** Boys: textured crop, curtain middle part, side part with a quiff, short spikes. */
@@ -274,6 +282,8 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     lash: decal({ color: 0x17111c }),
     brow: decal(),
     mouth: decal({ color: 0x7a3035 }),
+    tongue: decal({ color: 0xe86a7a }),
+    sweat: new THREE.MeshBasicMaterial({ color: 0xa6dcff }),
     blush: decal({ color: 0xff8a9e, transparent: true, opacity: 0.4, depthWrite: false }),
     glasses: new THREE.MeshBasicMaterial({ color: 0x2a2840 }),
     // Badges are unlit stickers so their colour reads the same from every angle.
@@ -300,6 +310,24 @@ export function createStudents(parent: THREE.Object3D, count: number) {
   // Smile: a short arc opening upwards.
   const smile = new THREE.TorusGeometry(0.02, 0.0045, 4, 12, Math.PI * 0.62);
   smile.rotateZ(-Math.PI / 2 - Math.PI * 0.31);
+  // Grin: the lower half of a disc, flat edge up.
+  const grin = new THREE.CircleGeometry(1, 18, Math.PI, Math.PI);
+  // Happy closed eye: an arch (∩), flattened onto the face.
+  const happyEye = new THREE.TorusGeometry(1, 0.2, 4, 14, Math.PI * 0.8);
+  happyEye.rotateZ(Math.PI * 0.1);
+  happyEye.scale(1, 1, 0.02);
+  // Sweat drop: a sphere drawn out into a teardrop pointing up.
+  const sweat = new THREE.SphereGeometry(1, 10, 8);
+  const sweatPosition = sweat.attributes.position;
+  for (let i = 0; i < sweatPosition.count; i++) {
+    const y = sweatPosition.getY(i);
+    const narrow = y > 0 ? 1 - y * 0.85 : 1;
+    sweatPosition.setX(i, sweatPosition.getX(i) * narrow);
+    sweatPosition.setZ(i, sweatPosition.getZ(i) * narrow * 0.5);
+    sweatPosition.setY(i, y > 0 ? y * 1.6 : y);
+  }
+  sweat.scale(0.012, 0.012, 0.012);
+  sweat.computeVertexNormals();
 
   // Attendance badge: a coin-like disc with a white rim, carrying a check (on time) or a clock face (late).
   const badgeDisc = new THREE.CylinderGeometry(0.11, 0.11, 0.02, 28);
@@ -358,6 +386,10 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     lashes: make(lashGeometry(), materials.lash, 2),
     brows: make(browGeometry(), materials.brow, 2),
     mouth: make(smile, materials.mouth),
+    grins: make(grin, materials.mouth),
+    grinTongues: make(grin, materials.tongue),
+    happyEyes: make(happyEye, materials.lash, 2),
+    sweat: make(sweat, materials.sweat),
     blush: make(new THREE.CircleGeometry(1, 16), materials.blush, 2),
     glasses: make(lens, materials.glasses, 2),
     scarfKnot: make(scarfKnot, materials.scarf),
@@ -564,23 +596,30 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     at(head, torso, 0, 0.8, 0, pose.tilt, swing * -0.06, 0);
     put(parts.head, index, head);
 
-    // Face. Eyes are decals that follow the curve of the head; a blink squashes them under the lash line.
-    const open = 1 - THREE.MathUtils.clamp(pose.blink ?? 0, 0, 1);
+    // Face. Eyes are decals that follow the curve of the head; a blink squashes them under the lash line,
+    // and a happy squint swaps them for closed arches.
+    const smileK = THREE.MathUtils.clamp(pose.smile ?? 0, 0, 1);
+    const squint = THREE.MathUtils.clamp(pose.squint ?? 0, 0, 1);
+    const worry = THREE.MathUtils.clamp(pose.worry ?? 0, 0, 1);
+    const open = Math.min(1 - THREE.MathUtils.clamp(pose.blink ?? 0, 0, 1), 1 - squint);
+    const lidded = squint < 0.5;
     const ey = -0.004;
     for (let side = 0; side < 2; side++) {
       const sign = side === 0 ? -1 : 1;
       const slot = index * 2 + side;
       const ex = sign * 0.062;
       put(parts.ears, slot, at(out, head, sign * 0.175, -0.01, 0, 0, 0, 0, scale.set(0.6, 1, 0.8)));
-      put(parts.irises, slot, onFace(ex, ey - 0.006 * (1 - open), 0.0012, 0.026, 0.034 * Math.max(0.08, open)));
+      put(parts.irises, slot, onFace(ex, ey - 0.006 * (1 - open), 0.0012, 0.026, 0.034 * Math.max(0.08, open)), lidded);
       put(parts.pupils, slot, onFace(ex, ey + 0.002, 0.0022, 0.0135, 0.019 * open), open > 0.4);
       put(parts.shines, index * 4 + side * 2, onFace(ex - 0.009, ey + 0.013, 0.0032, 0.0085, 0.0095 * open), open > 0.4);
       put(parts.shines, index * 4 + side * 2 + 1, onFace(ex + 0.01, ey - 0.014, 0.0032, 0.0045, 0.0045 * open), open > 0.4);
       // Lash line hugs the top of the iris, with a flick at the outer corner (bolder for girls); closed, it becomes the lid.
       const lashSize = look.girl ? 0.03 : 0.028;
-      put(parts.lashes, slot, onFace(ex, ey + 0.017 * open - 0.008 * (1 - open), 0.0028, sign * lashSize, lashSize * (look.girl ? 1.05 : 0.8) * (0.55 + 0.45 * open)));
-      put(parts.brows, slot, onFace(sign * 0.066, 0.05, 0.002, 0.048, look.girl ? 0.009 : 0.013, sign * -0.12));
-      put(parts.blush, slot, onFace(sign * 0.105, -0.045, 0.0015, 0.024, 0.015));
+      put(parts.lashes, slot, onFace(ex, ey + 0.017 * open - 0.008 * (1 - open), 0.0028, sign * lashSize, lashSize * (look.girl ? 1.05 : 0.8) * (0.55 + 0.45 * open)), lidded);
+      put(parts.happyEyes, slot, onFace(ex, ey - 0.006, 0.0028, 0.022, 0.02 * squint), !lidded);
+      // Brows lift a little when happy; worried, the inner ends rise.
+      put(parts.brows, slot, onFace(sign * 0.066, 0.05 + 0.006 * Math.max(smileK, worry), 0.002, 0.048, look.girl ? 0.009 : 0.013, sign * -(0.12 + 0.38 * worry)));
+      put(parts.blush, slot, onFace(sign * 0.105, -0.045, 0.0015, 0.024 * (1 + 0.25 * smileK), 0.015 * (1 + 0.25 * smileK)));
       put(parts.glasses, slot, at(out, head, ex, ey, 0.176), look.glasses);
 
       // Braids fall forward over the shoulders as a plait of alternating segments.
@@ -595,7 +634,15 @@ export function createStudents(parent: THREE.Object3D, count: number) {
       // Space buns on top of the head.
       put(parts.buns, slot, at(out, head, sign * 0.115, 0.15, -0.02, 0, 0, 0, scale.set(1, 0.95, 1)), look.style === "buns");
     }
-    put(parts.mouth, index, onFace(0, -0.072, 0.003, 1, 1));
+    // Mouth: the resting smile, an open grin, or a small frown.
+    const grinning = smileK > 0.35 && smileK >= worry;
+    const frowning = worry > 0.35 && !grinning;
+    if (frowning) put(parts.mouth, index, onFace(0, -0.1, 0.003, 0.7, 0.7, Math.PI));
+    else put(parts.mouth, index, onFace(0, -0.072, 0.003, 1, 1), !grinning);
+    put(parts.grins, index, onFace(0, -0.074, 0.003, 0.03, 0.028 * smileK), grinning);
+    put(parts.grinTongues, index, onFace(0, -0.089, 0.0036, 0.016, 0.011 * smileK), grinning);
+    // Sweat drop at the temple while worried.
+    put(parts.sweat, index, onFace(-0.142, 0.012, 0.006, 1.4 * worry, 1.4 * worry), worry > 0.05);
 
     // Hair bow on the side of the crown, for the styles that leave room for one.
     const bowed = look.girl && look.style !== "buns" && look.style !== "ponytail";

@@ -14,7 +14,8 @@ import { createStudents } from "./hero-students";
  * - Mini students wander the floor, walk to a class while it runs and stand
  *   around it, then drift off when it ends.
  * - Arriving at class is attendance: a badge pops over the student's head — a
- *   green check when they made it on time, an amber clock when they were late.
+ *   green check when they made it on time, an amber clock when they were late —
+ *   and their face says it too: a beaming grin, or worried brows and a sweat drop.
  * - Every so often the alarm clock rings: sound rings ripple out, classes end
  *   together and a new set of classes begins (a shift change on the timetable).
  * - Hover near the students and they turn to wave; click one and it jumps.
@@ -78,6 +79,10 @@ interface Student {
   wavePhase: number;
   /** Seconds into a jump, or -1 on the ground. */
   jumpT: number;
+  /** Eased facial expression, 0…1 each. */
+  smile: number;
+  squint: number;
+  worry: number;
 }
 
 interface Prop {
@@ -397,7 +402,7 @@ export function mountHeroScene(container: HTMLElement, options: { reduced: boole
   const randomSpot = (out: THREE.Vector3) => out.set(rand(-8, 8), 0, rand(-7, 2.4));
   const students: Student[] = Array.from({ length: STUDENTS }, () => {
     const pos = randomSpot(new THREE.Vector3());
-    return { pos, target: randomSpot(new THREE.Vector3()), heading: rand(0, Math.PI * 2), walk: 0, stride: 0, seed: Math.random() * 100, block: null, slot: 0, pause: rand(0, 2), raise: 0, raiseFor: 0, calledAt: 0, arrived: false, badgeT: -1, late: false, wave: 0, wavePhase: 0, jumpT: -1 };
+    return { pos, target: randomSpot(new THREE.Vector3()), heading: rand(0, Math.PI * 2), walk: 0, stride: 0, seed: Math.random() * 100, block: null, slot: 0, pause: rand(0, 2), raise: 0, raiseFor: 0, calledAt: 0, arrived: false, badgeT: -1, late: false, wave: 0, wavePhase: 0, jumpT: -1, smile: 0, squint: 0, worry: 0 };
   });
 
   const gather = (block: Block) => {
@@ -683,6 +688,15 @@ export function mountHeroScene(container: HTMLElement, options: { reduced: boole
         if (k >= 1) student.jumpT = -1;
       }
 
+      // Expression: grins while waving or jumping; on time it beams with closed eyes, late it looks worried.
+      const onTime = !student.late ? Math.min(1, badge) : 0;
+      const late = student.late ? Math.min(1, badge) : 0;
+      const jumping = student.jumpT >= 0 ? 1 : 0;
+      const follow = 1 - Math.exp(-dt * 9);
+      student.smile += (Math.max(student.wave, onTime, jumping) - student.smile) * follow;
+      student.squint += (Math.max(onTime, jumping) - student.squint) * follow;
+      student.worry += (late - student.worry) * follow;
+
       const phase = Math.sin(student.walk);
       rig.update(index, {
         x: student.pos.x,
@@ -700,6 +714,9 @@ export function mountHeroScene(container: HTMLElement, options: { reduced: boole
         late: student.late,
         // The still frame for reduced motion keeps every eye open.
         blink: reduced ? 0 : blinkAt(time, student.seed),
+        smile: student.smile,
+        squint: student.squint,
+        worry: student.worry,
       });
     });
     rig.commit();
