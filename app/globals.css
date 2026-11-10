@@ -345,13 +345,23 @@ a.side-nav-item { position: relative; isolation: isolate; overflow: hidden; }
 .page-header h1 { font-size: var(--text-2xl); font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
 .page-header p { max-width: 75ch; color: var(--muted); font-size: var(--text-md); }
 .page-header-meta { margin-top: 6px; }
+.class-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin: 0; padding: 0; list-style: none; }
+.class-facts > li { display: inline-flex; align-items: center; }
+.class-fact { gap: 6px; color: var(--text-2); font-size: var(--text-sm); font-weight: 500; }
+.class-fact svg { width: 16px; height: 16px; color: var(--muted); }
+.class-fact.is-full { color: var(--warning); }
+.class-fact.is-full svg { color: currentColor; }
 .page-header-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .panel { margin-bottom: 18px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); box-shadow: var(--shadow-panel); }
 .panel-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+/* The title block takes the room but never pushes the actions onto their own line unless the panel is too narrow for both;
+   when they do wrap, they stay on the right. */
+.panel-header > div:first-child { flex: 1 1 200px; min-width: 0; }
+.panel-header:has(> div:first-child > p) { align-items: flex-start; }
 .panel-header h2 { font-size: var(--text-lg); font-weight: 700; }
 .panel-header p { margin-top: 2px; color: var(--muted); font-size: var(--text-sm); }
-.panel-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.panel-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; margin-left: auto; }
 .panel-body { padding: 16px 18px; }
 .panel > .notice { margin: 12px 18px; }
 /* One bounded column: wide children (tables) scroll inside their own panel instead of stretching the stack past the page. */
@@ -1107,7 +1117,8 @@ a.side-nav-item:hover svg { transform: translateX(2px); }
   .view-tabs { display: flex; width: 100%; }
   .view-tabs a { flex: 1; }
   .view-tabs a small { display: none; }
-  .page-header-actions .btn { flex: 1; }
+  /* Share the row but size to the label, so a long label wraps the row instead of being cut. */
+  .page-header-actions .btn { flex: 1 1 auto; }
   .search { max-width: none; }
   .select-inline { width: 100%; justify-content: space-between; }
   .select-inline select { flex: 1; }
@@ -1257,7 +1268,16 @@ a.side-nav-item:hover svg { transform: translateX(2px); }
 .invite-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
 .invite-list > li { display: grid; gap: 6px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); }
 .invite-code { font-family: var(--font-mono, ui-monospace, monospace); letter-spacing: 0.18em; font-size: var(--text-lg, 1.125rem); }
-.invite-create { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; align-items: end; }
+/* The fields share label / control / hint rows, so the controls line up whether or not a field has a hint;
+   the create button gets a row of its own. */
+.invite-create { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 12px; align-items: start; }
+.invite-create > .field { grid-row: span 3; grid-template-rows: subgrid; gap: 0; row-gap: 6px; }
+.invite-create > .btn { grid-column: 1 / -1; justify-self: start; margin-top: 12px; }
+@media (max-width: 520px) {
+  .invite-create { grid-template-columns: minmax(0, 1fr); row-gap: 12px; }
+  .invite-create > .field { grid-row: auto; grid-template-rows: none; }
+  .invite-create > .btn { margin-top: 0; }
+}
 .plain-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
 .stack-tight { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 4px; }
 .choice-card { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); cursor: pointer; }
