@@ -477,9 +477,10 @@ function SettingsTab() {
 }
 
 function SettingsForm({ initial, onSaved }: { initial: FinanceSettings; onSaved: (value: FinanceSettings) => void }) {
-  const { centerId, canManage } = useCenter();
+  const { centerId, canManage, isOwner } = useCenter();
   const action = useAction();
   const [bankBin, setBankBin] = useState(initial.bankBin ?? "");
+  const [password, setPassword] = useState("");
   const [account, setAccount] = useState(initial.bankAccountNumber ?? "");
   const [name, setName] = useState(initial.bankAccountName ?? "");
   const [dueDays, setDueDays] = useState(initial.dueDays);
@@ -487,13 +488,21 @@ function SettingsForm({ initial, onSaved }: { initial: FinanceSettings; onSaved:
   const anyBank = Boolean(bankBin || account.trim() || name.trim());
   const bankError = anyBank && (!bankBin || !/^[A-Za-z0-9]{4,20}$/.test(account.trim()) || name.trim().length < 2)
     ? "Chọn ngân hàng, nhập số tài khoản (4–20 chữ/số) và tên chủ tài khoản — hoặc để trống cả ba." : null;
+  // D7: the account decides where every QR sends money, so only the owner changes it, with the password.
+  const canEditBank = canManage && isOwner;
+  const bankChanged = (bankBin || null) !== (initial.bankBin ?? null)
+    || (account.trim() || null) !== (initial.bankAccountNumber ?? null)
+    || (name.trim().toUpperCase() || null) !== (initial.bankAccountName ?? null);
+  const passwordError = bankChanged && !password ? "Nhập mật khẩu của bạn để đổi tài khoản nhận tiền." : null;
 
   async function save() {
-    if (bankError) return;
+    if (bankError || passwordError) return;
     const result = await action.run(() => financeApi.updateSettings(centerId, {
       bankBin: bankBin || null, bankAccountNumber: account.trim() || null, bankAccountName: name.trim() || null,
       dueDays, emailReminders, expectedVersion: initial.version,
+      ...(bankChanged ? { currentPassword: password } : {}),
     }));
+    setPassword("");
     if (result) onSaved(result);
   }
 
@@ -503,18 +512,23 @@ function SettingsForm({ initial, onSaved }: { initial: FinanceSettings; onSaved:
         <form className="form-grid panel-body" onSubmit={(event) => { event.preventDefault(); void save(); }}>
           <Field label="Ngân hàng">
             {(id) => (
-              <select id={id} value={bankBin} disabled={!canManage} onChange={(event) => setBankBin(event.target.value)}>
+              <select id={id} value={bankBin} disabled={!canEditBank} onChange={(event) => setBankBin(event.target.value)}>
                 <option value="">— Không dùng chuyển khoản —</option>
                 {BANKS.map((bank) => <option key={bank.bin} value={bank.bin}>{bank.name}</option>)}
               </select>
             )}
           </Field>
           <Field label="Số tài khoản">
-            {(id) => <input id={id} value={account} disabled={!canManage} maxLength={20} inputMode="numeric" onChange={(event) => setAccount(event.target.value)} />}
+            {(id) => <input id={id} value={account} disabled={!canEditBank} maxLength={20} inputMode="numeric" onChange={(event) => setAccount(event.target.value)} />}
           </Field>
           <Field label="Tên chủ tài khoản" hint="Viết hoa không dấu, đúng như ngân hàng ghi." error={bankError} className="field-wide">
-            {(id, describedBy) => <input id={id} value={name} disabled={!canManage} maxLength={100} aria-describedby={describedBy} onChange={(event) => setName(event.target.value.toUpperCase())} />}
+            {(id, describedBy) => <input id={id} value={name} disabled={!canEditBank} maxLength={100} aria-describedby={describedBy} onChange={(event) => setName(event.target.value.toUpperCase())} />}
           </Field>
+          {bankChanged && (
+            <Field label="Mật khẩu của bạn" hint="Đổi tài khoản nhận tiền cần nhập lại mật khẩu. Mọi chủ trung tâm sẽ nhận email báo thay đổi." error={passwordError} className="field-wide">
+              {(id, describedBy) => <input id={id} type="password" autoComplete="current-password" value={password} aria-describedby={describedBy} onChange={(event) => setPassword(event.target.value)} />}
+            </Field>
+          )}
           <Field label="Hạn đóng (số ngày từ đầu kỳ)" hint="Quá hạn thì học sinh được nhắc trong app và một email.">
             {(id, describedBy) => <input id={id} type="number" min={0} max={60} value={dueDays} disabled={!canManage} aria-describedby={describedBy} onChange={(event) => setDueDays(Math.max(0, Math.min(60, Number(event.target.value) || 0)))} />}
           </Field>
@@ -524,6 +538,7 @@ function SettingsForm({ initial, onSaved }: { initial: FinanceSettings; onSaved:
           {canManage && <div className="field-wide"><Button type="submit" variant="primary" icon={<Settings2 aria-hidden="true" />} pending={action.pending} status={action.status}>Lưu cài đặt</Button></div>}
         </form>
         {!canManage && <p className="cell-note">Chỉ chủ hoặc quản lý trung tâm sửa được cài đặt này.</p>}
+        {canManage && !isOwner && <p className="cell-note">Chỉ chủ trung tâm đổi được tài khoản nhận tiền. Quản lý vẫn sửa được hạn đóng và email nhắc.</p>}
         <ErrorNotice error={action.error} onDismiss={action.clearError} />
       </Panel>
       <Panel title="Xem trước mã QR">

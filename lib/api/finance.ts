@@ -79,7 +79,8 @@ export const financeApi = {
   settings(centerId: Guid) {
     return apiRequest<FinanceSettings>(`/centers/${centerId}/tuition/settings`);
   },
-  updateSettings(centerId: Guid, input: Omit<FinanceSettings, "version"> & { expectedVersion: number }) {
+  /** Changing the bank account needs the owner and `currentPassword` (D7); every owner is emailed. */
+  updateSettings(centerId: Guid, input: Omit<FinanceSettings, "version"> & { expectedVersion: number; currentPassword?: string }) {
     return apiRequest<FinanceSettings>(`/centers/${centerId}/tuition/settings`, { method: "PUT", body: input });
   },
   myTuition() {
