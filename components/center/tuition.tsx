@@ -21,8 +21,9 @@ import { BANKS, bankName, vietQrUrl } from "@/lib/banks";
 import { Badge, Button, Dialog, EmptyState, ErrorNotice, Field, Notice, PageHeader, Pagination, Panel, Segmented, SkeletonRows, Toggle, ButtonLink } from "@/components/ui/primitives";
 import { ReasonDialog } from "@/components/ui/reason-dialog";
 import { RoleGate, useCenter } from "./center-frame";
+import { AutoPayTab, TransfersTab } from "./payments";
 
-type Tab = "charges" | "receipts" | "fees" | "settings";
+type Tab = "charges" | "receipts" | "transfers" | "fees" | "autopay" | "settings";
 
 /** Tuition for the center (docs/HOC-PHI.md): who owes what, receipts, class fees and settings. */
 export function TuitionWorkspace() {
@@ -34,7 +35,7 @@ export function TuitionWorkspace() {
 }
 
 function Inner() {
-  const { centerId } = useCenter();
+  const { centerId, canManage } = useCenter();
   const [tab, setTab] = useState<Tab>("charges");
   const summary = useResource(() => financeApi.summary(centerId), [centerId]);
   const refresh = () => void summary.reload();
@@ -47,7 +48,9 @@ function Inner() {
           <Segmented label="Mục" value={tab} onChange={setTab} options={[
             { value: "charges", label: "Công nợ" },
             { value: "receipts", label: "Biên lai" },
+            { value: "transfers", label: "Chuyển khoản" },
             { value: "fees", label: "Học phí lớp" },
+            ...(canManage ? [{ value: "autopay" as const, label: "Thanh toán tự động" }] : []),
             { value: "settings", label: "Cài đặt" },
           ]} />
         }
@@ -59,7 +62,9 @@ function Inner() {
         </Notice>
       )}
       {tab === "charges" && <ChargesTab onChanged={refresh} />}
-      {tab === "receipts" && <ReceiptsTab onChanged={refresh} />}
+      {tab === "receipts" && <ReceiptsTab onChanged={refresh} onOpenTransfers={() => setTab("transfers")} />}
+      {tab === "transfers" && <TransfersTab onChanged={refresh} />}
+      {tab === "autopay" && canManage && <AutoPayTab />}
       {tab === "fees" && <FeesTab onChanged={refresh} />}
       {tab === "settings" && <SettingsTab />}
     </>
@@ -282,13 +287,14 @@ export function MissedSessionsDialog({ charge, canManage, onClose, onSaved }: { 
 
 // ---------------- receipts ----------------
 
-function ReceiptsTab({ onChanged }: { onChanged: () => void }) {
+function ReceiptsTab({ onChanged, onOpenTransfers }: { onChanged: () => void; onOpenTransfers: () => void }) {
   const { centerId, canManage } = useCenter();
   const [method, setMethod] = useState<PaymentMethod | "">("");
   const [term, setTerm] = useState("");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [voiding, setVoiding] = useState<Receipt | null>(null);
+  const [reopened, setReopened] = useState<Receipt | null>(null);
   const list = useResource(
     () => financeApi.receipts(centerId, { method: method || undefined, search: search || undefined, page, pageSize: 25 }),
     [centerId, method, search, page],
@@ -311,6 +317,12 @@ function ReceiptsTab({ onChanged }: { onChanged: () => void }) {
         <Button size="sm" variant="ghost" icon={<RefreshCcw aria-hidden="true" />} onClick={() => void list.reload()} pending={list.loading && Boolean(data)}>Làm mới</Button>
       </div>
       <ErrorNotice error={list.error} onReload={() => void list.reload()} />
+      {reopened && (
+        <Notice tone="info" title={`Khoản chuyển khoản ${formatMoney(reopened.amount)} đã quay lại hàng chờ`}
+          action={<Button size="sm" onClick={onOpenTransfers}>Gán lại</Button>} onDismiss={() => setReopened(null)}>
+          Biên lai {reopened.numberText} ghi cho một khoản chuyển khoản. Tiền vẫn đã vào tài khoản — hãy gán khoản đó cho đúng học sinh ở tab Chuyển khoản.
+        </Notice>
+      )}
       {!data ? <SkeletonRows rows={6} columns={6} /> : data.items.length === 0 ? (
         <EmptyState icon={<ReceiptText aria-hidden="true" />} title="Chưa có biên lai">Thu tiền từ trang học phí của từng học sinh (nút “Thu tiền” ở tab Công nợ).</EmptyState>
       ) : (
@@ -321,7 +333,7 @@ function ReceiptsTab({ onChanged }: { onChanged: () => void }) {
               <tbody>
                 {data.items.map((item) => (
                   <tr key={item.id} className={item.voidedAtUtc ? "row-voided" : undefined}>
-                    <td><code className="code">{item.numberText}</code>{item.voidedAtUtc && <p><Badge tone="danger">Đã huỷ</Badge></p>}</td>
+                    <td><code className="code">{item.numberText}</code>{item.source === "Auto" && <p><Badge tone="brand">Tự động</Badge></p>}{item.voidedAtUtc && <p><Badge tone="danger">Đã huỷ</Badge></p>}</td>
                     <td className="col-muted">{formatIsoDate(item.receivedOn)}</td>
                     <td><Link className="row-link" href={`/centers/${centerId}/tuition/students/${item.studentId}`}>{item.studentName}</Link>{item.payerName && <p className="cell-note">{item.payerName} nộp</p>}</td>
                     <td>{paymentMethodLabels[item.method] ?? item.method}</td>
@@ -344,7 +356,7 @@ function ReceiptsTab({ onChanged }: { onChanged: () => void }) {
           <Pagination page={data.page} pageSize={data.pageSize} total={data.totalCount} onChange={setPage} />
         </>
       )}
-      <VoidReceiptDialog receipt={voiding} onClose={() => setVoiding(null)} onDone={() => { setVoiding(null); void list.reload(); onChanged(); }} />
+      <VoidReceiptDialog receipt={voiding} onClose={() => setVoiding(null)} onDone={() => { if (voiding?.bankTransactionId) setReopened(voiding); setVoiding(null); void list.reload(); onChanged(); }} />
     </Panel>
   );
 }

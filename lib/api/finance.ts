@@ -1,5 +1,7 @@
 import { apiRequest } from "./http";
 import type {
+  BankTransfer,
+  BankTransferFilter,
   ChargeFilter,
   ClassFeeRow,
   DiscountKind,
@@ -9,7 +11,10 @@ import type {
   MyTuition,
   PaymentIntent,
   PaymentMethod,
+  PaymentProvider,
+  PaymentProviderMode,
   Receipt,
+  ShadowReport,
   StudentTuition,
   TuitionCharge,
   TuitionPage,
@@ -82,6 +87,35 @@ export const financeApi = {
   /** Changing the bank account needs the owner and `currentPassword` (D7); every owner is emailed. */
   updateSettings(centerId: Guid, input: Omit<FinanceSettings, "version"> & { expectedVersion: number; currentPassword?: string }) {
     return apiRequest<FinanceSettings>(`/centers/${centerId}/tuition/settings`, { method: "PUT", body: input });
+  },
+  // ---------------- bank feed (docs/THANH-TOAN-QR-KE-HOACH.md) ----------------
+  paymentProvider(centerId: Guid) {
+    return apiRequest<PaymentProvider>(`/centers/${centerId}/tuition/payment-provider`);
+  },
+  /** Owner only, with the password. Leave secrets empty to keep the stored ones. Auto only from Shadow. */
+  savePaymentProvider(centerId: Guid, input: { currentPassword: string; mode: PaymentProviderMode; webhookSecret?: string; apiToken?: string; expectedVersion: number }) {
+    return apiRequest<PaymentProvider>(`/centers/${centerId}/tuition/payment-provider`, { method: "PUT", body: input });
+  },
+  pullNow(centerId: Guid) {
+    return apiRequest<PaymentProvider>(`/centers/${centerId}/tuition/payment-provider/pull`, { method: "POST" });
+  },
+  shadowReport(centerId: Guid, from: IsoDate, to: IsoDate) {
+    return apiRequest<ShadowReport>(`/centers/${centerId}/tuition/payment-provider/shadow-report`, { query: { from, to } });
+  },
+  bankTransfers(centerId: Guid, query: { status?: BankTransferFilter; page?: number; pageSize?: number } = {}) {
+    return apiRequest<TuitionPage<BankTransfer>>(`/centers/${centerId}/bank-transactions`, { query });
+  },
+  assignTransfer(centerId: Guid, transferId: Guid, input: { studentId: Guid; expectedVersion: number; chargeIds?: Guid[] }) {
+    return apiRequest<BankTransfer>(`/centers/${centerId}/bank-transactions/${transferId}/assign`, { method: "POST", body: input });
+  },
+  ignoreTransfer(centerId: Guid, transferId: Guid, input: { reason: string; expectedVersion: number }) {
+    return apiRequest<BankTransfer>(`/centers/${centerId}/bank-transactions/${transferId}/ignore`, { method: "POST", body: input });
+  },
+  resolveHeldTransfer(centerId: Guid, transferId: Guid, input: { isDuplicate: boolean; reason: string; expectedVersion: number }) {
+    return apiRequest<BankTransfer>(`/centers/${centerId}/bank-transactions/${transferId}/resolve-held`, { method: "POST", body: input });
+  },
+  retryTransfer(centerId: Guid, transferId: Guid, expectedVersion: number) {
+    return apiRequest<BankTransfer>(`/centers/${centerId}/bank-transactions/${transferId}/retry`, { method: "POST", body: { expectedVersion } });
   },
   myTuition() {
     return apiRequest<MyTuition>(`/me/tuition`);
