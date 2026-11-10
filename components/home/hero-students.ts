@@ -3,13 +3,19 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
 
 /*
  * Chibi students for the hero scene, drawn as instanced parts so a whole class
- * costs about twenty draw calls. Proportions favour a large head (≈40% of the
+ * costs a few dozen draw calls. Proportions favour a large head (≈40% of the
  * height) because the figures are seen small and from afar: the face, hair and
  * red scarf are what make them read as children at a glance.
  *
  * Vietnamese school uniform: white short-sleeve shirt, navy trousers or pleated
  * skirt, and for most a red scarf (khăn quàng đỏ). Toon shading keeps the
  * shapes flat and legible against the dark navy backdrop.
+ *
+ * Hair is a scalp cap plus separate tapered locks (fringe, quiff, face-framing
+ * strands, ponytail), so each style has a broken, clumped hairline instead of
+ * one straight edge, each lock a shade apart. Eyes are layered
+ * decals that follow the curve of the face: a shaded iris, pupil, two
+ * catchlights, an upper lash line and a brow, and they can blink.
  */
 
 export interface StudentPose {
@@ -32,18 +38,29 @@ export interface StudentPose {
   /** Attendance badge over the head: 0 hidden … 1 full size (may overshoot while popping in). */
   badge: number;
   late: boolean;
+  /** 0 eyes open … 1 closed. */
+  blink?: number;
 }
+
+/** Boys: textured crop, curtain middle part, side part with a quiff, short spikes. */
+const BOY_STYLES = ["crop", "curtain", "sidePart", "spiky"] as const;
+/** Girls: long with see-through bangs, high ponytail, two braids, bob with blunt bangs, space buns. */
+const GIRL_STYLES = ["long", "ponytail", "braids", "bob", "buns"] as const;
+type HairStyle = (typeof BOY_STYLES)[number] | (typeof GIRL_STYLES)[number];
 
 interface Look {
   girl: boolean;
   scarf: boolean;
-  /** Girls only: two long braids over the shoulders instead of hair worn loose down the back. */
-  braids: boolean;
+  style: HairStyle;
+  /** Which way a side part or swept fringe falls. */
+  flip: 1 | -1;
   glasses: boolean;
 }
 
 const SKIN = [0xf6d2b4, 0xf1c4a0, 0xe8b48c, 0xf8dcc4];
-const HAIR = [0x1d1726, 0x2a1d1a, 0x3a2620, 0x14121c];
+/** Mostly black and dark brown, with a chestnut and an ash brown for the dyed-hair kids. */
+const HAIR = [0x1d1726, 0x2a1d1a, 0x3a2620, 0x14121c, 0x4a2c20, 0x3b302f];
+const IRIS = [0x4a2c1a, 0x3a2216, 0x5a3622, 0x2e2838];
 const PACK = [0x5b4cf0, 0x2d6cdf, 0x12806a, 0xe0a63a, 0xd9576b, 0x7b6ff5, 0x2bb3c0];
 const NAVY_CLOTH = 0x23336b;
 /** Sneaker colourways: [upper, accent stripe & heel tab]. Bright uppers so feet read even from afar. */
@@ -60,6 +77,12 @@ const SNEAKERS: Array<[number, number]> = [
 const ON_TIME = 0x16a36f;
 const LATE = 0xe0a63a;
 const BOW = [0xf0508a, 0xe0303f, 0xff9ec0, 0xffffff, 0xf2c14e];
+
+const HEAD_R = 0.18;
+/** Fringe locks and longer strands (quiff, spikes, ponytail) per student. */
+const LOCKS = 9;
+const STRANDS = 5;
+const BRAID_SEGMENTS = 6;
 
 /** Three-step ramp: lit, mid, shadow — the cartoon look. */
 function toonRamp() {
@@ -78,16 +101,164 @@ function limb(radius: number, length: number) {
   return geometry;
 }
 
+/**
+ * A unit lock of hair: rooted at the origin, hanging 1 unit down -y, wide in x,
+ * flattened in z by `depth` (z faces out from the scalp) and tapering to a point. `bend`
+ * curls it along z as it falls (negative hugs the head, positive flicks out);
+ * `wave` adds a soft S so it reads as hair rather than a cone.
+ */
+function lockGeometry(bend: number, wave: number, depth = 0.5) {
+  const geometry = new THREE.CylinderGeometry(1, 0.08, 1, 8, 8);
+  geometry.translate(0, -0.5, 0);
+  const position = geometry.attributes.position;
+  for (let i = 0; i < position.count; i++) {
+    const t = -position.getY(i);
+    position.setZ(i, position.getZ(i) * depth + bend * t * t);
+    position.setX(i, position.getX(i) + wave * Math.sin(t * Math.PI));
+  }
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+/**
+ * Hair worn down: an open cylinder around the back of the head whose surface is
+ * rippled into clumps and whose hem is scalloped into tips. `curl` turns the
+ * ends in, as on a bob. Cylinder θ = 0 faces +z (the face).
+ */
+function curtainGeometry(rTop: number, rBottom: number, length: number, arcStart: number, arcLength: number, clumps: number, scallop: number, curl: number) {
+  const geometry = new THREE.CylinderGeometry(rTop, rBottom, length, 48, 10, true, arcStart, arcLength);
+  const position = geometry.attributes.position;
+  for (let i = 0; i < position.count; i++) {
+    const x = position.getX(i);
+    const y = position.getY(i);
+    const z = position.getZ(i);
+    const t = (length / 2 - y) / length;
+    const theta = Math.atan2(x, z);
+    const ripple = 0.5 + 0.5 * Math.sin(theta * clumps);
+    const r = Math.hypot(x, z) + ripple * 0.012 * t - curl * t ** 3;
+    position.setX(i, Math.sin(theta) * r);
+    position.setZ(i, Math.cos(theta) * r);
+    position.setY(i, y - scallop * ripple * t ** 8);
+  }
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+/** Upper lash line for a right eye (outer corner at +x), in units of the eye's half-width. */
+function lashGeometry() {
+  const shape = new THREE.Shape();
+  shape.moveTo(-1.1, -0.05);
+  shape.quadraticCurveTo(-0.25, 0.95, 1.05, 0.3);
+  shape.lineTo(1.42, 0.52);
+  shape.lineTo(1.18, 0.02);
+  shape.quadraticCurveTo(-0.15, 0.62, -1.1, -0.05);
+  return new THREE.ShapeGeometry(shape, 10);
+}
+
+/** Iris disc, darker under the lid and lighter at the bottom; tinted per student by instance colour. */
+function irisGeometry() {
+  const geometry = new THREE.CircleGeometry(1, 28);
+  const position = geometry.attributes.position;
+  const colors = new Float32Array(position.count * 3);
+  for (let i = 0; i < position.count; i++) {
+    const k = THREE.MathUtils.clamp(0.7 - position.getY(i) * 0.7, 0.3, 1.5);
+    colors.set([k, k, k], i * 3);
+  }
+  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  return geometry;
+}
+
+/** A short rounded bar, one unit long, thin in z: brows. */
+function browGeometry() {
+  const geometry = new THREE.CapsuleGeometry(0.5, 1, 3, 8);
+  geometry.rotateZ(Math.PI / 2);
+  geometry.scale(0.5, 1, 0.008);
+  return geometry;
+}
+
+/** [azimuth from the face, elevation, length, width, lift off the scalp, roll, stands up?] */
+type LockSpec = [a: number, e: number, len: number, w: number, lift: number, roll: number, up?: boolean];
+
+/** Deterministic per-lock jitter, -1…1, so fringes look messy but never flicker. */
+const jitter = (k: number) => (((k * 7919) % 13) / 13 - 0.5) * 2;
+
+const SIDEBURNS: LockSpec[] = [
+  [1.32, 0.42, 0.075, 0.04, -0.15, 0],
+  [-1.32, 0.42, 0.075, 0.04, -0.15, 0],
+];
+
+function fringe(style: HairStyle, flip: number): LockSpec[] {
+  const locks: LockSpec[] = [];
+  switch (style) {
+    case "crop":
+      // Textured crop: a short, choppy fringe falling straight down, ends uneven.
+      for (let k = 0; k < 7; k++) locks.push([(k - 3) * 0.23, 0.84, 0.1 + (k % 2) * 0.018 + jitter(k) * 0.008, 0.045, -0.12, (k - 3) * -0.05 + jitter(k + 3) * 0.12]);
+      locks.push(...SIDEBURNS);
+      break;
+    case "curtain":
+      // Curtain fringe: parted in the middle, each half sweeping out to the temples.
+      for (const side of [-1, 1]) for (let j = 0; j < 4; j++) locks.push([side * (0.13 + j * 0.27), 0.9, 0.14 - j * 0.012, 0.05, -0.1, side * (0.62 + j * 0.14)]);
+      break;
+    case "sidePart":
+      // Side part: long locks swept across the forehead; the rest is lifted into the quiff (strands).
+      locks.push([flip * 0.45, 0.92, 0.17, 0.06, -0.08, -flip * 1.05], [flip * 0.1, 0.95, 0.15, 0.05, -0.08, -flip * 1.1], ...SIDEBURNS);
+      break;
+    case "spiky":
+      for (let k = 0; k < 3; k++) locks.push([(k - 1) * 0.35, 0.84, 0.07, 0.045, -0.12, (k - 1) * -0.2]);
+      locks.push(...SIDEBURNS);
+      break;
+    case "long":
+      // See-through bangs: thin, separated locks, plus two long strands framing the face.
+      for (let k = 0; k < 6; k++) locks.push([(k - 2.5) * 0.2, 0.84, 0.12 + jitter(k) * 0.01, 0.034, -0.12, (k - 2.5) * -0.06]);
+      locks.push([0.82, 0.5, 0.3, 0.056, -0.06, 0.08], [-0.82, 0.5, 0.3, 0.056, -0.06, -0.08]);
+      break;
+    case "ponytail":
+      for (let k = 0; k < 5; k++) locks.push([(k - 2) * 0.24 + flip * 0.08, 0.84, 0.115, 0.045, -0.12, flip * 0.35]);
+      locks.push([0.88, 0.5, 0.17, 0.034, -0.05, 0.05], [-0.88, 0.5, 0.17, 0.034, -0.05, -0.05]);
+      break;
+    case "braids":
+    case "bob":
+      // Blunt bangs: dense, even, cut just above the brows.
+      for (let k = 0; k < 7; k++) locks.push([(k - 3) * 0.2, 0.82, style === "bob" ? 0.122 : 0.114, 0.05, -0.12, (k - 3) * -0.03]);
+      break;
+    case "buns":
+      for (let k = 0; k < 5; k++) locks.push([(k - 2) * 0.24, 0.84, 0.11 + jitter(k) * 0.01, 0.034, -0.12, (k - 2) * -0.06]);
+      locks.push([0.88, 0.5, 0.2, 0.034, -0.05, 0.05], [-0.88, 0.5, 0.2, 0.034, -0.05, -0.05]);
+      break;
+  }
+  return locks;
+}
+
+function strands(style: HairStyle, flip: number): LockSpec[] {
+  switch (style) {
+    case "sidePart":
+      // Quiff: locks rising from the hairline and swept over to the side.
+      return [-0.5, -0.17, 0.17, 0.5].map((a, k): LockSpec => [a, 0.9, 0.11 - Math.abs(a) * 0.04, 0.058, 0.3, flip * (0.55 + k * 0.06), true]);
+    case "spiky":
+      // Short spikes fanned across the front of the crown, tips flicked back.
+      return [-0.8, -0.4, 0, 0.4, 0.8].map((a, k): LockSpec => [a, 0.95 + (k % 2) * 0.2, 0.085 + (k % 2) * 0.02, 0.05, 0.45, a * 0.9, true]);
+    case "ponytail":
+      // High ponytail from the back of the crown; a thinner second lock gives it volume.
+      return [
+        [Math.PI, 0.6, 0.36, 0.072, 0.08, 0],
+        [Math.PI, 0.58, 0.28, 0.05, 0.18, 0.2],
+      ];
+    default:
+      return [];
+  }
+}
+
 export function createStudents(parent: THREE.Object3D, count: number) {
   const ramp = toonRamp();
   const toon = (color: number, emissive = 0x000000) => new THREE.MeshToonMaterial({ color, gradientMap: ramp, emissive });
+  const decal = (options: THREE.MeshBasicMaterialParameters = {}) => new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, ...options });
 
   // Shirt and skin carry a faint self-glow so the figures stay bright on the navy floor.
   const materials = {
     shirt: toon(0xffffff, 0x1c1c3a),
     skin: toon(0xffffff, 0x2a1810),
     cloth: toon(0xffffff),
-    hair: new THREE.MeshToonMaterial({ color: 0xffffff, gradientMap: ramp, side: THREE.DoubleSide }),
+    hair: new THREE.MeshToonMaterial({ color: 0xffffff, gradientMap: ramp, side: THREE.DoubleSide, emissive: 0x0c0a14 }),
     sole: toon(0xffffff, 0x24243e),
     upper: toon(0xffffff, 0x14142a),
     laces: toon(0xffffff, 0x24243e),
@@ -96,8 +267,14 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     bow: toon(0xffffff, 0x2a0a18),
     scarf: toon(0xe0303f, 0x3a0608),
     pack: toon(0xffffff),
-    eye: new THREE.MeshBasicMaterial({ color: 0x15131f }),
-    shine: new THREE.MeshBasicMaterial({ color: 0xffffff }),
+    // Face decals are unlit so the eyes stay crisp whichever way the head turns.
+    iris: decal({ vertexColors: true }),
+    pupil: decal({ color: 0x0e0a12 }),
+    shine: decal(),
+    lash: decal({ color: 0x17111c }),
+    brow: decal(),
+    mouth: decal({ color: 0x7a3035 }),
+    blush: decal({ color: 0xff8a9e, transparent: true, opacity: 0.4, depthWrite: false }),
     glasses: new THREE.MeshBasicMaterial({ color: 0x2a2840 }),
     // Badges are unlit stickers so their colour reads the same from every angle.
     badge: new THREE.MeshBasicMaterial({ color: 0xffffff }),
@@ -105,17 +282,14 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     shadow: new THREE.MeshBasicMaterial({ color: 0x07061f, transparent: true, opacity: 0.38, depthWrite: false }),
   };
 
-  // Hair: a crown cap down to the brow (it doubles as the fringe) plus a back piece, leaving the face open.
-  // Sphere φ runs from -x through +z, so φ = 3π/2 is the back of the head.
-  const hairCap = new THREE.SphereGeometry(0.19, 22, 10, 0, Math.PI * 2, 0, Math.PI * 0.42);
-  // Girls: the back piece reaches the nape. Boys: cropped short so ears and neck show.
-  const hairBack = new THREE.SphereGeometry(0.191, 22, 8, Math.PI * 0.9, Math.PI * 1.2, Math.PI * 0.3, Math.PI * 0.42);
-  const hairNape = new THREE.SphereGeometry(0.191, 22, 6, Math.PI * 1.0, Math.PI, Math.PI * 0.3, Math.PI * 0.26);
-  // Long hair worn loose: a tapered curtain around the back and sides, falling past the shoulders.
-  // Cylinder θ = 0 faces +z (the face), so the opening sits at the front.
-  const longHair = new THREE.CylinderGeometry(0.192, 0.235, 0.46, 24, 3, true, Math.PI * 0.36, Math.PI * 1.28);
-  // Boys: a short spiky tuft standing up at the front of the crown.
-  const spike = new THREE.ConeGeometry(0.055, 0.1, 6);
+  // Scalp cap down to the hairline; the locks hide its edge. Sphere φ runs from -x through +z, so φ = 3π/2 is the back.
+  const hairCap = new THREE.SphereGeometry(0.19, 28, 12, 0, Math.PI * 2, 0, Math.PI * 0.38);
+  // Back of the head: to the nape for girls; cropped short for boys so ears and neck show.
+  const hairBack = new THREE.SphereGeometry(0.191, 24, 8, Math.PI * 0.9, Math.PI * 1.2, Math.PI * 0.3, Math.PI * 0.42);
+  const hairNape = new THREE.SphereGeometry(0.191, 24, 6, Math.PI * 1.0, Math.PI, Math.PI * 0.3, Math.PI * 0.26);
+  // Long hair worn loose, clumped with a scalloped hem; and a chin-length bob whose ends curl in.
+  const longHair = curtainGeometry(0.192, 0.24, 0.46, Math.PI * 0.36, Math.PI * 1.28, 13, 0.05, 0);
+  const bob = curtainGeometry(0.188, 0.215, 0.24, Math.PI * 0.27, Math.PI * 1.46, 15, 0.02, 0.035);
   const shadowGeo = new THREE.CircleGeometry(0.26, 20);
   shadowGeo.rotateX(-Math.PI / 2);
   const skirt = new THREE.CylinderGeometry(0.13, 0.215, 0.16, 12);
@@ -123,6 +297,9 @@ export function createStudents(parent: THREE.Object3D, count: number) {
   const scarfTail = new THREE.ConeGeometry(0.05, 0.13, 3);
   scarfTail.rotateX(Math.PI);
   const lens = new THREE.TorusGeometry(0.042, 0.009, 6, 16);
+  // Smile: a short arc opening upwards.
+  const smile = new THREE.TorusGeometry(0.02, 0.0045, 4, 12, Math.PI * 0.62);
+  smile.rotateZ(-Math.PI / 2 - Math.PI * 0.31);
 
   // Attendance badge: a coin-like disc with a white rim, carrying a check (on time) or a clock face (late).
   const badgeDisc = new THREE.CylinderGeometry(0.11, 0.11, 0.02, 28);
@@ -155,22 +332,33 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     sleeves: make(new THREE.CylinderGeometry(0.062, 0.068, 0.1, 10), materials.shirt, 2),
     hands: make(new THREE.SphereGeometry(0.05, 10, 8), materials.skin, 2),
     neck: make(new THREE.CylinderGeometry(0.05, 0.05, 0.06, 8), materials.skin),
-    head: make(new THREE.SphereGeometry(0.18, 22, 16), materials.skin),
+    head: make(new THREE.SphereGeometry(HEAD_R, 24, 18), materials.skin),
     ears: make(new THREE.SphereGeometry(0.04, 8, 6), materials.skin, 2),
     hairCap: make(hairCap, materials.hair),
     hairBack: make(hairBack, materials.hair),
     hairNape: make(hairNape, materials.hair),
-    spikes: make(spike, materials.hair, 3),
     longHair: make(longHair, materials.hair),
-    sideLocks: make(new RoundedBoxGeometry(0.07, 0.34, 0.09, 2, 0.03), materials.hair, 2),
-    braids: make(limb(0.048, 0.3), materials.hair, 2),
+    bob: make(bob, materials.hair),
+    locks: make(lockGeometry(-0.55, 0.06), materials.hair, LOCKS),
+    strands: make(lockGeometry(1.1, 0.1), materials.hair, STRANDS),
+    // Ponytail: round in section, drooping as it falls.
+    ponytail: make(lockGeometry(-0.7, 0.05, 0.9), materials.hair, 2),
+    buns: make(new THREE.SphereGeometry(0.068, 14, 10), materials.hair, 2),
+    braids: make(new THREE.SphereGeometry(0.042, 10, 8), materials.hair, 2 * BRAID_SEGMENTS),
     braidTies: make(new THREE.SphereGeometry(0.035, 8, 6), materials.bow, 2),
+    scrunchie: make(new THREE.TorusGeometry(0.045, 0.02, 6, 14), materials.bow),
     bowLoops: make(new THREE.SphereGeometry(0.05, 10, 8), materials.bow, 2),
     bowKnot: make(new THREE.SphereGeometry(0.025, 8, 6), materials.bow),
     socks: make(new THREE.CylinderGeometry(0.059, 0.059, 0.07, 10), materials.sock, 2),
     belt: make(new RoundedBoxGeometry(0.3, 0.035, 0.205, 2, 0.015), materials.belt),
-    eyes: make(new THREE.SphereGeometry(0.026, 10, 8), materials.eye, 2),
-    shines: make(new THREE.SphereGeometry(0.009, 6, 4), materials.shine, 2),
+    irises: make(irisGeometry(), materials.iris, 2),
+    pupils: make(new THREE.CircleGeometry(1, 20), materials.pupil, 2),
+    // Two catchlights per eye: a big one up toward the key light, a small one below.
+    shines: make(new THREE.CircleGeometry(1, 14), materials.shine, 4),
+    lashes: make(lashGeometry(), materials.lash, 2),
+    brows: make(browGeometry(), materials.brow, 2),
+    mouth: make(smile, materials.mouth),
+    blush: make(new THREE.CircleGeometry(1, 16), materials.blush, 2),
     glasses: make(lens, materials.glasses, 2),
     scarfKnot: make(scarfKnot, materials.scarf),
     scarfTails: make(scarfTail, materials.scarf, 2),
@@ -182,25 +370,40 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     packFlap: make(new RoundedBoxGeometry(0.24, 0.1, 0.13, 2, 0.04), materials.pack),
   };
 
-  // Per-student identity.
+  // Per-student identity. Styles are dealt in turn from a random start, so every class shows the full range.
   const color = new THREE.Color();
+  const boyOffset = Math.floor(Math.random() * BOY_STYLES.length);
+  const girlOffset = Math.floor(Math.random() * GIRL_STYLES.length);
+  const fringes: LockSpec[][] = [];
+  const strandSpecs: LockSpec[][] = [];
   const looks: Look[] = Array.from({ length: count }, (_, index) => {
     const girl = index % 2 === 1;
+    const turn = Math.floor(index / 2);
     const look: Look = {
       girl,
       scarf: Math.random() < 0.75,
-      braids: girl && Math.random() < 0.35,
+      style: girl ? GIRL_STYLES[(turn + girlOffset) % GIRL_STYLES.length] : BOY_STYLES[(turn + boyOffset) % BOY_STYLES.length],
+      flip: Math.random() < 0.5 ? 1 : -1,
       glasses: Math.random() < 0.18,
     };
+    fringes.push(fringe(look.style, look.flip));
+    strandSpecs.push(strands(look.style, look.flip));
     const skin = SKIN[Math.floor(Math.random() * SKIN.length)];
     const hair = HAIR[Math.floor(Math.random() * HAIR.length)];
+    const iris = IRIS[Math.floor(Math.random() * IRIS.length)];
     const pack = PACK[Math.floor(Math.random() * PACK.length)];
     for (const part of [parts.head, parts.neck] as THREE.InstancedMesh[]) part.setColorAt(index, color.setHex(skin));
-    for (const part of [parts.hairCap, parts.hairBack, parts.hairNape, parts.longHair]) part.setColorAt(index, color.setHex(hair));
+    for (const part of [parts.hairCap, parts.hairBack, parts.hairNape, parts.longHair, parts.bob]) part.setColorAt(index, color.setHex(hair));
+    // Locks vary a shade from one another so the clumps separate.
+    for (let k = 0; k < LOCKS; k++) parts.locks.setColorAt(index * LOCKS + k, color.setHex(hair).multiplyScalar(1 + jitter(k + index) * 0.1));
+    for (let k = 0; k < STRANDS; k++) parts.strands.setColorAt(index * STRANDS + k, color.setHex(hair).multiplyScalar(1 + jitter(k * 3 + index) * 0.1));
+    for (let k = 0; k < 2; k++) parts.ponytail.setColorAt(index * 2 + k, color.setHex(hair).multiplyScalar(1 - k * 0.08));
+    for (let k = 0; k < 2 * BRAID_SEGMENTS; k++) parts.braids.setColorAt(index * 2 * BRAID_SEGMENTS + k, color.setHex(hair));
+    for (let k = 0; k < 4; k++) parts.shines.setColorAt(index * 4 + k, color.setHex(0xffffff));
     const bow = BOW[Math.floor(Math.random() * BOW.length)];
     const [upper, accent] = SNEAKERS[Math.floor(Math.random() * SNEAKERS.length)];
     parts.bowKnot.setColorAt(index, color.setHex(bow));
-    for (let tuft = 0; tuft < 3; tuft++) parts.spikes.setColorAt(index * 3 + tuft, color.setHex(hair));
+    parts.scrunchie.setColorAt(index, color.setHex(bow));
     // Seed the badge colour so the material compiles with per-instance colour from the first frame.
     parts.badgeDiscs.setColorAt(index, color.setHex(ON_TIME));
     parts.hips.setColorAt(index, color.setHex(NAVY_CLOTH));
@@ -215,10 +418,11 @@ export function createStudents(parent: THREE.Object3D, count: number) {
       parts.uppers.setColorAt(slot, color.setHex(upper));
       parts.stripes.setColorAt(slot, color.setHex(accent));
       parts.heels.setColorAt(slot, color.setHex(accent));
-      parts.sideLocks.setColorAt(slot, color.setHex(hair));
-      parts.braids.setColorAt(slot, color.setHex(hair));
+      parts.buns.setColorAt(slot, color.setHex(hair));
       parts.braidTies.setColorAt(slot, color.setHex(bow));
       parts.bowLoops.setColorAt(slot, color.setHex(bow));
+      parts.irises.setColorAt(slot, color.setHex(iris));
+      parts.brows.setColorAt(slot, color.setHex(hair).multiplyScalar(0.85));
       // Boys: navy trousers to the ankle. Girls: bare legs under the skirt.
       parts.legs.setColorAt(slot, color.setHex(girl ? skin : NAVY_CLOTH));
     }
@@ -231,12 +435,16 @@ export function createStudents(parent: THREE.Object3D, count: number) {
   const head = new THREE.Matrix4();
   const joint = new THREE.Matrix4();
   const shoe = new THREE.Matrix4();
+  const yaw = new THREE.Matrix4();
   const out = new THREE.Matrix4();
   const local = new THREE.Matrix4();
   const euler = new THREE.Euler();
   const quat = new THREE.Quaternion();
+  const roll = new THREE.Quaternion();
   const pos = new THREE.Vector3();
   const scale = new THREE.Vector3();
+  const normal = new THREE.Vector3();
+  const FORWARD = new THREE.Vector3(0, 0, 1);
   const hidden = new THREE.Matrix4().makeScale(0, 0, 0);
 
   /** out = parentMatrix · T(x,y,z) · R(rx,ry,rz) · S(s) */
@@ -248,6 +456,24 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     return target.multiplyMatrices(parentMatrix, local);
   };
   const put = (mesh: THREE.InstancedMesh, slot: number, matrix: THREE.Matrix4, visible = true) => mesh.setMatrixAt(slot, visible ? matrix : hidden);
+
+  /** A flat decal lying on the face at (x, y), `depth` above the skin, turned `rz` in its own plane. */
+  const onFace = (x: number, y: number, depth: number, sx: number, sy: number, rz = 0) => {
+    const r = HEAD_R + depth;
+    const z = Math.sqrt(Math.max(0, r * r - x * x - y * y));
+    quat.setFromUnitVectors(FORWARD, normal.set(x, y, z).normalize());
+    if (rz) quat.multiply(roll.setFromAxisAngle(FORWARD, rz));
+    local.compose(pos.set(x, y, z), quat, scale.set(sx, sy, 1));
+    return out.multiplyMatrices(head, local);
+  };
+
+  /** A lock rooted on the scalp at azimuth `a` (0 = the face) and elevation `e`, hanging down the head or standing up. */
+  const lockAt = ([a, e, len, w, lift, rz, up]: LockSpec, sway: number) => {
+    at(yaw, head, 0, 0, 0, 0, a, 0);
+    const r = 0.186;
+    const rx = up ? Math.PI + lift : -(e + lift) + sway;
+    return at(out, yaw, 0, r * Math.sin(e), r * Math.cos(e), rx, 0, rz, scale.set(w, len, w));
+  };
 
   /** Rotation that turns a badge to face the camera, in the parent's space. Set once per frame. */
   const facing = new THREE.Quaternion();
@@ -337,33 +563,78 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     // Head: big and round, with a gentle nod; everything on the face hangs off it.
     at(head, torso, 0, 0.8, 0, pose.tilt, swing * -0.06, 0);
     put(parts.head, index, head);
+
+    // Face. Eyes are decals that follow the curve of the head; a blink squashes them under the lash line.
+    const open = 1 - THREE.MathUtils.clamp(pose.blink ?? 0, 0, 1);
+    const ey = -0.004;
     for (let side = 0; side < 2; side++) {
       const sign = side === 0 ? -1 : 1;
       const slot = index * 2 + side;
+      const ex = sign * 0.062;
       put(parts.ears, slot, at(out, head, sign * 0.175, -0.01, 0, 0, 0, 0, scale.set(0.6, 1, 0.8)));
-      put(parts.eyes, slot, at(out, head, sign * 0.062, 0.0, 0.163, 0, 0, 0, scale.set(1, 1.35, 0.6)));
-      put(parts.shines, slot, at(out, head, sign * 0.056, 0.012, 0.178));
-      put(parts.glasses, slot, at(out, head, sign * 0.062, 0.0, 0.172), look.glasses);
+      put(parts.irises, slot, onFace(ex, ey - 0.006 * (1 - open), 0.0012, 0.026, 0.034 * Math.max(0.08, open)));
+      put(parts.pupils, slot, onFace(ex, ey + 0.002, 0.0022, 0.0135, 0.019 * open), open > 0.4);
+      put(parts.shines, index * 4 + side * 2, onFace(ex - 0.009, ey + 0.013, 0.0032, 0.0085, 0.0095 * open), open > 0.4);
+      put(parts.shines, index * 4 + side * 2 + 1, onFace(ex + 0.01, ey - 0.014, 0.0032, 0.0045, 0.0045 * open), open > 0.4);
+      // Lash line hugs the top of the iris, with a flick at the outer corner (bolder for girls); closed, it becomes the lid.
+      const lashSize = look.girl ? 0.03 : 0.028;
+      put(parts.lashes, slot, onFace(ex, ey + 0.017 * open - 0.008 * (1 - open), 0.0028, sign * lashSize, lashSize * (look.girl ? 1.05 : 0.8) * (0.55 + 0.45 * open)));
+      put(parts.brows, slot, onFace(sign * 0.066, 0.05, 0.002, 0.048, look.girl ? 0.009 : 0.013, sign * -0.12));
+      put(parts.blush, slot, onFace(sign * 0.105, -0.045, 0.0015, 0.024, 0.015));
+      put(parts.glasses, slot, at(out, head, ex, ey, 0.176), look.glasses);
 
-      // Girls: locks framing the face (loose hair), or braids falling forward over the shoulders.
-      put(parts.sideLocks, slot, at(out, head, sign * 0.168, -0.13, 0.05, 0, 0, sign * -0.06), look.girl && !look.braids);
+      // Braids fall forward over the shoulders as a plait of alternating segments.
       at(joint, head, sign * 0.14, -0.1, -0.02, -0.3 + swing * sign * 0.12, 0, sign * 0.24);
-      put(parts.braids, slot, joint, look.braids);
-      put(parts.braidTies, slot, at(out, joint, 0, -0.33, 0), look.braids);
-      // Hair bow on the side of the crown.
-      put(parts.bowLoops, slot, at(out, head, 0.1 + sign * 0.055, 0.16, 0.04, 0, 0, -0.55 + sign * 0.5, scale.set(1.25, 0.75, 0.5)), look.girl);
+      for (let k = 0; k < BRAID_SEGMENTS; k++) {
+        const taper = 1 - k * 0.07;
+        const zig = k % 2 ? 1 : -1;
+        at(out, joint, zig * 0.008, -0.03 - k * 0.05, 0, 0, 0, zig * 0.45, scale.set(taper, 1.35 * taper, taper));
+        put(parts.braids, slot * BRAID_SEGMENTS + k, out, look.style === "braids");
+      }
+      put(parts.braidTies, slot, at(out, joint, 0, -0.33, 0), look.style === "braids");
+      // Space buns on top of the head.
+      put(parts.buns, slot, at(out, head, sign * 0.115, 0.15, -0.02, 0, 0, 0, scale.set(1, 0.95, 1)), look.style === "buns");
     }
-    put(parts.hairCap, index, at(out, head, 0, 0.008, -0.004));
-    put(parts.hairBack, index, head, look.girl);
+    put(parts.mouth, index, onFace(0, -0.072, 0.003, 1, 1));
+
+    // Hair bow on the side of the crown, for the styles that leave room for one.
+    const bowed = look.girl && look.style !== "buns" && look.style !== "ponytail";
+    for (let side = 0; side < 2; side++) {
+      const sign = side === 0 ? -1 : 1;
+      put(parts.bowLoops, index * 2 + side, at(out, head, 0.1 + sign * 0.055, 0.16, 0.04, 0, 0, -0.55 + sign * 0.5, scale.set(1.25, 0.75, 0.5)), bowed);
+    }
+    put(parts.bowKnot, index, at(out, head, 0.1, 0.16, 0.045), bowed);
+
+    // Hair. A quiff or curtain part gets a little extra height on the crown.
+    const tall = look.style === "sidePart" || look.style === "curtain" ? 1.06 : look.style === "spiky" ? 1.0 : 1.03;
+    at(out, head, 0, 0.008, -0.004, 0, 0, 0, scale.set(1.02, tall, 1.02));
+    put(parts.hairCap, index, out);
+    put(parts.hairBack, index, head, look.girl && look.style !== "bob");
     put(parts.hairNape, index, head, !look.girl);
-    put(parts.bowKnot, index, at(out, head, 0.1, 0.16, 0.045), look.girl);
-    // Loose long hair sways a little behind the walk.
-    put(parts.longHair, index, at(out, head, 0, -0.25, -0.01, Math.abs(swing) * 0.08), look.girl && !look.braids);
-    // Boys: three spikes along the front of the crown.
-    for (let tuft = 0; tuft < 3; tuft++) {
-      const x = (tuft - 1) * 0.07;
-      put(parts.spikes, index * 3 + tuft, at(out, head, x, 0.175 - Math.abs(x) * 0.25, 0.07, -0.45, 0, -x * 2.2), !look.girl);
+    // Loose long hair sways a little behind the walk; the bob sits close around the jaw.
+    put(parts.longHair, index, at(out, head, 0, -0.25, -0.01, Math.abs(swing) * 0.08), look.style === "long");
+    put(parts.bob, index, at(out, head, 0, -0.072, -0.004, Math.abs(swing) * 0.04), look.style === "bob");
+
+    const sway = Math.abs(swing) * 0.1;
+    const lockList = fringes[index];
+    for (let k = 0; k < LOCKS; k++) {
+      const spec = lockList[k];
+      // Only the long face-framing strands sway; the fringe stays put.
+      put(parts.locks, index * LOCKS + k, spec ? lockAt(spec, spec[2] > 0.2 ? sway : 0) : hidden);
     }
+    const strandList = strandSpecs[index];
+    const tail = look.style === "ponytail";
+    for (let k = 0; k < STRANDS; k++) {
+      const spec = tail ? undefined : strandList[k];
+      put(parts.strands, index * STRANDS + k, spec ? lockAt(spec, 0) : hidden);
+    }
+    for (let k = 0; k < 2; k++) {
+      const spec = tail ? strandList[k] : undefined;
+      // The ponytail swings side to side with the stride.
+      put(parts.ponytail, index * 2 + k, spec ? lockAt([spec[0], spec[1], spec[2], spec[3], spec[4], spec[5] + swing * 0.25], 0) : hidden);
+    }
+    at(yaw, head, 0, 0, 0, 0, Math.PI, 0);
+    put(parts.scrunchie, index, at(out, yaw, 0, 0.186 * Math.sin(0.6), 0.186 * Math.cos(0.6), 0.68), look.style === "ponytail");
 
     // Attendance badge floats above the head and always faces the camera.
     const shown = pose.badge > 0.001;
