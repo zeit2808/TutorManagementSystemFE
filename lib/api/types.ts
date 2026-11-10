@@ -752,6 +752,89 @@ export type PaymentMethod = "Cash" | "BankTransfer";
 export type DiscountKind = "Percent" | "Amount";
 export type MissedKind = "ExcusedAbsent" | "UnexcusedAbsent" | "Cancelled" | "NotHeld";
 
+export type ReceiptSource = "Manual" | "Auto";
+
+/** Off: nothing is pulled. Shadow: pulled and matched on paper only. Auto: matches become receipts. */
+export type PaymentProviderMode = "Off" | "Shadow" | "Auto";
+
+export interface PaymentProvider {
+  configured: boolean;
+  provider: string;
+  mode: PaymentProviderMode;
+  bankBin: string | null;
+  accountNumber: string | null;
+  accountMatchesSettings: boolean;
+  webhookPath: string | null;
+  hasWebhookSecret: boolean;
+  hasApiToken: boolean;
+  invalidSignatureCount: number;
+  lastInvalidSignatureAtUtc: string | null;
+  lastPulledAtUtc: string | null;
+  lastPullError: string | null;
+  updatedAtUtc: string | null;
+  version: number;
+}
+
+export type ShadowVerdict = "Match" | "DifferentStudent" | "MissingManual" | "ManualOnly" | "BothSkipped" | "NotEvaluated";
+
+export interface ShadowReportRow {
+  transactionId: Guid;
+  transactedAtUtc: string;
+  amount: number;
+  content: string;
+  referenceCode: string | null;
+  shadowOutcome: string | null;
+  shadowReason: string | null;
+  expectedStudentCode: string | null;
+  expectedStudentName: string | null;
+  manualReceiptId: Guid | null;
+  manualReceiptNumber: string | null;
+  manualStudentName: string | null;
+  verdict: ShadowVerdict;
+}
+
+export interface ShadowReport {
+  from: IsoDate;
+  to: IsoDate;
+  counts: Record<string, number>;
+  rows: ShadowReportRow[];
+  manualWithoutTransfer: Array<{ receiptId: Guid; number: string; receivedOn: IsoDate; amount: number; studentName: string }>;
+  agrees: boolean;
+}
+
+export type BankTransferStatus = "Received" | "Booked" | "NeedsReview" | "Held" | "Failed" | "Ignored";
+export type BankTransferFilter = "Queue" | BankTransferStatus | "All";
+
+export interface TransferSuggestion {
+  studentId: Guid;
+  studentCode: string;
+  studentName: string;
+  reason: string;
+}
+
+export interface BankTransfer {
+  id: Guid;
+  transactedAtUtc: string;
+  amount: number;
+  content: string;
+  referenceCode: string | null;
+  bankCode: string;
+  accountNumber: string;
+  virtualAccount: string | null;
+  status: BankTransferStatus;
+  reviewReason: string | null;
+  ignoreReason: string | null;
+  studentId: Guid | null;
+  studentCode: string | null;
+  studentName: string | null;
+  receiptId: Guid | null;
+  receiptNumber: string | null;
+  duplicateOfId: Guid | null;
+  lastError: string | null;
+  suggestions: TransferSuggestion[];
+  version: number;
+}
+
 export interface TuitionPage<T> {
   page: number;
   pageSize: number;
@@ -822,6 +905,10 @@ export interface Receipt {
   studentCode: string;
   studentName: string;
   payerName: string | null;
+  /** Manual, or Auto when the bank feed booked it. */
+  source: ReceiptSource;
+  /** The bank transfer it records; after a void the transfer is back in the queue. */
+  bankTransactionId?: Guid | null;
   method: PaymentMethod;
   amount: number;
   allocated: number;
