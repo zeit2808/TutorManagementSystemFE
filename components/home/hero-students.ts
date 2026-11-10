@@ -14,8 +14,8 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
  * Hair is a scalp cap plus separate tapered locks (fringe, quiff, face-framing
  * strands, ponytail), so each style has a broken, clumped hairline instead of
  * one straight edge, each lock a shade apart. Eyes are layered
- * decals that follow the curve of the face: a shaded iris, pupil, two
- * catchlights, an upper lash line and a brow, and they can blink. Faces
+ * decals that follow the curve of the face: a matte iris, pupil, an upper
+ * lash line and a brow, and they can blink. Faces
  * react to what happens: a grin and happy closed eyes when waving, jumping or
  * arriving on time; raised brows, a frown and a sweat drop when late.
  */
@@ -163,13 +163,13 @@ function lashGeometry() {
   return new THREE.ShapeGeometry(shape, 10);
 }
 
-/** Iris disc, darker under the lid and lighter at the bottom; tinted per student by instance colour. */
+/** Iris disc, a little darker under the lid; matte, tinted per student by instance colour. */
 function irisGeometry() {
   const geometry = new THREE.CircleGeometry(1, 28);
   const position = geometry.attributes.position;
   const colors = new Float32Array(position.count * 3);
   for (let i = 0; i < position.count; i++) {
-    const k = THREE.MathUtils.clamp(0.7 - position.getY(i) * 0.7, 0.3, 1.5);
+    const k = 0.8 - position.getY(i) * 0.15;
     colors.set([k, k, k], i * 3);
   }
   geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
@@ -278,13 +278,11 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     // Face decals are unlit so the eyes stay crisp whichever way the head turns.
     iris: decal({ vertexColors: true }),
     pupil: decal({ color: 0x0e0a12 }),
-    shine: decal(),
     lash: decal({ color: 0x17111c }),
     brow: decal(),
     mouth: decal({ color: 0x7a3035 }),
     tongue: decal({ color: 0xe86a7a }),
     sweat: new THREE.MeshBasicMaterial({ color: 0xa6dcff }),
-    blush: decal({ color: 0xff8a9e, transparent: true, opacity: 0.4, depthWrite: false }),
     glasses: new THREE.MeshBasicMaterial({ color: 0x2a2840 }),
     // Badges are unlit stickers so their colour reads the same from every angle.
     badge: new THREE.MeshBasicMaterial({ color: 0xffffff }),
@@ -381,8 +379,6 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     belt: make(new RoundedBoxGeometry(0.3, 0.035, 0.205, 2, 0.015), materials.belt),
     irises: make(irisGeometry(), materials.iris, 2),
     pupils: make(new THREE.CircleGeometry(1, 20), materials.pupil, 2),
-    // Two catchlights per eye: a big one up toward the key light, a small one below.
-    shines: make(new THREE.CircleGeometry(1, 14), materials.shine, 4),
     lashes: make(lashGeometry(), materials.lash, 2),
     brows: make(browGeometry(), materials.brow, 2),
     mouth: make(smile, materials.mouth),
@@ -390,7 +386,6 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     grinTongues: make(grin, materials.tongue),
     happyEyes: make(happyEye, materials.lash, 2),
     sweat: make(sweat, materials.sweat),
-    blush: make(new THREE.CircleGeometry(1, 16), materials.blush, 2),
     glasses: make(lens, materials.glasses, 2),
     scarfKnot: make(scarfKnot, materials.scarf),
     scarfTails: make(scarfTail, materials.scarf, 2),
@@ -431,7 +426,6 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     for (let k = 0; k < STRANDS; k++) parts.strands.setColorAt(index * STRANDS + k, color.setHex(hair).multiplyScalar(1 + jitter(k * 3 + index) * 0.1));
     for (let k = 0; k < 2; k++) parts.ponytail.setColorAt(index * 2 + k, color.setHex(hair).multiplyScalar(1 - k * 0.08));
     for (let k = 0; k < 2 * BRAID_SEGMENTS; k++) parts.braids.setColorAt(index * 2 * BRAID_SEGMENTS + k, color.setHex(hair));
-    for (let k = 0; k < 4; k++) parts.shines.setColorAt(index * 4 + k, color.setHex(0xffffff));
     const bow = BOW[Math.floor(Math.random() * BOW.length)];
     const [upper, accent] = SNEAKERS[Math.floor(Math.random() * SNEAKERS.length)];
     parts.bowKnot.setColorAt(index, color.setHex(bow));
@@ -611,15 +605,12 @@ export function createStudents(parent: THREE.Object3D, count: number) {
       put(parts.ears, slot, at(out, head, sign * 0.175, -0.01, 0, 0, 0, 0, scale.set(0.6, 1, 0.8)));
       put(parts.irises, slot, onFace(ex, ey - 0.006 * (1 - open), 0.0012, 0.026, 0.034 * Math.max(0.08, open)), lidded);
       put(parts.pupils, slot, onFace(ex, ey + 0.002, 0.0022, 0.0135, 0.019 * open), open > 0.4);
-      put(parts.shines, index * 4 + side * 2, onFace(ex - 0.009, ey + 0.013, 0.0032, 0.0085, 0.0095 * open), open > 0.4);
-      put(parts.shines, index * 4 + side * 2 + 1, onFace(ex + 0.01, ey - 0.014, 0.0032, 0.0045, 0.0045 * open), open > 0.4);
       // Lash line hugs the top of the iris, with a flick at the outer corner (bolder for girls); closed, it becomes the lid.
       const lashSize = look.girl ? 0.03 : 0.028;
       put(parts.lashes, slot, onFace(ex, ey + 0.017 * open - 0.008 * (1 - open), 0.0028, sign * lashSize, lashSize * (look.girl ? 1.05 : 0.8) * (0.55 + 0.45 * open)), lidded);
       put(parts.happyEyes, slot, onFace(ex, ey - 0.006, 0.0028, 0.022, 0.02 * squint), !lidded);
       // Brows lift a little when happy; worried, the inner ends rise.
       put(parts.brows, slot, onFace(sign * 0.066, 0.05 + 0.006 * Math.max(smileK, worry), 0.002, 0.048, look.girl ? 0.009 : 0.013, sign * -(0.12 + 0.38 * worry)));
-      put(parts.blush, slot, onFace(sign * 0.105, -0.045, 0.0015, 0.024 * (1 + 0.25 * smileK), 0.015 * (1 + 0.25 * smileK)));
       put(parts.glasses, slot, at(out, head, ex, ey, 0.176), look.glasses);
 
       // Braids fall forward over the shoulders as a plait of alternating segments.
