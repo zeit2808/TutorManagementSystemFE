@@ -1,12 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Archive, ArchiveRestore, CalendarRange, DoorClosed, DoorOpen, Pencil, Search, UserMinus, UserPlus, UsersRound } from "lucide-react";
+import { Archive, ArchiveRestore, BookOpen, CalendarRange, DoorClosed, DoorOpen, Pencil, Search, UserMinus, UserPlus, UsersRound } from "lucide-react";
 import { academicsApi, type ClassStudent, type ScheduleCheck, type Student, type TeachingClass } from "@/lib/api";
 import { useAction, useResource } from "@/lib/hooks/use-resource";
 import { fetchAllPages } from "@/lib/hooks/use-lookups";
 import { formatDateTime, formatPhone } from "@/lib/format";
-import { Badge, Button, ButtonLink, Dialog, EmptyState, ErrorNotice, KeyValue, Meter, Notice, PageHeader, Pagination, Panel, Segmented, SkeletonRows, StateRail, BackButton } from "@/components/ui/primitives";
+import { Badge, Button, ButtonLink, Dialog, EmptyState, ErrorNotice, KeyValue, Meter, Notice, PageHeader, Pagination, Panel, Segmented, SkeletonRows, BackButton } from "@/components/ui/primitives";
 import { ConfirmDialog, ReasonDialog } from "@/components/ui/reason-dialog";
 import { ConflictConfirmDialog, scheduleCheckFrom } from "@/components/ui/conflict-dialog";
 import { ClassEditor } from "./classes";
@@ -68,17 +68,28 @@ export function ClassDetail({ classId }: { classId: string }) {
       <BackButton href={`/centers/${centerId}/classes`}>Tất cả lớp</BackButton>
       <PageHeader
         title={teachingClass.name}
-        description={subject?.name ?? "Môn không xác định"}
         meta={
-          <StateRail
-            label="Vòng đời lớp"
-            current={!teachingClass.isActive ? "archived" : teachingClass.registrationOpen ? "open" : "closed"}
-            steps={[
-              { id: "closed", label: "Hoạt động · đóng đăng ký", tone: "neutral" },
-              { id: "open", label: "Hoạt động · mở đăng ký", tone: "success" },
-              { id: "archived", label: "Đã lưu trữ", tone: "neutral" },
-            ]}
-          />
+          // One row of facts under the class name: its subject, where it stands, and how full it is.
+          <ul className="class-facts" aria-label="Thông tin lớp">
+            <li className="class-fact">
+              <BookOpen aria-hidden="true" />
+              <span className="sr-only">Môn: </span>
+              {subject?.name ?? "Môn không xác định"}
+            </li>
+            <li>
+              {!teachingClass.isActive ? (
+                <Badge tone="neutral" icon={<Archive aria-hidden="true" />}>Đã lưu trữ</Badge>
+              ) : teachingClass.registrationOpen ? (
+                <Badge tone="success" icon={<DoorOpen aria-hidden="true" />}>Đang mở đăng ký</Badge>
+              ) : (
+                <Badge tone="neutral" icon={<DoorClosed aria-hidden="true" />}>Đóng đăng ký</Badge>
+              )}
+            </li>
+            <li className={`class-fact${full ? " is-full" : ""}`}>
+              <UsersRound aria-hidden="true" />
+              {teachingClass.enrolledCount}/{teachingClass.maxStudents} học sinh{full && " · đủ sĩ số"}
+            </li>
+          </ul>
         }
         actions={
           canManage && (
