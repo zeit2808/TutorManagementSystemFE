@@ -371,6 +371,8 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     heels: make(new RoundedBoxGeometry(0.06, 0.05, 0.03, 2, 0.012), materials.upper, 2),
     arms: make(limb(0.045, 0.16), materials.skin, 2),
     sleeves: make(new THREE.CylinderGeometry(0.062, 0.068, 0.1, 10), materials.shirt, 2),
+    // Shoulder of the shirt: a ball over the shoulder joint that turns with the arm, so the top of the arm never shows.
+    shoulders: make(new THREE.SphereGeometry(0.067, 14, 10), materials.shirt, 2),
     hands: make(new THREE.SphereGeometry(0.05, 10, 8), materials.skin, 2),
     neck: make(new THREE.CylinderGeometry(0.05, 0.05, 0.06, 8), materials.skin),
     head: make(new THREE.SphereGeometry(HEAD_R, 24, 18), materials.skin),
@@ -586,6 +588,7 @@ export function createStudents(parent: THREE.Object3D, count: number) {
       const rz = THREE.MathUtils.lerp(sign * THREE.MathUtils.lerp(0.14, 0.05, up) + (isRight ? pose.wave * Math.sin(pose.wavePhase) * 0.5 : 0), -sign * 0.38, read);
       at(joint, torso, sign * (look.girl ? 0.162 : 0.185), 0.55, 0, rx, 0, rz);
       put(parts.sleeves, index * 2 + side, at(out, joint, 0, -0.03, 0));
+      put(parts.shoulders, index * 2 + side, at(out, joint, 0, -0.004, 0));
       put(parts.arms, index * 2 + side, joint);
       put(parts.hands, index * 2 + side, at(out, joint, 0, -0.23, 0));
     }
