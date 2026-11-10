@@ -481,6 +481,7 @@ function SettingsForm({ initial, onSaved }: { initial: FinanceSettings; onSaved:
   const action = useAction();
   const [bankBin, setBankBin] = useState(initial.bankBin ?? "");
   const [password, setPassword] = useState("");
+  const [triedSave, setTriedSave] = useState(false);
   const [account, setAccount] = useState(initial.bankAccountNumber ?? "");
   const [name, setName] = useState(initial.bankAccountName ?? "");
   const [dueDays, setDueDays] = useState(initial.dueDays);
@@ -493,16 +494,20 @@ function SettingsForm({ initial, onSaved }: { initial: FinanceSettings; onSaved:
   const bankChanged = (bankBin || null) !== (initial.bankBin ?? null)
     || (account.trim() || null) !== (initial.bankAccountNumber ?? null)
     || (name.trim().toUpperCase() || null) !== (initial.bankAccountName ?? null);
-  const passwordError = bankChanged && !password ? "Nhập mật khẩu của bạn để đổi tài khoản nhận tiền." : null;
+  const passwordMissing = bankChanged && !password;
+  // Only after a save attempt, so the field does not open already red.
+  const passwordError = triedSave && passwordMissing ? "Nhập mật khẩu của bạn để đổi tài khoản nhận tiền." : null;
 
   async function save() {
-    if (bankError || passwordError) return;
+    setTriedSave(true);
+    if (bankError || passwordMissing) return;
     const result = await action.run(() => financeApi.updateSettings(centerId, {
       bankBin: bankBin || null, bankAccountNumber: account.trim() || null, bankAccountName: name.trim() || null,
       dueDays, emailReminders, expectedVersion: initial.version,
       ...(bankChanged ? { currentPassword: password } : {}),
     }));
     setPassword("");
+    setTriedSave(false);
     if (result) onSaved(result);
   }
 
