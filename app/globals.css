@@ -1257,7 +1257,16 @@ a.side-nav-item:hover svg { transform: translateX(2px); }
 .invite-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
 .invite-list > li { display: grid; gap: 6px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); }
 .invite-code { font-family: var(--font-mono, ui-monospace, monospace); letter-spacing: 0.18em; font-size: var(--text-lg, 1.125rem); }
-.invite-create { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; align-items: end; }
+/* The fields share label / control / hint rows, so the controls line up whether or not a field has a hint;
+   the create button gets a row of its own. */
+.invite-create { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 12px; align-items: start; }
+.invite-create > .field { grid-row: span 3; grid-template-rows: subgrid; gap: 0; row-gap: 6px; }
+.invite-create > .btn { grid-column: 1 / -1; justify-self: start; margin-top: 12px; }
+@media (max-width: 520px) {
+  .invite-create { grid-template-columns: minmax(0, 1fr); row-gap: 12px; }
+  .invite-create > .field { grid-row: auto; grid-template-rows: none; }
+  .invite-create > .btn { margin-top: 0; }
+}
 .plain-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
 .stack-tight { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 4px; }
 .choice-card { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); cursor: pointer; }
