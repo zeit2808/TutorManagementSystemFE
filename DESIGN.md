@@ -121,7 +121,27 @@ Giao diện art-directed trước đây — nền giấy, đường tuyến, doo
 - Nút gọi request (`Button status={useAction().status}`): đang chạy giữ nhãn + spinner và một vạch tiến trình ở đáy; thành công chuyển xanh với dấu ✓ được vẽ ra (~1,6s); lỗi chuyển đỏ, lắc nhẹ (~2,2s) cạnh notice lỗi tại chỗ.
 - Thanh công cụ: mọi control trong `.toolbar` cao chung 36px để nút, select, ô tìm và segmented thẳng mép.
 - Notice trượt vào 260ms, hộp thoại 220ms, chip điểm danh “pop” khi chọn.
+- Menu tài khoản: bảng nổi mở 170ms (mờ dần + trượt 4px + phóng từ 0.98, gốc ở góc trên phải), đóng 130ms; trên điện thoại là tấm trượt từ đáy 240ms kèm lớp phủ mờ.
 - `prefers-reduced-motion`: bỏ mọi chuyển dịch và hiệu ứng tràn, chỉ giữ fade 100–120ms cùng phản hồi màu.
+
+### Chip và menu tài khoản
+
+- `components/ui/account-menu.tsx` là chip duy nhất cho mọi khu vực: thanh đầu khu trung tâm và nền tảng, thanh trên cổng học sinh, trang chọn trung tâm và Cài đặt. Màn hình từ 860px trở xuống chỉ vẽ avatar tròn (khu trung tâm/nền tảng: góc phải hàng đầu sidebar).
+- Menu theo mẫu WAI-ARIA menu button. Thứ tự: thẻ tài khoản (avatar, họ tên hiển thị → tên đăng nhập → email, nhãn vai trò) → trung tâm đang làm việc và "Đổi trung tâm" (chỉ khi có nơi khác để đến) → "Cài đặt" và lối sang khu vực khác theo vai trò → ba lựa chọn giao diện Sáng/Tối/Theo máy (`menuitemradio`, đổi ngay, không đóng menu) → "Đăng xuất" màu đỏ.
+- Bàn phím: Enter/Space/↓ mở và focus mục đầu, ↑ mở và focus mục cuối, ↑/↓/Home/End di chuyển, ←/→ trong hàng giao diện, gõ chữ cái để nhảy; Esc hoặc Tab đóng và trả focus về chip; bấm ra ngoài hoặc đổi trang cũng đóng.
+- Sidebar không còn "Tài khoản & bảo mật"/"Đăng xuất" ở chân: mọi việc về tài khoản đi qua chip.
+
+### Cài đặt `/settings`
+
+- Bố cục kiểu trang cài đặt của mạng xã hội: cột trái 340px gồm thẻ tài khoản và ba nhóm mục (Tài khoản: Hồ sơ cá nhân, Email đăng nhập; Bảo mật: Mật khẩu, Đăng nhập Google, Phiên đăng nhập; Tuỳ chọn: Giao diện), mỗi mục có icon tròn, tên và một dòng mô tả; mục đang mở tô `brand-soft`, icon nền violet. Bên phải là nội dung mục, `/settings` là trang tổng quan có lời chào và ô tóm tắt từng mục.
+- Điện thoại: `/settings` chính là danh sách mục; mỗi mục mở riêng với liên kết "‹ Cài đặt" để quay lại.
+- `/account/security` cũ chuyển hướng về `/settings`.
+
+### Chế độ tối
+
+- `<html data-theme="light|dark">` do script nhỏ trong `<head>` (`lib/theme-script.ts`) đặt trước lần vẽ đầu, theo `localStorage["tm.theme"]` hoặc cài đặt của máy; `lib/theme.ts` cung cấp `useTheme()` và theo dõi khi máy đổi sáng/tối.
+- Mọi màu nằm ở biến trong `:root`; `:root[data-theme="dark"]` định nghĩa lại cùng bộ biến: nền `#0e0f1d`, bề mặt `#161829`, viền `#2a2e47`, chữ `#e7e9f6`, brand `#6c5ff5` (chữ trên brand vẫn trắng), sidebar indigo tối hơn. Không viết mã màu sáng trực tiếp trong rule mới; thêm biến nếu cần sắc độ mới.
+- Biên nhận in giữ nền trắng ở cả hai chế độ.
 
 **Key Characteristics:**
 

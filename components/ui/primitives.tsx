@@ -377,21 +377,3 @@ export function Meter({ value, max, label }: { value: number; max: number; label
     </span>
   );
 }
-
-/**
- * Account chip for the top bar: rounded pill whose border carries a slow
- * travelling light, so the signed-in identity and active role stay noticeable.
- */
-export function UserChip({ name, role, href = "/account/security" }: { name: string; role: string; href?: string }) {
-  const letters = name.replace(/[^\p{L}\p{N}\s]/gu, " ").trim().split(/\s+/).filter(Boolean);
-  const avatar = (letters.length > 1 ? letters.slice(-2).map((part) => part[0]).join("") : (letters[0] ?? "?").slice(0, 2)).toUpperCase();
-  return (
-    <Link className="user-chip" href={href} title="Tài khoản & bảo mật">
-      <span className="user-chip-inner">
-        <span className="user-chip-avatar" aria-hidden="true">{avatar}</span>
-        <span className="user-chip-name">{name}</span>
-        <span className="user-chip-role">{role}</span>
-      </span>
-    </Link>
-  );
-}

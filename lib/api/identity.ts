@@ -5,14 +5,31 @@ import type {
   CenterContext,
   CenterMember,
   CurrentUser,
+  EmailChangeStarted,
   InvitationPreview,
   MemberInvitation,
+  UpdateMyProfileInput,
 } from "./types";
 
 export const identityApi = {
   /** The signed-in account with roles read from the database and linked sign-in methods. */
   me() {
     return apiRequest<CurrentUser>("/me");
+  },
+
+  /** Display name and phone; returns the refreshed account. */
+  updateProfile(input: UpdateMyProfileInput) {
+    return apiRequest<CurrentUser>("/me/profile", { method: "PUT", body: input });
+  },
+
+  /** Step 1 of changing the sign-in email: re-checks the password, mails an 8-digit code to the new address. */
+  requestEmailChange(newEmail: string, currentPassword: string) {
+    return apiRequest<EmailChangeStarted>("/me/email/change", { method: "POST", body: { newEmail, currentPassword } });
+  },
+
+  /** Step 2: the code from the new inbox; returns the account with its new email. */
+  confirmEmailChange(newEmail: string, otp: string) {
+    return apiRequest<CurrentUser>("/me/email/confirm", { method: "POST", body: { newEmail, otp } });
   },
 
   myCenters() {

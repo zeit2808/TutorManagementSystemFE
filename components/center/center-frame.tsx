@@ -1,9 +1,9 @@
 "use client";
 
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from "react";
 import Link from "next/link";
 import { NavLink } from "@/components/ui/nav-link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   BarChart3,
   BookOpen,
@@ -19,7 +19,6 @@ import {
   Inbox,
   LayoutDashboard,
   LoaderCircle,
-  LogOut,
   MessageSquareReply,
   Presentation,
   RefreshCcw,
@@ -29,12 +28,13 @@ import {
   UsersRound,
   WalletCards,
 } from "lucide-react";
-import { ApiError, authApi, getApiErrorMessage, identityApi, payrollApi, type CenterContext, type PayrollStatus } from "@/lib/api";
+import { ApiError, getApiErrorMessage, identityApi, payrollApi, type CenterContext, type PayrollStatus } from "@/lib/api";
 import { useResource } from "@/lib/hooks/use-resource";
 import { FINANCE_ROLES, MANAGEMENT_ROLES, centerStatus, payrollModeLabels, roleLabel } from "@/lib/labels";
 import { initials } from "@/lib/format";
 import { useSessionUser } from "@/lib/auth/session";
-import { UserChip } from "@/components/ui/primitives";
+import { AccountMenu, type AccountMenuCenter } from "@/components/ui/account-menu";
+import { rememberWorkspace } from "@/lib/auth/workspace";
 
 export interface CenterScope {
   centerId: string;
@@ -116,7 +116,6 @@ const upcoming = [
 ];
 
 export function CenterFrame({ centerId, children }: { centerId: string; children: ReactNode }) {
-  const router = useRouter();
   const pathname = usePathname();
   const { user } = useSessionUser();
   const resource = useResource(() => identityApi.centerContext(centerId), [centerId]);
@@ -139,10 +138,10 @@ export function CenterFrame({ centerId, children }: { centerId: string; children
     };
   }, [centerId, resource.data, payroll.data, reloadPayroll]);
 
-  async function logout() {
-    await authApi.logout();
-    router.replace("/login");
-  }
+  const centerName = resource.data?.displayName;
+  useEffect(() => {
+    if (centerName) rememberWorkspace({ href: `/centers/${centerId}`, label: centerName });
+  }, [centerId, centerName]);
 
   if (resource.loading && !scope) {
     return (
@@ -175,15 +174,28 @@ export function CenterFrame({ centerId, children }: { centerId: string; children
 
   const status = centerStatus[scope.context.status] ?? { label: scope.context.status, tone: "neutral" };
   const groups = navGroups(centerId, scope.payroll);
+  const menuCenter: AccountMenuCenter = {
+    name: scope.context.displayName,
+    statusLabel: `Trung tâm ${status.label.toLowerCase()}`,
+    tone: status.tone,
+    canManage: scope.canManage,
+  };
+  const menuLinks = user?.isPlatformAdmin ? [{ href: "/platform", label: "Quản trị nền tảng", icon: ShieldCheck }] : [];
+  const accountMenu = (variant: "full" | "compact") => (
+    <AccountMenu variant={variant} roleLabel={roleLabel(scope.context.role)} center={menuCenter} canSwitchCenter={canSwitch} links={menuLinks} />
+  );
 
   return (
     <CenterScopeContext.Provider value={scope}>
       <div className="app">
         <aside className="sidebar">
-          <Link className="brand" href={`/centers/${centerId}`}>
-            <span className="brand-mark"><BookOpen aria-hidden="true" /></span>
-            <span><strong>Quản Lý Dạy Thêm</strong><small>Vận hành trung tâm</small></span>
-          </Link>
+          <div className="sidebar-head">
+            <Link className="brand" href={`/centers/${centerId}`}>
+              <span className="brand-mark"><BookOpen aria-hidden="true" /></span>
+              <span><strong>Quản Lý Dạy Thêm</strong><small>Vận hành trung tâm</small></span>
+            </Link>
+            <span className="only-narrow">{accountMenu("compact")}</span>
+          </div>
 
           {canSwitch ? (
             <Link className="center-switch" href="/select-center" title="Đổi nơi làm việc">
@@ -241,17 +253,12 @@ export function CenterFrame({ centerId, children }: { centerId: string; children
             </div>
           </nav>
 
-          <div className="sidebar-footer">
-            {user?.isPlatformAdmin && <Link href="/platform"><ShieldCheck aria-hidden="true" />Quản trị nền tảng</Link>}
-            <Link href="/account/security"><UserCog aria-hidden="true" />Tài khoản & bảo mật</Link>
-            <button type="button" onClick={() => void logout()}><LogOut aria-hidden="true" />Đăng xuất</button>
-          </div>
         </aside>
 
         <div className="content">
           <header className="topbar">
             <span className="topbar-center"><Building2 aria-hidden="true" />{scope.context.displayName}</span>
-            <UserChip name={user?.username ?? "Tài khoản"} role={roleLabel(scope.context.role)} />
+            {accountMenu("full")}
           </header>
           <main className="workspace">{children}</main>
         </div>

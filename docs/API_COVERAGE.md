@@ -19,14 +19,16 @@ Front-end chỉ hiện thực các luồng đã có endpoint; module chưa có A
 
 | Luồng nghiệp vụ | Endpoint | Màn hình |
 | --- | --- | --- |
-| Đăng nhập mật khẩu / Google, liên kết Google | `POST auth/login`, `auth/google`, `auth/google/link` | `/login`, `/account/security` |
-| Làm mới, đăng xuất, đăng xuất mọi nơi | `auth/refresh-token`, `auth/logout`, `auth/logout-all` | Tự động, menu tài khoản, `/account/security` |
-| Đổi / quên / đặt lại mật khẩu | `auth/password/change|forgot|reset` | `/account/security`, `/forgot-password`, `/reset-password` |
+| Đăng nhập mật khẩu / Google, liên kết Google | `POST auth/login`, `auth/google`, `auth/google/link` | `/login`, `/settings/google` |
+| Làm mới, đăng xuất, đăng xuất mọi nơi | `auth/refresh-token`, `auth/logout`, `auth/logout-all` | Tự động, menu ở chip tài khoản, `/settings/sessions` |
+| Đổi / quên / đặt lại mật khẩu | `auth/password/change|forgot|reset` | `/settings/password`, `/forgot-password`, `/reset-password` |
 | Xác minh email (tài khoản cũ) | `auth/verify-email`, `auth/resend-verification-email` | `/verify-email` |
 | Nhận lời mời (mọi vai trò): xem trước, tạo tài khoản, hoặc đăng nhập rồi chấp nhận | `auth/invitations/preview`, `auth/invitations/accept`, `me/invitations/accept` | `/accept-invitation?token=` |
 | Thành viên: mời, gửi lại, thu hồi, đổi vai trò, ngừng/khôi phục quyền | `centers/{id}/members`, `centers/{id}/member-invitations` (+ resend/revoke) | `/centers/[id]/members` |
 | Gắn hồ sơ giáo viên với tài khoản; lịch dạy của tôi | `teachers/{id}/account`, `my/teaching` | `/centers/[id]/teachers`, `/centers/[id]/attendance` |
-| Tài khoản hiện tại | `me` (`identityApi.me`) | sẵn sàng cho màn tài khoản |
+| Tài khoản hiện tại (họ tên hiển thị, email, số điện thoại, cách đăng nhập) | `me` (`identityApi.me`, kho chung `lib/auth/account.ts`) | Chip + menu tài khoản, `/settings` |
+| Sửa hồ sơ cá nhân: họ tên hiển thị, số điện thoại | `PUT me/profile` | `/settings/profile` |
+| Đổi email đăng nhập bằng mã 8 số gửi tới email mới | `POST me/email/change`, `POST me/email/confirm` | `/settings/email` |
 | Chọn trung tâm theo membership | `me/centers`, `centers/{id}/context` | `/select-center`, layout trung tâm |
 | Nền tảng: tạo, duyệt, từ chối, sửa & gửi duyệt lại, đình chỉ, khôi phục, lịch sử trạng thái | `platform/centers?status&search&page`, `platform/center-counts`, `platform/centers/{id}` (+ approve/reject/resubmit/suspend/reinstate/history) | `/platform`, `/platform/centers/[id]` |
 | Nền tảng: mời chủ trung tâm, xem lời mời đang mở, gửi lại/thu hồi lời mời chủ | `platform/centers/{id}/invitations` (+ resend/revoke) | `/platform/centers/[id]` |

@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { ThemeWatcher } from "@/lib/theme";
+import { THEME_BOOT_SCRIPT } from "@/lib/theme-script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,8 +14,15 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="vi" suppressHydrationWarning>
-      <body suppressHydrationWarning>{children}</body>
+    <html lang="vi" data-theme="light" suppressHydrationWarning>
+      <head>
+        {/* Applies the saved light/dark choice before the first paint. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+      </head>
+      <body suppressHydrationWarning>
+        <ThemeWatcher />
+        {children}
+      </body>
     </html>
   );
 }

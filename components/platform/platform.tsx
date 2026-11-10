@@ -4,7 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { NavLink } from "@/components/ui/nav-link";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowRight, BookOpen, Building2, Check, Coins, FileClock, Inbox, LoaderCircle, LogOut, Mail, MailPlus, Pause, Pencil, Play, Plus, RefreshCcw, Search, Send, ShieldAlert, UserCog, X } from "lucide-react";
+import { ArrowRight, BookOpen, Building2, Check, Coins, FileClock, Inbox, LoaderCircle, Mail, MailPlus, Pause, Pencil, Play, Plus, RefreshCcw, Search, Send, ShieldAlert, X } from "lucide-react";
 import { ApiError, authApi, identityApi, organizationsApi, type Center, type CenterChangeRequest, type CenterInvitation, type ChangeQueueStatus, type MemberInvitation } from "@/lib/api";
 import { useSessionUser } from "@/lib/auth/session";
 import { useAction, useResource } from "@/lib/hooks/use-resource";
@@ -12,10 +12,12 @@ import { useNow } from "@/lib/hooks/use-now";
 import { formatDateTime } from "@/lib/format";
 import { centerStatus, roleLabel } from "@/lib/labels";
 import { validateEmail, validateOptional, validateRequired, validateTaxCode, validateVietnamMobile } from "@/lib/validation";
-import { Badge, Button, Dialog, UserChip, EmptyState, ErrorNotice, Field, Notice, PageHeader, Pagination, Panel, Segmented, SkeletonRows, BackButton, ButtonLink } from "@/components/ui/primitives";
+import { Badge, Button, Dialog, EmptyState, ErrorNotice, Field, Notice, PageHeader, Pagination, Panel, Segmented, SkeletonRows, BackButton, ButtonLink } from "@/components/ui/primitives";
 import { ConfirmDialog, ReasonDialog } from "@/components/ui/reason-dialog";
 import { ChangeRequestCard, ProfileFacts, StatusHistory, centerLifecycle } from "@/components/center/profile";
 import { PayrollConfigPanel } from "./payroll-config";
+import { AccountMenu } from "@/components/ui/account-menu";
+import { rememberWorkspace } from "@/lib/auth/workspace";
 
 export function PlatformFrame({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -25,6 +27,11 @@ export function PlatformFrame({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (status === "anonymous") router.replace(`/login?next=${encodeURIComponent(pathname)}`);
   }, [pathname, router, status]);
+
+  const isAdmin = Boolean(user?.isPlatformAdmin);
+  useEffect(() => {
+    if (isAdmin) rememberWorkspace({ href: "/platform", label: "Quản trị nền tảng" });
+  }, [isAdmin]);
 
   if (status === "loading" || status === "anonymous") {
     return <main className="standalone-state"><LoaderCircle className="spin" aria-hidden="true" /><h1>Đang kiểm tra quyền quản trị</h1></main>;
@@ -40,18 +47,20 @@ export function PlatformFrame({ children }: { children: ReactNode }) {
     );
   }
 
-  async function logout() {
-    await authApi.logout();
-    router.replace("/login");
-  }
+  const accountMenu = (variant: "full" | "compact") => (
+    <AccountMenu variant={variant} roleLabel="Quản trị nền tảng" links={[{ href: "/select-center", label: "Trung tâm tôi là thành viên", icon: Inbox }]} />
+  );
 
   return (
     <div className="app">
       <aside className="sidebar">
-        <Link className="brand" href="/platform">
-          <span className="brand-mark"><BookOpen aria-hidden="true" /></span>
-          <span><strong>Quản Lý Dạy Thêm</strong><small>Quản trị nền tảng</small></span>
-        </Link>
+        <div className="sidebar-head">
+          <Link className="brand" href="/platform">
+            <span className="brand-mark"><BookOpen aria-hidden="true" /></span>
+            <span><strong>Quản Lý Dạy Thêm</strong><small>Quản trị nền tảng</small></span>
+          </Link>
+          <span className="only-narrow">{accountMenu("compact")}</span>
+        </div>
         <nav className="side-nav" aria-label="Điều hướng nền tảng">
           <div className="side-nav-group">
             <span className="side-nav-label">Nền tảng</span>
@@ -62,15 +71,11 @@ export function PlatformFrame({ children }: { children: ReactNode }) {
             <Link className="side-nav-item" href="/select-center"><Inbox aria-hidden="true" /><span>Trung tâm tôi là thành viên</span></Link>
           </div>
         </nav>
-        <div className="sidebar-footer">
-          <Link href="/account/security"><UserCog aria-hidden="true" />Tài khoản & bảo mật</Link>
-          <button type="button" onClick={() => void logout()}><LogOut aria-hidden="true" />Đăng xuất</button>
-        </div>
       </aside>
       <div className="content">
         <header className="topbar">
           <span className="topbar-center"><ShieldAlert aria-hidden="true" />Phạm vi toàn nền tảng</span>
-          <UserChip name={user.username ?? "Quản trị"} role="Quản trị nền tảng" />
+          {accountMenu("full")}
         </header>
         <main className="workspace">{children}</main>
       </div>

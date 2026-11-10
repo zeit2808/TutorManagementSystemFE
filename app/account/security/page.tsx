@@ -1,5 +1,6 @@
-import { SecuritySettings } from "@/components/auth/security-settings";
+import { redirect } from "next/navigation";
 
+/** The old "Tài khoản & bảo mật" page now lives in Settings. */
 export default function AccountSecurityPage() {
-  return <SecuritySettings />;
+  redirect("/settings");
 }

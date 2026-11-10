@@ -3,13 +3,14 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, BookOpen, LoaderCircle, Building2, LogOut, ShieldAlert, ShieldCheck, UserCog } from "lucide-react";
-import { authApi, identityApi } from "@/lib/api";
+import { ArrowRight, BookOpen, LoaderCircle, Building2, ShieldAlert, ShieldCheck } from "lucide-react";
+import { identityApi } from "@/lib/api";
 import { useSessionUser } from "@/lib/auth/session";
 import { useResource } from "@/lib/hooks/use-resource";
 import { centerStatus, roleLabel } from "@/lib/labels";
 import { initials } from "@/lib/format";
 import { Badge, EmptyState, ErrorNotice, PageHeader, SkeletonRows } from "@/components/ui/primitives";
+import { AccountMenu } from "@/components/ui/account-menu";
 
 export function CenterSelector() {
   const router = useRouter();
@@ -26,10 +27,8 @@ export function CenterSelector() {
     else if (skip && only) router.replace(`/centers/${only.centerId}`);
   }, [only, router, skip, student]);
 
-  async function logout() {
-    await authApi.logout();
-    router.replace("/login");
-  }
+  const roleText = user?.isPlatformAdmin ? "Quản trị nền tảng" : "Thành viên";
+  const adminLinks = user?.isPlatformAdmin ? [{ href: "/platform", label: "Quản trị nền tảng", icon: ShieldCheck }] : [];
 
   if (student) {
     return <main className="standalone-state"><LoaderCircle className="spin" aria-hidden="true" /><h1>Đang mở cổng học sinh</h1></main>;
@@ -43,10 +42,8 @@ export function CenterSelector() {
     <div className="select-page">
       <header className="select-bar">
         <Link className="brand brand-dark" href="/select-center"><span className="brand-mark"><BookOpen aria-hidden="true" /></span><strong>Quản Lý Dạy Thêm</strong></Link>
-        <nav>
-          <Link href="/account/security"><UserCog aria-hidden="true" /><span>{user?.username ?? "Tài khoản"}</span></Link>
-          <button type="button" onClick={() => void logout()}><LogOut aria-hidden="true" /><span>Đăng xuất</span></button>
-        </nav>
+        <span className="only-wide"><AccountMenu roleLabel={roleText} links={adminLinks} /></span>
+        <span className="only-narrow"><AccountMenu variant="compact" roleLabel={roleText} links={adminLinks} /></span>
       </header>
       <main className="select-main">
         <PageHeader title="Chọn nơi làm việc" description="Vai trò được áp dụng riêng cho từng trung tâm. Trung tâm bị đình chỉ vẫn hiện để bạn biết lý do không vào được." />
