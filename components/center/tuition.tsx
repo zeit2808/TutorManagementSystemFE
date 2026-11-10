@@ -22,8 +22,9 @@ import { Badge, Button, Dialog, EmptyState, ErrorNotice, Field, Notice, PageHead
 import { ReasonDialog } from "@/components/ui/reason-dialog";
 import { RoleGate, useCenter } from "./center-frame";
 import { AutoPayTab, TransfersTab } from "./payments";
+import { ReconciliationTab } from "./payment-ops";
 
-type Tab = "charges" | "receipts" | "transfers" | "fees" | "autopay" | "settings";
+type Tab = "charges" | "receipts" | "transfers" | "fees" | "autopay" | "reconcile" | "settings";
 
 /** Tuition for the center (docs/HOC-PHI.md): who owes what, receipts, class fees and settings. */
 export function TuitionWorkspace() {
@@ -50,7 +51,7 @@ function Inner() {
             { value: "receipts", label: "Biên lai" },
             { value: "transfers", label: "Chuyển khoản" },
             { value: "fees", label: "Học phí lớp" },
-            ...(canManage ? [{ value: "autopay" as const, label: "Thanh toán tự động" }] : []),
+            ...(canManage ? [{ value: "autopay" as const, label: "Thanh toán tự động" }, { value: "reconcile" as const, label: "Đối soát" }] : []),
             { value: "settings", label: "Cài đặt" },
           ]} />
         }
@@ -65,6 +66,7 @@ function Inner() {
       {tab === "receipts" && <ReceiptsTab onChanged={refresh} onOpenTransfers={() => setTab("transfers")} />}
       {tab === "transfers" && <TransfersTab onChanged={refresh} />}
       {tab === "autopay" && canManage && <AutoPayTab />}
+      {tab === "reconcile" && canManage && <ReconciliationTab />}
       {tab === "fees" && <FeesTab onChanged={refresh} />}
       {tab === "settings" && <SettingsTab />}
     </>

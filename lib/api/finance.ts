@@ -11,7 +11,11 @@ import type {
   MyTuition,
   PaymentIntent,
   PaymentMethod,
+  PaymentAlert,
+  PaymentAlertState,
+  PaymentMetrics,
   PaymentProvider,
+  ReconciliationRun,
   PaymentProviderMode,
   Receipt,
   ShadowReport,
@@ -113,6 +117,27 @@ export const financeApi = {
   },
   resolveHeldTransfer(centerId: Guid, transferId: Guid, input: { isDuplicate: boolean; reason: string; expectedVersion: number }) {
     return apiRequest<BankTransfer>(`/centers/${centerId}/bank-transactions/${transferId}/resolve-held`, { method: "POST", body: input });
+  },
+  // ---------------- reconciliation and alerts (Đợt 5) ----------------
+  reconciliations(centerId: Guid, query: { page?: number; pageSize?: number } = {}) {
+    return apiRequest<TuitionPage<ReconciliationRun>>(`/centers/${centerId}/tuition/payment-provider/reconciliations`, { query });
+  },
+  reconciliation(centerId: Guid, runId: Guid) {
+    return apiRequest<ReconciliationRun>(`/centers/${centerId}/tuition/payment-provider/reconciliations/${runId}`);
+  },
+  /** Owner: reconcile now; the Worker starts within half a minute. */
+  reconcileNow(centerId: Guid) {
+    return apiRequest<boolean>(`/centers/${centerId}/tuition/payment-provider/reconciliations`, { method: "POST" });
+  },
+  paymentAlerts(centerId: Guid, state: PaymentAlertState | "All" = "Open") {
+    return apiRequest<PaymentAlert[]>(`/centers/${centerId}/tuition/payment-provider/alerts`, { query: { state } });
+  },
+  /** Owner: seen; no more reminders. */
+  acknowledgeAlert(centerId: Guid, alertId: Guid) {
+    return apiRequest<PaymentAlert>(`/centers/${centerId}/tuition/payment-provider/alerts/${alertId}/acknowledge`, { method: "POST" });
+  },
+  paymentMetrics(centerId: Guid, days = 7) {
+    return apiRequest<PaymentMetrics>(`/centers/${centerId}/tuition/payment-provider/metrics`, { query: { days } });
   },
   retryTransfer(centerId: Guid, transferId: Guid, expectedVersion: number) {
     return apiRequest<BankTransfer>(`/centers/${centerId}/bank-transactions/${transferId}/retry`, { method: "POST", body: { expectedVersion } });

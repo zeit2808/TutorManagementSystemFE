@@ -835,6 +835,81 @@ export interface BankTransfer {
   version: number;
 }
 
+export interface ReconciliationFinding {
+  kind: string;
+  bankTransactionId: Guid | null;
+  receiptId: Guid | null;
+  deliveryId: Guid | null;
+  amount: number | null;
+  detail: string;
+}
+
+/** One nightly (02:00) or manual reconciliation of the last 3 days (docs/THANH-TOAN-QR-KE-HOACH.md, Đợt 5). */
+export interface ReconciliationRun {
+  id: Guid;
+  trigger: "Nightly" | "Manual";
+  status: "Completed" | "ScanFailed";
+  error: string | null;
+  windowFromUtc: string;
+  windowToUtc: string;
+  startedAtUtc: string;
+  finishedAtUtc: string;
+  scannedCount: number;
+  missedCount: number;
+  changedCount: number;
+  incomingTotal: number;
+  bookedTotal: number;
+  bookedReceiptTotal: number;
+  pendingTotal: number;
+  failedTotal: number;
+  ignoredTotal: number;
+  totalsAgree: boolean;
+  findingCount: number;
+  findings: ReconciliationFinding[];
+}
+
+export type PaymentAlertState = "Open" | "Acknowledged" | "Resolved";
+
+export interface PaymentAlert {
+  id: Guid;
+  kind: string;
+  title: string;
+  detail: string;
+  state: PaymentAlertState;
+  firstSeenAtUtc: string;
+  lastSeenAtUtc: string;
+  resolvedAtUtc: string | null;
+  acknowledgedAtUtc: string | null;
+}
+
+export interface PaymentMetrics {
+  days: number;
+  fromUtc: string;
+  toUtc: string;
+  doorbells: number;
+  doorbellsRedelivered: number;
+  doorbellsByHour: number[];
+  invalidSignatureTotal: number;
+  lastInvalidSignatureAtUtc: string | null;
+  transfers: number;
+  transferAmount: number;
+  byStatus: Record<string, number>;
+  byFetchedBy: Record<string, number>;
+  seenAgain: number;
+  receiptConflicts: number;
+  manualAssigned: number;
+  manualIgnored: number;
+  manualRetried: number;
+  latencyP50Seconds: number | null;
+  latencyP95Seconds: number | null;
+  latencyMaxSeconds: number | null;
+  oldestReceivedSeconds: number | null;
+  openAlerts: number;
+  lastReconciledAtUtc: string | null;
+  lastReconciliationStatus: string | null;
+  lastReconciliationFindings: number | null;
+}
+
 export interface TuitionPage<T> {
   page: number;
   pageSize: number;

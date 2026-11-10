@@ -357,6 +357,14 @@ a.side-nav-item { position: relative; isolation: isolate; overflow: hidden; }
 /* One bounded column: wide children (tables) scroll inside their own panel instead of stretching the stack past the page. */
 .stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
 .stack > *, .detail-grid > *, .dashboard-grid > * { min-width: 0; }
+.alert-list { display: grid; gap: 0; }
+.alert-item { display: grid; gap: 6px; padding: 12px 18px; border-bottom: 1px solid var(--line); }
+.alert-item:last-child { border-bottom: 0; }
+.alert-item .row-between p { display: flex; align-items: center; gap: 6px; }
+.inline-icon { width: 16px; height: 16px; color: var(--muted); }
+.hour-bars { display: flex; align-items: flex-end; gap: 2px; height: 64px; margin-top: 6px; }
+.hour-bars span { flex: 1; min-width: 3px; background: var(--brand); border-radius: 2px 2px 0 0; }
+.hour-bars span.is-empty { background: var(--line); }
 .badge-row { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 16px; }
 .row-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 
