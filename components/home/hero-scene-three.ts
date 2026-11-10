@@ -273,6 +273,13 @@ function makeRuler(kit: Kit) {
 
 /* ───────── Scene ───────── */
 
+/** Eyes shut for about 0.15 s every few seconds, each student on a rhythm of their own. */
+function blinkAt(time: number, seed: number) {
+  const period = 3.2 + (seed % 2.3);
+  const t = (time + seed) % period;
+  return t < 0.15 ? Math.sin((t / 0.15) * Math.PI) : 0;
+}
+
 export function mountHeroScene(container: HTMLElement, options: { reduced: boolean; onReady: () => void }) {
   const { reduced } = options;
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "low-power" });
@@ -691,6 +698,8 @@ export function mountHeroScene(container: HTMLElement, options: { reduced: boole
         wavePhase: student.wavePhase,
         badge,
         late: student.late,
+        // The still frame for reduced motion keeps every eye open.
+        blink: reduced ? 0 : blinkAt(time, student.seed),
       });
     });
     rig.commit();
