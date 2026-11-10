@@ -305,7 +305,7 @@ export function createStudents(parent: THREE.Object3D, count: number) {
   const hairNape = new THREE.SphereGeometry(0.191, 24, 6, Math.PI * 1.0, Math.PI, Math.PI * 0.3, Math.PI * 0.26);
   // Long hair worn loose, clumped with a scalloped hem; and a chin-length bob whose ends curl in.
   const longHair = curtainGeometry(0.192, 0.24, 0.46, Math.PI * 0.36, Math.PI * 1.28, 13, 0.05, 0);
-  const bob = curtainGeometry(0.188, 0.215, 0.24, Math.PI * 0.27, Math.PI * 1.46, 15, 0.02, 0.035);
+  const bob = curtainGeometry(0.19, 0.215, 0.29, Math.PI * 0.27, Math.PI * 1.46, 15, 0.02, 0.035);
   const shadowGeo = new THREE.CircleGeometry(0.26, 20);
   shadowGeo.rotateX(-Math.PI / 2);
   const skirt = new THREE.CylinderGeometry(0.13, 0.215, 0.16, 12);
@@ -612,10 +612,11 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     // Book: held open between the hands, tilted so the pages face the eyes; it grows in as the arms come up.
     const book = at(joint, torso, 0, 0.53, 0.24, 0.8, 0, 0, Math.max(0.001, read) * 1.35);
     const shut = read > 0.02;
+    // The left half is the right half turned over end to end (about z), so its pages still face the reader.
     put(parts.bookCovers, index * 2, at(out, book, 0, 0, 0, 0, 0.35, 0), shut);
-    put(parts.bookCovers, index * 2 + 1, at(out, book, 0, 0, 0, 0, Math.PI - 0.35, 0), shut);
+    put(parts.bookCovers, index * 2 + 1, at(out, book, 0, 0, 0, 0, -0.35, Math.PI), shut);
     put(parts.bookPages, index * 2, at(out, book, 0, 0, 0, 0, 0.35, 0), shut);
-    put(parts.bookPages, index * 2 + 1, at(out, book, 0, 0, 0, 0, Math.PI - 0.35, 0), shut);
+    put(parts.bookPages, index * 2 + 1, at(out, book, 0, 0, 0, 0, -0.35, Math.PI), shut);
     const page = THREE.MathUtils.clamp(pose.page ?? 0, 0, 1);
     put(parts.bookLeaf, index, at(out, book, 0, 0, 0, 0, THREE.MathUtils.lerp(0.35, Math.PI - 0.35, page), 0), shut && page > 0 && page < 1);
 
@@ -685,7 +686,7 @@ export function createStudents(parent: THREE.Object3D, count: number) {
     put(parts.hairNape, index, head, !look.girl);
     // Loose long hair sways a little behind the walk; the bob sits close around the jaw.
     put(parts.longHair, index, at(out, head, 0, -0.25, -0.01, Math.abs(swing) * 0.08), look.style === "long");
-    put(parts.bob, index, at(out, head, 0, -0.072, -0.004, Math.abs(swing) * 0.04), look.style === "bob");
+    put(parts.bob, index, at(out, head, 0, -0.05, -0.004, Math.abs(swing) * 0.04), look.style === "bob");
 
     const sway = Math.abs(swing) * 0.1;
     const lockList = fringes[index];
