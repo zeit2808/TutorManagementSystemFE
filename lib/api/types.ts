@@ -514,11 +514,26 @@ export interface AcceptedInvitation {
 export interface CurrentUser {
   id: Guid;
   username?: string | null;
+  /** Optional name the account owner chose; clients fall back to the username, then the email. */
+  displayName?: string | null;
   email: string;
+  /** Stored as +84…; null only for student (Google) accounts. */
+  phoneNumber?: string | null;
   emailVerified: boolean;
   roles: string[];
   hasPassword: boolean;
   hasGoogle: boolean;
+}
+
+export interface UpdateMyProfileInput {
+  displayName: string | null;
+  phoneNumber: string | null;
+}
+
+export interface EmailChangeStarted {
+  newEmail: string;
+  expiresAtUtc: IsoDateTime;
+  resendAvailableAtUtc: IsoDateTime;
 }
 
 export type CenterMemberRole = "CenterOwner" | "CenterAdmin" | "Teacher" | "Staff";

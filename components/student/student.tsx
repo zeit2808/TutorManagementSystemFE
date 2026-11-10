@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowRight, BookOpen, CalendarDays, ChevronDown, ChevronLeft, ChevronRight, ClipboardList, GraduationCap, LoaderCircle, LogOut, School, Search, Send, ShieldAlert, UserCog, Users, WalletCards } from "lucide-react";
-import { academicsApi, authApi, type ClassApplication, type DirectoryCenter, type DirectoryClass, type OpenClass } from "@/lib/api";
+import { ArrowRight, BookOpen, CalendarDays, ChevronDown, ChevronLeft, ChevronRight, ClipboardList, GraduationCap, LoaderCircle, School, Search, Send, ShieldAlert, Users, WalletCards } from "lucide-react";
+import { academicsApi, type ClassApplication, type DirectoryCenter, type DirectoryClass, type OpenClass } from "@/lib/api";
 import { useSessionUser } from "@/lib/auth/session";
 import { useAction, useResource } from "@/lib/hooks/use-resource";
 import { useNow } from "@/lib/hooks/use-now";
@@ -13,6 +13,8 @@ import { applicationStatus } from "@/lib/labels";
 import { validateName, validateVietnamMobile } from "@/lib/validation";
 import { Badge, Button, EmptyState, ErrorNotice, Field, Meter, Notice, PageHeader, Pagination, Panel, Segmented, SkeletonRows, BackButton } from "@/components/ui/primitives";
 import { ConflictList } from "@/components/ui/conflict-dialog";
+import { AccountMenu } from "@/components/ui/account-menu";
+import { rememberWorkspace } from "@/lib/auth/workspace";
 
 const RECENT_KEY = "tm.student.recentCenters";
 const GUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
@@ -45,6 +47,11 @@ export function StudentFrame({ children }: { children: ReactNode }) {
     if (status === "anonymous") router.replace(`/login?next=${encodeURIComponent(pathname)}`);
   }, [pathname, router, status]);
 
+  const isStudent = Boolean(user?.isStudent);
+  useEffect(() => {
+    if (isStudent) rememberWorkspace({ href: "/student", label: "Cổng học sinh" });
+  }, [isStudent]);
+
   if (status !== "ready") return <main className="standalone-state"><LoaderCircle className="spin" aria-hidden="true" /><h1>Đang mở cổng học sinh</h1></main>;
   if (!user?.isStudent) {
     return (
@@ -59,11 +66,6 @@ export function StudentFrame({ children }: { children: ReactNode }) {
     );
   }
 
-  async function logout() {
-    await authApi.logout();
-    router.replace("/login");
-  }
-
   return (
     <div className="student-app">
       <header className="student-bar">
@@ -72,9 +74,9 @@ export function StudentFrame({ children }: { children: ReactNode }) {
           <Link href="/student" aria-current={pathname === "/student" ? "page" : undefined}><CalendarDays aria-hidden="true" /><span>Lịch học</span></Link>
           <Link href="/student/find" aria-current={pathname.startsWith("/student/find") || pathname.startsWith("/student/centers") ? "page" : undefined}><Search aria-hidden="true" /><span>Đăng ký học</span></Link>
           <Link href="/student/tuition" aria-current={pathname.startsWith("/student/tuition") ? "page" : undefined}><WalletCards aria-hidden="true" /><span>Học phí</span></Link>
-          <Link href="/account/security"><UserCog aria-hidden="true" /><span>Tài khoản</span></Link>
-          <button type="button" onClick={() => void logout()}><LogOut aria-hidden="true" /><span>Đăng xuất</span></button>
         </nav>
+        <span className="only-wide"><AccountMenu roleLabel="Học sinh" /></span>
+        <span className="only-narrow"><AccountMenu variant="compact" roleLabel="Học sinh" /></span>
       </header>
       <main className="student-main">{children}</main>
     </div>
