@@ -16,7 +16,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   return (
     <AuthShell
       title="Đăng nhập"
-      description="Chủ trung tâm, quản lý và nhân viên dùng tên đăng nhập. Học sinh dùng Google."
+      description="Đăng nhập bằng tên đăng nhập và mật khẩu, hoặc bằng Google. Học sinh dùng Google; nhân sự trung tâm dùng được Google sau khi đã liên kết."
       footer={<><span>Có email mời mở trung tâm?</span><ButtonLink size="sm" variant="soft" href="/accept-invitation" icon={<MailOpen aria-hidden="true" />}>Tạo tài khoản từ lời mời</ButtonLink></>}
     >
       {success && <Notice tone="success">{success}</Notice>}
@@ -26,7 +26,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
         </Notice>
       )}
       <LoginForm nextPath={nextPath} />
-      <div className="divider"><span>Học sinh</span></div>
+      <div className="divider"><span>Hoặc đăng nhập bằng Google</span></div>
       <GoogleLoginButton nextPath={nextPath} />
     </AuthShell>
   );

@@ -703,6 +703,8 @@ a.side-nav-item { position: relative; isolation: isolate; overflow: hidden; }
 .divider { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: var(--text-xs); font-weight: 600; }
 .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 .google-slot { display: flex; justify-content: center; min-height: 44px; }
+.auth-google-hint { display: grid; gap: 6px; margin: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-2); color: var(--muted); font-size: var(--text-xs); line-height: 1.5; list-style: none; }
+.auth-google-hint strong { color: var(--text-2); font-weight: 600; }
 .inline-status { display: flex; align-items: center; gap: 8px; font-size: var(--text-sm); }
 .inline-status svg { width: 16px; height: 16px; }
 .inline-icon { width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; }
