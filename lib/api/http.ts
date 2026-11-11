@@ -91,6 +91,25 @@ export function setAccessToken(tokens: TokenResponse) {
 export function clearAccessToken() {
   session = null;
   notifySession();
+  notifyDataChanged(null);
+}
+
+/**
+ * Client caches subscribe here. A successful write reports its path; `null` means "forget everything"
+ * (signed out or switched account), so one user's cached data never shows for the next.
+ */
+type DataChangeListener = (path: string | null) => void;
+const dataChangeListeners = new Set<DataChangeListener>();
+
+export function onDataChanged(listener: DataChangeListener) {
+  dataChangeListeners.add(listener);
+  return () => {
+    dataChangeListeners.delete(listener);
+  };
+}
+
+function notifyDataChanged(path: string | null) {
+  for (const listener of dataChangeListeners) listener(path);
 }
 
 export function hasLiveAccessToken() {
@@ -187,6 +206,8 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
   }
 
   if (!response.ok || (envelope && !envelope.success)) throw errorFrom(response, envelope);
+  const method = (fetchOptions.method ?? "GET").toUpperCase();
+  if (method !== "GET" && method !== "HEAD") notifyDataChanged(path);
   return (envelope?.data ?? undefined) as T;
 }
 

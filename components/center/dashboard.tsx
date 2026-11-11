@@ -4,7 +4,7 @@ import { ArrowRight, CalendarClock, ClipboardCheck, Inbox, MessageSquareReply, P
 import { academicsApi, organizationsApi } from "@/lib/api";
 import { useResource } from "@/lib/hooks/use-resource";
 import { useNow } from "@/lib/hooks/use-now";
-import { loadCenterLookups } from "@/lib/hooks/use-lookups";
+import { invalidateCenterLookups, loadCenterLookups } from "@/lib/hooks/use-lookups";
 import { addDays, formatTimeRange, formatWeekday, formatDayMonth, isSameLocalDay, startOfDay } from "@/lib/format";
 import { Badge, Button, ButtonLink, EmptyState, ErrorNotice, PageHeader, Panel, SkeletonRows } from "@/components/ui/primitives";
 import { useCenter } from "./center-frame";
@@ -29,6 +29,11 @@ export function CenterDashboard() {
   }, [centerId, canManage, isOwner]);
 
   const data = resource.data;
+  // "Làm mới" must show the latest class counts, not the shared lookup copy.
+  const refresh = () => {
+    invalidateCenterLookups(centerId);
+    void resource.reload();
+  };
   const today = new Date(now);
   const days = Array.from({ length: 7 }, (_, index) => addDays(startOfDay(today), index));
 
@@ -44,12 +49,12 @@ export function CenterDashboard() {
         description={data ? `${data.profile.displayName} · ${data.profile.address}` : context.displayName}
         actions={
           <>
-            <Button icon={<RefreshCcw aria-hidden="true" />} onClick={() => void resource.reload()} pending={resource.loading && Boolean(data)}>Làm mới</Button>
+            <Button icon={<RefreshCcw aria-hidden="true" />} onClick={refresh} pending={resource.loading && Boolean(data)}>Làm mới</Button>
             {canManage && <ButtonLink variant="primary" href={`/centers/${centerId}/attendance`} icon={<ClipboardCheck aria-hidden="true" />}>Mở điểm danh</ButtonLink>}
           </>
         }
       />
-      <ErrorNotice error={resource.error} onReload={() => void resource.reload()} />
+      <ErrorNotice error={resource.error} onReload={refresh} />
 
       <div className="dashboard-grid">
         <Panel title="Lịch 7 ngày tới" description="Buổi học theo ngày, gồm cả buổi đã hủy" flush actions={<ButtonLink size="sm" variant="soft" href={`/centers/${centerId}/schedule`} trailing={<ArrowRight aria-hidden="true" />}>Mở lịch dạy</ButtonLink>}>
