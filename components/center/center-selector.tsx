@@ -14,8 +14,12 @@ import { AccountMenu } from "@/components/ui/account-menu";
 
 export function CenterSelector() {
   const router = useRouter();
-  const { user } = useSessionUser();
+  const { user, status } = useSessionUser();
   const centers = useResource(() => identityApi.myCenters(), []);
+  // Signed out (or the session expired): go to sign-in like every other screen, instead of a page of skeletons.
+  useEffect(() => {
+    if (status === "anonymous") router.replace(`/login?next=${encodeURIComponent("/select-center")}`);
+  }, [router, status]);
 
   // A member of exactly one center with no platform role has nothing to choose.
   const only = centers.data?.length === 1 ? centers.data[0] : null;

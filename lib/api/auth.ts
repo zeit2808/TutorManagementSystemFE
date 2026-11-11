@@ -118,7 +118,9 @@ export const authApi = {
 
   async logout() {
     try {
-      await apiRequest<void>("/auth/logout", { method: "POST", auth: "none" });
+      // Signing out must not hang on a stalled server: after a few seconds the browser forgets the session
+      // anyway and the login page explains that the server may not have ended it.
+      await apiRequest<void>("/auth/logout", { method: "POST", auth: "none", signal: AbortSignal.timeout(8_000) });
     } finally {
       clearAccessToken();
     }
