@@ -91,10 +91,14 @@ export function GoogleLoginButton({ nextPath }: { nextPath?: string }) {
   return (
     <div className="stack">
       <GoogleButton onCredential={(token) => void signIn(token)} />
+      <ul className="auth-google-hint">
+        <li><strong>Học sinh:</strong> lần đầu đăng nhập Google sẽ tạo tài khoản học sinh.</li>
+        <li><strong>Chủ trung tâm, quản lý, giáo viên, nhân viên:</strong> dùng được Google sau khi đăng nhập bằng mật khẩu và liên kết ở <strong>Cài đặt → Đăng nhập Google</strong>.</li>
+      </ul>
       {action.pending && <p className="col-muted inline-status"><LoaderCircle className="spin" aria-hidden="true" />Đang xác thực với Google…</p>}
       {linkRequired ? (
         <Notice tone="warning" title="Email này đã thuộc một tài khoản nhân sự">
-          Nếu đây là tài khoản của bạn (chủ trung tâm, quản lý, giáo viên): đăng nhập bằng tên đăng nhập và mật khẩu ở trên, rồi vào <strong>Tài khoản &amp; bảo mật → Liên kết Google</strong> để lần sau vào bằng Google. Nếu bạn là học sinh: hãy dùng một tài khoản Google khác.
+          Nếu đây là tài khoản của bạn (chủ trung tâm, quản lý, giáo viên): đăng nhập bằng tên đăng nhập và mật khẩu ở trên, rồi vào <strong>Cài đặt → Đăng nhập Google</strong> để liên kết, lần sau vào bằng Google. Nếu bạn là học sinh: hãy dùng một tài khoản Google khác.
         </Notice>
       ) : (
         <ErrorNotice error={action.error} />
